@@ -1,0 +1,125 @@
+#!/bin/bash
+#global variables
+proccess=$2
+proccessCount=0
+fprlist=`mktemp prlst.XXXXX`
+lineOfFprlist=1
+host=.informatik.htw-dresden.de
+#colors
+REDCOLOR='\033[0;31m'
+GREENCOLOR='\033[0;32m'
+NC='\033[0m'
+#scipt ending
+scrEndErr() {
+        echo -e "$1"
+        echo "ending the script"
+        rm $fprlist
+        exit 1
+}
+#checks status of host
+hostCheck() {
+    hostTmp=$1$host
+    ping $hostTmp -c1 -W1 &> /dev/null
+    #check success
+    if [ $? -eq 0 ]; then
+        echo -e "${GREENCOLOR}online${NC}: $hostTmp"
+        arrComputerNames[$2]=$1 
+        return 1
+    else
+        echo -e "${REDCOLOR}offline${NC}: $hostTmp"
+        return 0
+    fi
+}
+#checks all computers in labor
+computersCheck() {
+    if [ $(($3-$2)) -ne 0 ]; then
+        echo "checking status of $1{$2..$3}$host ..."
+    else
+        echo "checking status of $1$2$host ..."
+    fi
+    count=0
+    #get availble computers
+    for (( i=$2; $i <= $3; i++ ))
+    do
+        hostCheck $1$i count
+        let count=$count+$? 
+    done
+    if [ $count -eq 0 ]; then
+        scrEndErr "there are ${REDCOLOR}no online${NC} computers"
+    fi
+    #get proccesses from availble computers
+    for computer in ${arrComputerNames[@]}
+    do
+        ftmp=`mktemp fpidlogintmp.XXXXX`
+        echo
+        getProccess $computer $ftmp\
+        rm $ftmp
+        if [ $? -eq 1 ]; then
+            let count=$count-1
+        fi
+    done
+    echo
+    #check of variables
+    if [ $count -eq 0 ]; then
+        scrEndErr "there are ${REDCOLOR}no computers with booted Linux${NC}"
+    elif [ $proccessCount -eq 0 ]; then
+        scrEndErr "there are ${REDCOLOR}no proccess \"$proccess\" found${NC}"
+    fi
+    echo ":proccess count:$proccessCount::" >> $fprlist
+    return 0;
+}
+#analyse proccess on availble servers
+getProccess() {
+    echo ">>getting <PID> <login> <real name> of $proccess"
+    filetemp=$2
+    echo "connect to \"$1$host\""
+    #awk '$1=$1' to cut spaces off
+    #get proccesses and logins
+    ssh -o "StrictHostKeyChecking no" $1 ps -eo pid,comm,user | grep "$proccess" | awk '$1=$1' | cut -d' ' -f1,3 > $filetemp 
+    if [ $? -ne 0 ]; then
+        echo -e "${REDCOLOR}Linux isn't booted${NC} on computer $1"
+        return 1
+    fi
+    lineOfFprlist=1
+    # get real names for logins
+    while read line
+    do 
+        #get NKZ
+        line=`echo $line | grep -o "[[:alnum:]]*$"`
+        #get real name
+        name=`finger -M $line | grep -o "Name: .*$" | cut -d':' -f2 | awk '$1=$1'`
+        #insert on line i
+        sed -i "${lineOfFprlist}s/$/ $name/" $filetemp
+        let lineOfFprlist=$lineOfFprlist+1
+    done < <(cat "$filetemp")
+    if [ $lineOfFprlist -eq 1 ]; then
+        echo -e "proccess ${REDCOLOR}not found${NC} on computer $1"
+        return 2
+    fi
+    let lineOfFprlist=$lineOfFprlist-1
+    let proccessCount=$proccessCount+$lineOfFprlist
+    echo ":$lineOfFprlist:$1::" >> $fprlist
+    cat "$filetemp" >> $fprlist
+    echo -e "${GREENCOLOR}copied${NC} from $filetemp to $fprlist"s
+    return 0
+}
+#checks parameters
+if [ $# -ne 2 ]; then
+    echo "usage: $0 <computer/labor> <proccess>"
+    exit 1
+fi
+#main
+#choose computer/labor
+case $1 in 
+    "Z136c") computersCheck "isys" 101 123 ;;
+    "Z146a") computersCheck "isys" 1 22 ;;
+    *)  #devide string to form <com> <num> 
+        cnum=`echo "$1" | grep -o "[[:digit:]]*"`
+        cname=`echo "$1" | grep -o "[[:alpha:]]*"`
+        computersCheck $cname $cnum $cnum ;;
+esac
+#output the list
+cat $fprlist
+rm $fprlist
+#end
+exit 0
