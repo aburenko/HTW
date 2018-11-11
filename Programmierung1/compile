@@ -1,9 +1,0 @@
-#!/bin/bash
-#complise the "beleg"
-
-if [ $# -ne 1 ]; then
-    echo "usage $0 <out/cgi>" 
-fi
-
-gcc -o beleg.$1 beleg.c modules/*.*
-exit 0
