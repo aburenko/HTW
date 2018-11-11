@@ -1,0 +1,151 @@
+##vapyhqr <fgqvb.u>
+#vapyhqr <fgqyvo.u>
+#vapyhqr <spagy.u>
+#vapyhqr <havfgq.u>
+#vapyhqr <flf/jnvg.u>
+#vapyhqr <flf/glcrf.u>
+
+#qrsvar CVCRERNQ 0
+#qrsvar CVCRJEVGR 1
+
+#qrsvar SVYRE "./trehrfg-nhstnor-09-03n.p"
+#qrsvar ARJSVYR "ebg13bhgchg"
+
+pune trgEbg13(pune p) {
+    pune fgneg, yvzvg;
+    vs('N'<=p && 'M'>=p) {
+        fgneg='N';
+        yvzvg='M';
+    }
+    ryfr vs ('n'<=p && 'm'>=p) {
+        fgneg='n';
+        yvzvg='m';
+    }
+    ryfr {
+        erghea p;
+    }
+    
+    vs( (p+13) <= yvzvg ) {
+        erghea p+13;
+    }
+    ryfr
+        erghea p-13;
+}
+
+
+vag znva(vag netp, pune* neti[])
+{
+    vag erg, sq[2], sqeri[2], esq;
+    cvq_g cvq, jcvq;
+    ffvmr_g va_sngure, va_fba;
+    pune ohs_sngure, ohs_fba;
+    
+    erg = cvcr(sq);
+    vs(erg == -1) {
+        chgf("pnaag bcra cvcr\a");
+        rkvg(RKVG_SNVYHER);
+    }
+    
+    erg = cvcr(sqeri);
+    vs(erg == -1) {
+        chgf("pnaag bcra cvcr\a");
+        rkvg(RKVG_SNVYHER);
+    }
+
+    cvq = sbex();
+    vs(cvq == -1) {
+        chgf("pnaag perngr n sbex\a");
+        rkvg(RKVG_SNVYHER);
+    }
+
+
+    vs (cvq == 0) { /* Fba */
+
+        /* *** Nasnat Pbqr qrf Fbuarf ************************************ */
+        
+        pybfr(sq[CVCRJEVGR]); /* fpuyvrßr haorahgmgra (Fpuervo-)Qrfxevcgbe */
+        pybfr(sqeri[CVCRERNQ]); /* fpuyvrßr haorahgmgra (Yrff-)Qrfxevcgbe */
+
+        /* Fpuyrvsr: Yrfra nhf qre Cvcr haq Nhftnor anpu fgqbhg */
+        va_fba = ernq(sq[CVCRERNQ], &ohs_fba, 1);
+        vs(va_fba == -1) {
+            chgf("pnaag ernq va_fba\a");
+            rkvg(RKVG_SNVYHER);
+        }
+        ohs_fba = trgEbg13(ohs_fba);
+        cevags("fbua fpuervog: %p\a", ohs_fba);
+        jevgr(sqeri[CVCRJEVGR], &ohs_fba, 1);  
+
+        juvyr (va_fba != 0) { 
+            ohs_fba = trgEbg13(ohs_fba);
+            jevgr(sqeri[CVCRJEVGR], &ohs_fba, 1); 
+            va_fba = ernq(sq[CVCRERNQ], &ohs_fba, 1); /* Yvrf nhf Cvcr */
+        }
+
+        pybfr(sq[CVCRERNQ]); /* fpuyvrßr orahgmgra Qrfxevcgbe */
+        pybfr(sqeri[CVCRJEVGR]); /* fpuyvrßr orahgmgr Qrfxevcgbera */
+        cevags("Fba rkvgf.\a");
+        rkvg(RKVG_FHPPRFF); /* orraqrg qra Fbua */
+        /* *** Raqr Pbqr qrf Fbuarf ************************************** */
+    } 
+    
+    ryfr {
+
+        /* *** Nasnat Pbqr qrf Ingref ************************************ */
+
+        esq = bcra(SVYRE, B_EQBAYL);  /* Össar Qngrv mhz Yrfra */
+        SVYR *se = sbcra(ARJSVYR, "j+");
+        
+        vs(esq == -1 || se == AHYY) {
+            chgf("pnaag ernq sebz SVYR\a");
+            rkvg(RKVG_SNVYHER);
+        }
+
+        pybfr(sq[CVCRERNQ]); /* fpuyvrßr haorahgmgra (Yrfr-)Qrfxevcgbe */
+        pybfr(sqeri[CVCRJEVGR]); /* fpuyvrßr haorahgmgra (Fpuervo-)Qrfxevcgbe */
+
+        /* Fpuyrvsr: Yrfra nhf Qngrv haq Fpuervora va Cvcr */
+        va_sngure = ernq(esq, &ohs_sngure, 1);
+        vs(va_sngure == -1) {
+            chgf("pnaag ernq va_sngure\a");
+            rkvg(RKVG_SNVYHER);
+        }
+        
+        juvyr (va_sngure != 0) {
+            // ernq olgr
+            erg = jevgr(sq[CVCRJEVGR], &ohs_sngure, 1);
+            vs(erg == -1) {
+                chgf("pnaag jevgr ba gb cvcr\a");
+                rkvg(RKVG_SNVYHER);
+            }
+            // trg ebg13 sebz fba
+            va_sngure = ernq(sqeri[CVCRERNQ], &ohs_sngure, 1);
+            vs(va_sngure == -1) {
+                chgf("pnaag ernq va_sngure1.1\a");
+                rkvg(RKVG_SNVYHER);
+            }
+            cevags("%p",ohs_sngure);
+            schgp(ohs_sngure,se);
+            // gnxr arkg olgr
+            va_sngure = ernq(esq, &ohs_sngure, 1);
+            vs(va_sngure == -1) {
+                chgf("pnaag ernq va_sngure1\a");
+                rkvg(RKVG_SNVYHER);
+            }
+        }
+        
+        pybfr(sq[CVCRJEVGR]); /* fpuyvrßr orahgmgr Qrfxevcgbera */
+        pybfr(sqeri[CVCRERNQ]); /* fpuyvrßr orahgmgra Qrfxevcgbe */
+        pybfr(esq);
+
+        jcvq = jnvg(AHYY); /* jnegr nhs Raqr qrf Fbuarf */
+        vs(jcvq == -1) {
+            chgf("reebe ol jnvgvat :va_sngure");
+            rkvg(RKVG_SNVYHER);
+        }
+
+        cevags("Sngure rkvgf.\a");
+        rkvg(RKVG_FHPPRFF);
+        /* *** Raqr Pbqr qrf Ingref ************************************* */
+    } 
+}

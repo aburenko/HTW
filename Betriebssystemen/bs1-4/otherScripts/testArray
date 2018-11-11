@@ -1,0 +1,14 @@
+#!/bin/bash
+
+arr[11]="foo"
+arr[2]="bar"
+arr[1]=5
+arr[9]=4
+
+echo ${arr[1]} + ${arr[9]}
+echo ${arr[11]}
+echo ${arr[2]}
+
+echo $((5+5))
+
+exit 0

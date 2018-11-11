@@ -1,0 +1,13 @@
+Netzwerkoperationen
+===================
+
+ssh Secure Shell
+    -X lässt graphische Aplikationen durch ssh starten
+    
+rdesktop (Remote Deskop für Windows)
+
+ftp File Transfer Protokol 
+-public informaion, alle können s lesen
+
+finger <login>
+ -M suche nach matches

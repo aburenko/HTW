@@ -1,0 +1,20 @@
+#!/bin/bash
+
+echo "enter a file"; read file 
+
+#if [ $# -ne 2 ]
+#then
+#	echo "you must have 2 Variables"
+#        exit 1 
+#fi	
+
+if test ! -e $file
+then
+	echo "File not exists"
+        exit 2
+fi	
+echo "enter your word to serch";read word
+
+grep -o $word $file | wc -l
+
+exit 0

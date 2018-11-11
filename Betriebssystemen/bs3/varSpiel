@@ -1,0 +1,11 @@
+#!/bin/bash
+echo $#
+if  [ $# -eq 4 ]
+then
+  echo $2 $1 $4 $3
+else
+  echo Fehler, muss 4 Variablen sein
+  exit
+fi
+
+exit 0
