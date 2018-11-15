@@ -21,11 +21,11 @@ GLuint loadShaders(const char* vertexFilePath,
 GLint height=100,width=100;
 enum VAO_IDs {Box,NumVAOs};
 enum Buffer_IDs { BoxBuffer, NumBuffers };
-enum BufferColor_IDs { BoxBufferColor, NumBuffersColor };
-enum Attrib_IDs {vPosition,vColor};
+enum EBO_IDs { BoxEBuffer, NumEBuffers };
+enum Attrib_IDs { vPosition, vColor };
 GLuint VAOs[NumVAOs];
 GLuint Buffers[NumBuffers];
-GLuint BuffersColor[NumBuffers];
+GLuint EBuffers[NumEBuffers];
 const GLuint NumVerticesCircle = 30;
 const GLuint NumFigure = 16;
 GLuint program;
@@ -40,63 +40,6 @@ using namespace glm;
 
 GLfloat alpha = 0.2, beta = 0.8, dist = 5, DELTA = 0.5;
 
-void generateCircle(GLfloat r) {
-	GLfloat verticesR[NumVerticesCircle][2];
-	///*
-	for (int i = 0; i < NumVerticesCircle; i++) {
-		if (i % 3 == 0) {
-			verticesR[i][0] = 0;
-			verticesR[i][1] = 0;
-		}
-		else {
-		GLfloat wert = 2* M_PI * i / (NumVerticesCircle/3);
-			verticesR[i][0] = (GLfloat)r*cos(wert);
-			verticesR[i][1] = (GLfloat)r*sin(wert);
-		}
-	//std::cout << "Punkt " << i << std::endl;
-	//std::cout << verticesR[i][0] << std::endl;
-	//std::cout << verticesR[i][1] << std::endl;
-	}
-	//*/
-	/*
-	int i = 0;
-	for (int counter = 0; counter < NumVerticesCircle; counter += 3) {
-		verticesR[i][0] = 0;
-		verticesR[i][1] = 0;
-		i++;
-
-		GLfloat wert = 6 * M_PI * counter / NumVerticesCircle;
-		verticesR[i][0] = (GLfloat)r*cos(wert);
-		verticesR[i][1] = (GLfloat)r*sin(wert);
-		i++;
-
-		GLfloat wert1 = 6 * M_PI * (counter + 1) / NumVerticesCircle;
-		verticesR[i][0] = (GLfloat)r*cos(wert1);
-		verticesR[i][1] = (GLfloat)r*sin(wert1);
-		i++;
-	}
-	*/
-	glBindVertexArray(VAOs[Box]);
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[BoxBuffer]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesR), verticesR, GL_STATIC_DRAW);
-	glVertexAttribPointer(vPosition, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glEnableVertexAttribArray(vPosition);
-}
-
-void drawCircle(void) {
-	for (int i = 0; i < NumVerticesCircle; i += 3) {
-		if (i % 2 == 0)
-			glVertexAttrib3f(vColor, 0.9, 0.9, 0.9);
-		else
-			glVertexAttrib3f(vColor, 1, 0, 0);
-		glDrawArrays(GL_TRIANGLES, i, 3);
-	}
-}
-
-GLuint ebo[1];
-GLuint vao[1];
-GLuint vbo[1];
-
 void genarateBox() {
 	static const GLfloat cube_positions[] = {
 		-1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0,
@@ -109,12 +52,12 @@ void genarateBox() {
 	static const GLushort cube_indices[] = {
 		0, 1, 2, 3, 6, 7, 4, 5, 0xFFFF, 2, 6, 0, 4, 1, 5, 3, 7 };
 
-	glGenBuffers(1, ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
+	glGenBuffers(1, EBuffers);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[0]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices,
 		GL_STATIC_DRAW);
-	glGenVertexArrays(1, vao); glBindVertexArray(vao[0]);
-	glGenBuffers(1, vbo); glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	glGenVertexArrays(1, VAOs); glBindVertexArray(VAOs[0]);
+	glGenBuffers(1, Buffers); glBindBuffer(GL_ARRAY_BUFFER, Buffers[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_positions) + sizeof(cube_colors),
 		NULL, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(cube_positions), cube_positions);
@@ -128,8 +71,8 @@ void genarateBox() {
 }
 
 void drawBox() {
-	glBindVertexArray(vao[0]);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
+	glBindVertexArray(VAOs[0]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[0]);
 #if USE_PRIMITIVE_RESTART
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(0xFFFF);
