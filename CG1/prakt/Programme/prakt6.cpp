@@ -19,14 +19,14 @@ GLuint loadShaders(const char* vertexFilePath,
  const char* tessevaluationFilePath,
  const char* computeFilePath);
 GLint height=100,width=100;
-enum VAO_IDs {Box,NumVAOs};
-enum Buffer_IDs { BoxBuffer, NumBuffers };
+enum VAO_IDs { Box, Triangles, Circle, NumVAOs };
+enum Buffer_IDs { BoxBuffer, TrianglesBuffer, CircleBuffer, NumBuffers };
 enum EBO_IDs { BoxEBuffer, NumEBuffers };
 enum Attrib_IDs { vPosition, vColor };
 GLuint VAOs[NumVAOs];
 GLuint Buffers[NumBuffers];
 GLuint EBuffers[NumEBuffers];
-const GLuint NumVerticesCircle = 30;
+const GLuint NumVerticesCircle = 60;
 const GLuint NumFigure = 16;
 GLuint program;
 
@@ -38,7 +38,7 @@ GLuint Location;
 
 using namespace glm;
 
-GLfloat alpha = 0.2, beta = 0.8, dist = 5, DELTA = 0.5;
+GLfloat alpha = 0.2f, beta = 0.8f, dist = 5.0f, DELTA = 0.5f;
 
 void genarateBox() {
 	static const GLfloat cube_positions[] = {
@@ -52,12 +52,11 @@ void genarateBox() {
 	static const GLushort cube_indices[] = {
 		0, 1, 2, 3, 6, 7, 4, 5, 0xFFFF, 2, 6, 0, 4, 1, 5, 3, 7 };
 
-	glGenBuffers(1, EBuffers);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[0]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices,
 		GL_STATIC_DRAW);
-	glGenVertexArrays(1, VAOs); glBindVertexArray(VAOs[0]);
-	glGenBuffers(1, Buffers); glBindBuffer(GL_ARRAY_BUFFER, Buffers[0]);
+	glBindVertexArray(VAOs[0]); 
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_positions) + sizeof(cube_colors),
 		NULL, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(cube_positions), cube_positions);
@@ -84,6 +83,60 @@ void drawBox() {
 #endif
 }
 
+void generateRectangle(GLfloat x, GLfloat y) {
+	GLfloat verticesR[4][2] = {
+		{ 0, 0 }, { 0, y },
+		{ x, 0 }, { x, y }
+	};
+	glBindVertexArray(VAOs[Triangles]);
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[TrianglesBuffer]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesR), verticesR, GL_STATIC_DRAW);
+	glVertexAttribPointer(vPosition, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(vPosition);
+}
+
+void drawRectangle(void) {
+	glBindVertexArray(VAOs[Triangles]);
+	glVertexAttrib3f(vColor, 1.0, 0.8f, 0);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glVertexAttrib3f(vColor, 1.0, 0.8f, 0);
+	glDrawArrays(GL_TRIANGLES, 1, 3);
+}
+
+void generateCircle(GLfloat r) {
+	GLfloat verticesR[NumVerticesCircle][2];
+
+	for (int i = 0; i < NumVerticesCircle; i++) {
+		if (i % 3 == 0) {
+			verticesR[i][0] = 0;
+			verticesR[i][1] = 0;
+		}
+		else {
+			GLfloat wert = 2 * M_PI * i / (NumVerticesCircle / 3.0);
+			verticesR[i][0] = (GLfloat)r*cos(wert);
+			verticesR[i][1] = (GLfloat)r*sin(wert);
+		}
+
+	}
+
+	glBindVertexArray(VAOs[Circle]);
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[CircleBuffer]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesR), verticesR, GL_STATIC_DRAW);
+	glVertexAttribPointer(vPosition, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(vPosition);
+}
+
+void drawCircle(void) {
+	glBindVertexArray(VAOs[Circle]);
+	for (int i = 0; i < NumVerticesCircle; i += 3) {
+		if (i % 2 == 0)
+			glVertexAttrib3f(vColor, 0.9f, 0.9f, 0.9f);
+		else
+			glVertexAttrib3f(vColor, 1, 0, 0);
+		glDrawArrays(GL_TRIANGLES, i, 3);
+	}
+}
+
 void init(void)
 {
 	printf("\n%s", (char*)glGetString(GL_RENDERER));
@@ -91,7 +144,14 @@ void init(void)
 	printf("\n%s\n", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
 	program = loadShaders("Programme/prakt6.vs", "Programme/prakt6.fs", "", "", "", "");
 	glUseProgram(program);
+
+	glGenBuffers(NumEBuffers, EBuffers);
+	glGenVertexArrays(NumVAOs, VAOs);
+	glGenBuffers(NumBuffers, Buffers);
+
 	genarateBox();
+	generateRectangle(2.0, 2.0);
+	generateCircle(1);
 }
 
 void display(void)
@@ -118,11 +178,26 @@ void display(void)
 		glm::vec3(0.0, cos(beta - 3.141593*0.5), 0.0)
 	);
 
+	Model = translate(Model, vec3(-2.0, 0.0, 0.0));
 	ModelViewProjection = Projection*View*Model;
-	
-	glUniformMatrix4fv(Location, 1, GL_FALSE, &ModelViewProjection[0][0]);
 
+	glUniformMatrix4fv(Location, 1, GL_FALSE, &ModelViewProjection[0][0]);
 	drawBox();
+
+	Model = mat4(1.0);
+	Model = rotate(Model, 0.5f, vec3(1.0, 1.0, 1.0));
+	Model = translate(Model, vec3(2.0, 0.0, 0.0));
+	ModelViewProjection = Projection*View*Model;
+
+	glUniformMatrix4fv(Location, 1, GL_FALSE, &ModelViewProjection[0][0]);
+	drawRectangle();
+
+	Model = mat4(1.0);
+	Model = translate(Model, vec3(5.0, 0.0, 0.0));
+	ModelViewProjection = Projection*View*Model;
+	glUniformMatrix4fv(Location, 1, GL_FALSE, &ModelViewProjection[0][0]);
+	drawCircle();
+
 
 	glFlush();
 }
@@ -164,10 +239,10 @@ void special(int specKey, int mouseX, int mouseY) {
 }
 
 void motion(int mouseX, int mouseY) {
-	if (mouseX<(width / 2)) { alpha -= (mouseX - (width / 2)) / 10000.0; }
-	else { alpha -= (mouseX - (width / 2)) / 10000.0; }
-	if (mouseY<(height / 2)) { beta -= (mouseY - (height / 2)) / 10000.0; }
-	else { beta -= (mouseY - (height / 2)) / 10000.0; }
+	if (mouseX<(width / 2)) { alpha -= (mouseX - (GLfloat)(width / 2)) / 10000.0f; }
+	else { alpha -= (mouseX - (width / 2)) / 10000.0f; }
+	if (mouseY<(height / 2)) { beta -= (mouseY - (GLfloat)(height / 2)) / 10000.0f; }
+	else { beta -= (mouseY - (GLfloat)(height / 2)) / 10000.0f; }
 	display();
 }
 

@@ -36,7 +36,9 @@
     <ClCompile Include="Programme\prakt 5.1.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Programme\prakt6.cpp" />
+    <ClCompile Include="Programme\prakt6.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Programme\Dreiecke.fs">
