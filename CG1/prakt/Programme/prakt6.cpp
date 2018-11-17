@@ -19,9 +19,9 @@ GLuint loadShaders(const char* vertexFilePath,
  const char* tessevaluationFilePath,
  const char* computeFilePath);
 GLint height=100,width=100;
-enum VAO_IDs { Box, Triangles, Circle, NumVAOs };
-enum Buffer_IDs { BoxBuffer, TrianglesBuffer, CircleBuffer, NumBuffers };
-enum EBO_IDs { BoxEBuffer, NumEBuffers };
+enum VAO_IDs { Box, Triangles, Circle, Cone, NumVAOs };
+enum Buffer_IDs { BoxBuffer, TrianglesBuffer, CircleBuffer, ConeBuffer, NumBuffers };
+enum EBO_IDs { BoxEBuffer, ConeEBuffer, NumEBuffers };
 enum Attrib_IDs { vPosition, vColor };
 GLuint VAOs[NumVAOs];
 GLuint Buffers[NumBuffers];
@@ -33,45 +33,58 @@ GLuint program;
 GLfloat posx = 0.0f;
 GLfloat posy = 0.0f;
 
+GLfloat kposx = 0.0;
+GLfloat kposy = 0.0;
+GLint mposx, mposy;
+
 // prakt4 
 GLuint Location;
 
 using namespace glm;
 
 GLfloat alpha = 0.2f, beta = 0.8f, dist = 5.0f, DELTA = 0.5f;
-
+// BOX
 void genarateBox() {
 	static const GLfloat cube_positions[] = {
-		-1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0,
-		-1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
-		1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
+		-1.0, -1.0, -1.0, 1.0,     // 0
+		-1.0, -1.0, 1.0, 1.0,     // 1
+		-1.0, 1.0, -1.0, 1.0,    // 2
+		-1.0, 1.0, 1.0, 1.0,    // 3
+		1.0, -1.0, -1.0, 1.0,  // 4
+		1.0, -1.0, 1.0, 1.0,  // 5
+		1.0, 1.0, -1.0, 1.0, // 6
+		1.0, 1.0, 1.0, 1.0  // 7
+	};
 	static const GLfloat cube_colors[] = {
-		1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0,
-		1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0,
-		0.0, 0.0, 1.0, 1.0, 0.5, 0.5, 0.5, 1.0 };
+		0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0,
+		0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0,
+		0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 };
 	static const GLushort cube_indices[] = {
 		0, 1, 2, 3, 6, 7, 4, 5, 0xFFFF, 2, 6, 0, 4, 1, 5, 3, 7 };
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[0]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[BoxEBuffer]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices,
 		GL_STATIC_DRAW);
-	glBindVertexArray(VAOs[0]); 
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[0]);
+
+	glBindVertexArray(VAOs[Box]); 
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[BoxBuffer]);
+
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_positions) + sizeof(cube_colors),
 		NULL, GL_STATIC_DRAW);
+
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(cube_positions), cube_positions);
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(cube_positions), sizeof(cube_colors),
 		cube_colors);
+
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0,
-		(const GLvoid*)sizeof(cube_positions));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)sizeof(cube_positions));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 }
 
 void drawBox() {
-	glBindVertexArray(VAOs[0]);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[0]);
+	glBindVertexArray(VAOs[BoxBuffer]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[BoxEBuffer]);
 #if USE_PRIMITIVE_RESTART
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(0xFFFF);
@@ -82,7 +95,7 @@ void drawBox() {
 		(const GLvoid*)(9 * sizeof(GLushort)));
 #endif
 }
-
+// Rectangle
 void generateRectangle(GLfloat x, GLfloat y) {
 	GLfloat verticesR[4][2] = {
 		{ 0, 0 }, { 0, y },
@@ -102,7 +115,7 @@ void drawRectangle(void) {
 	glVertexAttrib3f(vColor, 1.0, 0.8f, 0);
 	glDrawArrays(GL_TRIANGLES, 1, 3);
 }
-
+// Circle
 void generateCircle(GLfloat r) {
 	GLfloat verticesR[NumVerticesCircle][2];
 
@@ -136,6 +149,53 @@ void drawCircle(void) {
 		glDrawArrays(GL_TRIANGLES, i, 3);
 	}
 }
+// Cone
+void generateCone() {
+	static const GLfloat cube_positions[] = {
+		-1.0, 0.0, -1.0, 1.0,     // 0
+		1.0, 0.0, -1.0, 1.0,     // 1
+		-1.0, 0.0, 1.0, 1.0,    // 2
+		1.0, 0.0, 1.0, 1.0,    // 3
+		0.0, 2.0, 0.0, 1.0,   // 4
+	};
+	static const GLfloat cube_colors[] = {
+		1.0, 1.0, 1.0, 1.0,		// 0
+		1.0, 1.0, 0.0, 1.0,	   // 1
+		1.0, 0.0, 1.0, 1.0,   // 2
+		1.0, 0.0, 0.0, 1.0,  // 3
+		0.0, 1.0, 1.0, 1.0  // 4
+	};
+	static const GLushort cube_indices[] = {
+		0, 1, 2, 3, 0xFFFF, 1, 3, 4, 2, 0, 4, 1 
+	};
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[ConeEBuffer]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices,
+		GL_STATIC_DRAW);
+
+	glBindVertexArray(VAOs[Cone]);
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[ConeBuffer]);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_positions) + sizeof(cube_colors),
+		NULL, GL_STATIC_DRAW);
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(cube_positions), cube_positions);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(cube_positions), sizeof(cube_colors),
+		cube_colors);
+
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)sizeof(cube_colors));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+}
+
+void drawCone(void) {
+	glBindVertexArray(VAOs[ConeBuffer]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[ConeEBuffer]);
+
+	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, NULL);
+	glDrawElements(GL_TRIANGLE_STRIP, 7, GL_UNSIGNED_SHORT, (const GLvoid*)(5 * sizeof(GLushort)));
+}
 
 void init(void)
 {
@@ -152,11 +212,12 @@ void init(void)
 	genarateBox();
 	generateRectangle(2.0, 2.0);
 	generateCircle(1);
+	generateCone();
 }
 
 void display(void)
 {
-	glClearColor(0, 0, 0, 1);
+	glClearColor(1, 1, 1, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	GLfloat viewpoint[3];
@@ -178,6 +239,13 @@ void display(void)
 		glm::vec3(0.0, cos(beta - 3.141593*0.5), 0.0)
 	);
 
+	Model = translate(Model, vec3(0.0, 0.0, -3.0));
+	ModelViewProjection = Projection*View*Model;
+
+	glUniformMatrix4fv(Location, 1, GL_FALSE, &ModelViewProjection[0][0]);
+	drawCone();
+
+	Model = mat4(1.0);
 	Model = translate(Model, vec3(-2.0, 0.0, 0.0));
 	ModelViewProjection = Projection*View*Model;
 
@@ -211,11 +279,6 @@ void idle(void) {
 	display();
 	Sleep(15);
 }
-
-
-GLfloat kposx = 0.0;
-GLfloat kposy = 0.0;
-GLint mposx, mposy;
 
 void keyboard(unsigned char theKey, int mouseX, int mouseY) {
 	GLint x = mouseX;
