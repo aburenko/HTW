@@ -1,8 +1,8 @@
-import java.io.*; 
-import java.net.*; 
+import java.io.*;
+import java.net.*;
 import java.util.*;
-  
-class PingClient { 
+
+class PingClient {
 	private static final double LOSS_RATE = 0.3;
 	private static final int AVERAGE_DELAY = 100;  // milliseconds
 
@@ -15,30 +15,33 @@ class PingClient {
 		}
 		int port = Integer.parseInt(args[0]);
 
-		InetAddress IPAddress = InetAddress.getByName("localhost"); 
+		InetAddress IPAddress = InetAddress.getByName("localhost");
 
-		// Create random number generator for use in simulating 
+		// Create random number generator for use in simulating
 		// packet loss and network delay.
 		Random random = new Random();
 
 		// Create a datagram socket for receiving and sending UDP packets
 		// through the port specified on the command line.
 		DatagramSocket socket = new DatagramSocket();
-		
+
 		long timeF = System.currentTimeMillis();
 		// Create a datagram packet to send UDP packet.
-		byte[] sendData = new String("Ping \r\n").getBytes();    
-		DatagramPacket sendPacket = 
-			new DatagramPacket(sendData, sendData.length, IPAddress, port); 
+		byte[] sendData = new String("Ping \r\n").getBytes();
+		DatagramPacket sendPacket =
+			new DatagramPacket(sendData, sendData.length, IPAddress, port);
 
-		// Block until the host receives a UDP packet.
-		socket.send(sendPacket);
-		System.out.println("sent.");
 
 		// Decide whether to reply, or simulate packet loss.
 		if (random.nextDouble() < LOSS_RATE) {
 			System.out.println("   Reply not sent.");
+            return;
 		}
+        // Block until the host receives a UDP packet.
+        else {
+    		socket.send(sendPacket);
+    		System.out.println("sent.");
+        }
 
 		// Simulate network delay.
 		Thread.sleep((int) (random.nextDouble() * 2 * AVERAGE_DELAY));
@@ -49,7 +52,7 @@ class PingClient {
 
 		// Block until the host receives a UDP packet.
 		socket.receive(request);
-		
+
 		long timeS = System.currentTimeMillis();
 		long timeD = timeS -timeF;
 		System.out.println("time: " + timeD);
@@ -57,7 +60,7 @@ class PingClient {
 		printData(request);
 	}
 
-   /* 
+   /*
     * Print ping data to the standard output stream.
     */
 	private static void printData(DatagramPacket request) throws Exception
@@ -75,7 +78,7 @@ class PingClient {
 
 		// Wrap the input stream reader in a bufferred reader,
 		// so you can read the character data a line at a time.
-		// (A line is a sequence of chars terminated by any combination of \r and \n.) 
+		// (A line is a sequence of chars terminated by any combination of \r and \n.)
 		BufferedReader br = new BufferedReader(isr);
 
 		// The message data is contained in a single line, so read this line.
@@ -83,10 +86,10 @@ class PingClient {
 
 		// Print host address and data received from it.
 		System.out.println(
-			"Received from " + 
-			request.getAddress().getHostAddress() + 
+			"Received from " +
+			request.getAddress().getHostAddress() +
 			": " +
-			new String(line) 
+			new String(line)
 		);
 	}
 }
