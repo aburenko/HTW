@@ -1,0 +1,29 @@
+UDP
+1) 4
+2) 2 bytes je
+3) header + data
+4) 2^16 - 1 - 8 - 20 = 65507
+5) 2^16 - 1
+6) 17(dez), 11 (hex)
+7) --
+8) PORT 13 -> 44
+	44 -> 13
+TCP
+1) ...102: 80
+   ...12: 1161
+2) 1-3
+3) Sequence number: 1    (relative sequence number)
+   0d d6 01 f5 (echte)
+4) beide 1
+5) TCP FLOW
+6) 6406+1460 = 7866
+7) 0.267802
+8) 0.027460 und 0.273159
+9) 6780 B
+10) = 9)
+11) ja
+12) 
+13) 1460 * 5 + 892 * 1
+14) ab 0.124185ms endet es
+15) 164090 Byte
+16) 164090 Byte/5.56s = 29 kByte
