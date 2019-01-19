@@ -1,0 +1,12 @@
+#!/bin/bash
+
+#checks parameters
+if [ $# -ne 3 ]; then
+    echo "usage: $0 <hostname> <port> <fileName>"
+    exit 1
+fi
+
+#execute
+java -cp bin:s76905/bin Client $1 $2 $3
+
+exit 0

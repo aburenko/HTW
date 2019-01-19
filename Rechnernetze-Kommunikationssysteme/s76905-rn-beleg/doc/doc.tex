@@ -1,0 +1,699 @@
+\documentclass[12pt]{article}
+
+\usepackage[english,ngerman]{babel}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage[margin=0.75in]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{hyperref}
+\newtcolorbox{mybox}[2][]{%
+  attach boxed title to top left
+               = {yshift=-8pt},
+  colback      = blue!5!white,
+  colframe     = blue!75!black,
+  fonttitle    = \bfseries,
+  colbacktitle = gray!85!black,
+  title        = #2,#1,
+  enhanced,
+}
+\definecolor{atomictangerine}{rgb}{1.0, 0.6, 0.4}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\tikzset{%
+  >={Latex[width=2mm,length=2mm]},
+  % Specifications for style of nodes:
+            base/.style = {rectangle, draw=black,
+                           minimum width=4cm, minimum height=1cm,
+                           text centered, font=\sffamily, text width=3cm},
+  activityStarts/.style = {base, fill=blue!30},
+         process/.style = {base, rounded corners, minimum width=2.5cm, fill=orange!15,
+                           font=\ttfamily},
+         decision/.style = {base, minimum width=2.5cm, fill=green!15,
+                           font=\ttfamily},
+         end/.style = {base, minimum width=2.5cm, fill=red!15,
+                           font=\ttfamily}
+}
+\usetikzlibrary{shapes.geometric, arrows}
+
+\author{\\ Burenko Anton \\ s76905 \\ \\ \\ Prof. Dr.-Ing. Jörg Vogt \\ 
+Rechnernetze / Kommunikationssysteme \\ \\
+}
+\date{Wintersemester 2018/19}
+\title{UDP-Dateitransfer}
+
+\begin{document}
+\selectlanguage{ngerman}
+
+\maketitle
+
+\pagebreak
+
+\tableofcontents
+
+\pagebreak
+
+\section{Aufgabenstellung}
+Erstellen Sie ein Programm (Client + Server) zur Übertragung beliebiger Dateien zwischen zwei Rechnern, basierend auf dem UDP-Protokoll. Das Programm soll mit der Sprache JAVA erstellt werden und im Labor S311 unter Linux lauffähig sein und dort vorgeführt werden. Folgende Punkte sind umzusetzen:
+\begin{itemize}
+
+\item Aufruf des Clients (Quelle) auf der Konsole mit den Parametern: Ziel
+adresse (IP oder Hostname) + Portnummer (Bsp.: client-udp is311p1 3333 test.gif)
+
+\item Aufruf des Servers (Ziel) mit den Parametern: Portnummer (Bsp.: server-udp 3333). Um die Aufrufe für Client und Server so zu realisieren ist ein kleines Bash-script notwendig (z.B.: java Clientklasse \$1 \$2 \$3)
+
+\item Auf dem Zielrechner (Server) ist die Datei unter Verwendung des korrekten Dateinamens im Pfad des Servers abzuspeichern. Ist die Datei bereits vorhanden, soll an den Basisnamen der neuen Datei das Zeichen "1" angehängt werden. Client und Server sollten auch auf dem selben Rechner im selben Pfad funktionieren.
+
+\item Messen Sie bei der Übertragung die Datenrate und zeigen Sie am Client jede Sekunde den aktuellen Wert und am Ende den Gesamtwert an. Orientieren Sie sich hierzu an wget.
+
+\item Implementieren Sie exakt das im Dokument Beleg-Protokoll vorgegebene Über-tragungsprotokoll. Damit soll gewährleistet werden, dass Ihr Programm auch mit einem beliebigen anderen Programm funktioniert, welches dieses Protokoll implementiert.
+
+\item Gehen Sie davon aus, dass im Labor Pakete fehlerhaft übertragen werden können, verloren gehen können oder in ihrer Reihenfolge vertauscht werden können (beide Richtungen!). Implementieren Sie eine entsprechende Fehlerkorrektur.
+
+\item Entwerfen Sie eine Testumgebung als Bestandteil des Servers, mittels derer Sie eine bestimmte Paketverlustwahrscheinlichkeit und Paketverzögerung für beide Übertragungsrichtungen simulieren können. Sinnvollerweise sollten diese Parameter über die Konsole konfigurierbar sein
+
+\item Bestimmen Sie den theoretisch max. erzielbaren Durchsatz bei 10\% Paketverlust und 10 ms Verzögerung mit dem SW-Protokoll und vergleichen diesen mit Ihrem Programm. Begründen Sie die Unterschiede.
+
+\item Dokumentieren Sie die Funktion Ihres Programms unter Nutzung von Latex. Notwendig ist mindestens ein Zustandsdiagramm für Client und Server. Geben Sie Probleme/Limitierungen/Verbesserungsvorschläge für das verwendete Protokoll an.
+
+\item Die Abgabe des Belegs erfolgt als tar-Archiv mit einem vorgegebenen Aufbau.
+
+\end{itemize}
+
+\pagebreak
+
+\section{Protokoll}
+\subsection{Protokollbeschreibung}
+\begin{itemize}
+\item Nutzung des ersten Paketes für die Übertragung von Dateiinformationen
+\item Der Server erkennt einen neuen Übertragungswunsch durch eine neue Sessionnummer und die Kennung "Start".
+\item Der Client wählt eine Sessionnummer per Zufall.
+\item Übertragungsprotokoll:
+\begin{itemize}
+\item Stop-and-Wait-Protokoll
+\item Bei Absendung eines Paketes wird ein Timeout gestartet, welcher mit korrekter \item Bestätigung durch den Empfänger zurückgesetzt wird.
+\item Bei Auslösung des Timeouts wird das Paket erneut gesendet. Dies wird maximal 10 mal wiederholt. Danach erfolgt ein Programmabbruch mit einer Fehlermeldung.
+Beachten Sie die Vorgehensweise des Protokolls bzgl. verlorener Daten / ACKs etc.
+\end{itemize}
+\item Network-Byte-Order: Big-Endian-Format
+\item Die Länge eines Datagrams sei beliebig innerhalb des UDP-Standards, eine sinnvolle Länge ergibt sich aus der MTU des genutzten Netzes
+\item CRC32-Polynom (IEEE-Standard): 0x04C11DB7 für die Fehlererkennung im Startpaket und in der Gesamtdatei.
+\end{itemize}
+
+\subsection{Paketaufbau}
+\begin{itemize}
+\item Startpaket (Client to Server)
+\begin{itemize}
+\item 16-Bit Sessionnummer (Wahl per Zufallsgenerator)
+\item 8-Bit Paketnummer (immer 0)
+\item 5-Byte Kennung "Start" als ASCII-Zeichen
+\item 64-Bit Dateilänge (unsigned integer) (für Dateien > 4 GB)
+\item 2 Byte (unsigned integer) Länge des
+\item 0-255 Byte Dateiname als String mit Codierung UTF-8
+\item 32-Bit-CRC über alle Daten des Startpaketes
+\end{itemize}
+\item Datenpakete (Client to Server)
+\begin{itemize}
+\item 16-Bit-Sessionnummer
+\item 8-Bit Paketnummer ( 1. Datenpaket hat die Nr. 1, gerechnet wird mod 2, also nur 0 und 1)
+\item Daten
+\item 32-Bit-CRC (nur im letzten Paket vorhanden) Berechnung über Gesamtdatei, die CRC darf nicht auf mehrere UDP-Pakete aufgeteilt werden
+\end{itemize}
+\item Bestätigungspakete (Server to Client)
+\begin{itemize}
+\item 16-Bit-Sessionnummer
+\item 8-Bit Bestätigungsnummer für das zu bestätigende Paket (ACK 0 mit Paket Nr. 0 bestätigt)
+Bei einem CRC- Fehler soll kein ACK gesendet werden
+\end{itemize}
+\end{itemize}
+
+\section{Beschreibung von Klassen}
+\selectlanguage{english}
+\subsection{UDPTransfer}
+pakage udp \\ \\
+\textbf{\Large   abstract class UDPtransfer } \\
+contains variables and functions that Server and Client have in common.
+\\ \\
+\subsubsection{receive*}
+\begin{mybox}[colback=white]{receiveExec}
+\textbf{void receiveExec()} \\
+receives Packets and resend last acknowlege, until the right data packet
+will be received.\\ \\
+If MAX\_TRIES of receives was riched finishes program.
+\end{mybox}
+
+\begin{mybox}[colback=white]{receive}
+\textbf{boolean receive() throws SocketTimeoutException} \\
+dummy function for receiving a packet that need to be overriden
+by Server/Client.
+\\
+\textbf{Throws:} \\
+SocketTimeoutException - if there was no packet received. Timeout is
+set by setSocketTimeout(...). \\
+\textbf{Returns:} \\
+depends on implementation, look Client/Server.
+\end{mybox}
+
+\subsubsection{send}
+\begin{mybox}[colback=white]{send}
+\textbf{void send()} \\
+dummy function for sending a packet that need to be overriden
+by Server/Client.
+\end{mybox}
+
+\subsubsection{setSocketTimeout}
+\begin{mybox}[colback=white]{setSocketTimeout}
+\textbf{void setSocketTimeout(DatagramSocket ds, int time)} \\
+sets timeout of socket ds to time. \\
+after timeout socket throws SocketTimeoutException. \\
+\textbf{Parameters:} \\
+ds - DatagramSocket on wich timeout is need to be changed.  \\
+time - time for timeout in ms.
+\end{mybox}
+
+\subsubsection{simulateDelay}
+\begin{mybox}[colback=white]{simulateDelay}
+\textbf{void simulateDelay()} \\
+simulates a delay, that is defined by AVERAGE\_DELAY in ms. \\
+for no delay set AVERAGE\_DELAY to 0.
+\end{mybox}
+
+\subsubsection{calcRTO}
+\begin{mybox}[colback=white]{calcRTO}
+\textbf{void calcRTO()} \\
+calculate new Retransmission Timeout. \\
+Calculation depends on current Round Trip Time and ALPHA. \\
+ALPHA shows how strong Timeout need to be changed. (default: 0.125)
+\end{mybox}
+
+\subsubsection{generateSessionNumber}
+\begin{mybox}[colback=white]{generateSessionNumber}
+\textbf{byte[] generateSessionNumber()}  \\
+generates and returns random session number. \\
+\textbf{Returns:} \\
+S\_SESSION\_NUMBER bytes array that contains random sequence.
+\end{mybox}
+
+\subsection{Server}
+
+\textbf{\Large class Server extends UDPtransfer} \\
+receives a file from Client with Wait-Send. \\
+Server acknowledges packets according to given protokol.
+\\ \\
+
+\subsubsection{Constructor}
+\begin{mybox}[colback=atomictangerine]{Server}
+\textbf{Server(String args[])} \\
+runs Server according to given protkol.
+\\
+\textbf{Parameters:} \\
+args - Arguments for Server (port).
+\end{mybox}
+
+\subsubsection{main}
+\begin{mybox}[colback=lightgray]{main}
+\textbf{main(String args[])} \\
+execute new Object Server.
+\\
+\textbf{Parameters:} \\
+args - Arguments for Server (port).
+\end{mybox}
+
+\subsubsection{init*}
+\begin{mybox}[colback=white]{init}
+\textbf{void init()} \\
+initialize Variables for Start of Server (serverSocket, receiveData and random).
+\end{mybox}
+
+\begin{mybox}[colback=white]{initStart}
+\textbf{void initStart()} \\
+wait for first completed Packet, get Client-Data; calls prepareFile();
+send Acknowledge for this Packet.
+\end{mybox}
+
+\subsubsection{parseArgs}
+\begin{mybox}[colback=white]{parseArgs}
+\textbf{void parseArgs(String[] args)} \\
+checks and parses line arguments. If error occurred, print error message to console and stop the program. 
+\\
+\textbf{Parameters:} \\
+args - Arguments for Server (port).
+\end{mybox}
+
+\subsubsection{receive*}
+\begin{mybox}[colback=white]{receive}
+\textbf{boolean receive() throws SocketTimeoutException} \\
+receives a packet and decode it, returns status of decoding.
+\\
+\textbf{Override:} \\
+receive() in UDPTransfer \\
+\textbf{Throws:} \\
+SocketTimeoutException - if there was no packet received. Timeout is
+set by setSocketTimeout(...). \\
+\textbf{Returns:} \\
+true - decode success. \\
+false - decode fail.
+\end{mybox}
+
+\begin{mybox}[colback=white]{receiveData}
+\textbf{void receiveData() throws SocketTimeoutException} \\
+implements receive of packet. \\
+This method is used by receive, that will decide what to do with packet.
+\\
+\textbf{Throws:} \\
+SocketTimeoutException - if there was no packet received. Timeout is
+set by setSocketTimeout(...). \\
+\end{mybox}
+
+\subsubsection{prepareFile}
+\begin{mybox}[colback=white]{prepareFile}
+\textbf{void prepareFile()} \\
+create file with name received from Client. \\
+The name.example will be modified to name1.example
+if there is already name.example in destination folder
+\end{mybox}
+
+\subsubsection{generateAck}
+\begin{mybox}[colback=white]{generateAck}
+\textbf{void generateAck()} \\
+combines an acknowledge as byte array according protokol. \\
+Acknowledge will be saved in sendPacket.
+\end{mybox}
+
+\subsubsection{decode*}
+\begin{mybox}[colback=white]{decodeDataPacket}
+\textbf{boolean decodeDataPacket(byte[] sequence)} \\
+decodes a received data packet \textit{sequence} with given protokol. \\
+If received sequence is repeat of last packet, send last acknowledge
+one more time.
+\\
+\textbf{Parameters:} \\
+sequence - received data packet \\
+\textbf{Returns:} \\
+true - decode success. \\
+false - decode fail.
+\end{mybox}
+
+\begin{mybox}[colback=white]{decodeStartPacket}
+\textbf{boolean decodeStartPacket(byte[] sequence))} \\
+decodes a received start packet \textit{sequence} with given protokol. \\
+\textbf{Parameters:} \\
+sequence - received data packet \\
+\textbf{Returns:} \\
+true - decode success. \\
+false - decode fail.
+\end{mybox}
+
+\subsubsection{send}
+\begin{mybox}[colback=white]{send}
+\textbf{void send()} \\
+sends a formed acknowledge \textit{sendPacket}. \\
+Important: this function don't recombine a packet.\\
+\textbf{Override:} \\
+send() in UDPTransfer \\
+\end{mybox}
+
+\subsubsection{compareFileCRCwith}
+\begin{mybox}[colback=white]{compareFileCRCwith}
+\textbf{boolean compareFileCRCwith(byte[] receiveCRC)} \\
+build CRC of received file and compare it with CRC \textit{receiveCRC},
+that was received from Client in last data packet. \\
+Note: CRC is in this case CRC32 
+\\
+\textbf{Parameters:} \\
+receiveCRC - received CRC32 (length is defined with S\_CRC32) \\
+\textbf{Returns:} \\
+true - CRCs are equal. \\
+false - CRC are not equal.
+\end{mybox}
+
+\subsubsection{checkCRC}
+\begin{mybox}[colback=white]{checkCRC}
+\textbf{boolean checkCRC32(byte[] subject)} \\
+checks a CRC over a packet \textit{subject}. \\
+This method builds new CRC over packet and compare it with given
+CRC in last S\_CRC32 bytes of \textit{subject}
+\\
+Note: CRC is in this case CRC32  \\
+\textbf{Parameters:} \\
+subject - received packet\\
+\textbf{Returns:} \\
+true - CRCs are equal. \\
+false - CRCs are not equal.
+\end{mybox}
+
+\subsubsection{byteToLong}
+\begin{mybox}[colback=white]{byteToLong}
+\textbf{long byteToLong(byte[] b, int offset, int size)} \\
+converts byte to long and returns it.
+\\
+\textbf{Parameters:} \\
+b - array to converte\\
+offset - the start offset in the array b\\
+size - number of bytes to take starting with offset\\
+\textbf{Returns:} \\
+converted byte array as long
+\end{mybox}
+
+
+\subsubsection{show*}
+\begin{mybox}[colback=white]{showProgress}
+\textbf{void showProgress()} \\
+output to System.out current progress 
+\end{mybox}
+
+\begin{mybox}[colback=white]{showResult}
+\textbf{void showResult()} \\
+output to System.out transfer result 
+\end{mybox}
+
+\subsection{Client}
+
+\textbf{\Large class Client extends UDPtransfer} \\
+sends a file to Server, works with Wait-Send according to given protokol. \\
+\\ \\
+
+\subsubsection{Constructor}
+\begin{mybox}[colback=atomictangerine]{Client}
+\textbf{Client(String args[])} \\
+runs Client according to given protkol.
+\\
+\textbf{Parameters:} \\
+args - Arguments for Client (port, hostname, filepath).
+\end{mybox}
+
+\subsubsection{main}
+\begin{mybox}[colback=lightgray]{main}
+\textbf{main(String args[])} \\
+execute new Object Client.
+\\
+\textbf{Parameters:} \\
+args - Arguments for Client (port, hostname, filepath).
+\end{mybox}
+
+\subsubsection{parseArgs}
+\begin{mybox}[colback=white]{parseArgs}
+\textbf{void parseArgs(String[] args)} \\
+checks and parses line arguments. If error occurred, print error message to console and stop the program. 
+\\
+\textbf{Parameters:} \\
+args - Arguments for Client (port, hostname, filepath).
+\end{mybox}
+
+\subsubsection{receive}
+\begin{mybox}[colback=white]{receive}
+\textbf{boolean receive() throws SocketTimeoutException} \\
+receives a acknowledge packet and decode it, returns status of decoding.
+\\
+\textbf{Override:} \\
+receive() in UDPTransfer \\
+\textbf{Throws:} \\
+SocketTimeoutException - if there was no packet received. Timeout is
+set by setSocketTimeout(...). \\
+\textbf{Returns:} \\
+true - decode success. \\
+false - decode fail.
+\end{mybox}
+
+\subsubsection{send*}
+\begin{mybox}[colback=white]{send}
+\textbf{void send()} \\
+sends a formed \textit{sendPacket}. \\
+Important: this function don't recombine a packet.\\
+\textbf{Override:} \\
+send() in UDPTransfer \\
+\end{mybox}
+
+\begin{mybox}[colback=white]{sendingInit}
+\textbf{void sendingInit()} \\
+initialize Variables for Start of Client, forms start packet and sends it.
+\end{mybox}
+
+\begin{mybox}[colback=white]{updateSend}
+\textbf{void updateSend()} \\
+combines new data packet to send.
+\end{mybox}
+
+\subsubsection{checkAck}
+\begin{mybox}[colback=white]{checkAck}
+\textbf{boolean checkAck(byte[] rec)} \\
+checks if right acknowledge was received. \\
+If bad acknowledge was received - resends last packet.
+\\
+\textbf{Parameters:} \\
+rec - acknowledge packet for check. \\
+\textbf{Returns:} \\
+true - check success. \\
+false - check fail.
+\end{mybox}
+
+\subsubsection{genarate*}
+\begin{mybox}[colback=white]{genarateDataPacket}
+\textbf{byte[] genarateDataPacket()} \\
+generates new data packet according to protokol. \\
+\\
+\textbf{Returns:} \\
+byte array with next data packet
+\end{mybox}
+
+\begin{mybox}[colback=white]{genarateStartPacket}
+\textbf{byte[] genarateStartPacket()} \\
+generates a start packet according to protokol. \\
+\\
+\textbf{Returns:} \\
+byte array with start data packet
+\end{mybox}
+
+\subsubsection{checkSumToByteArray}
+\begin{mybox}[colback=white]{checkSumToByteArray}
+\textbf{byte[] checkSumToByteArray(Checksum checkSum)} \\
+converts Checksum to byte array and returns it.
+\\
+\textbf{Parameters:} \\
+checkSum - checksum to convert\\
+\textbf{Returns:} \\
+converted Checksum as byte array
+\end{mybox}
+
+\subsubsection{show*}
+\begin{mybox}[colback=white]{showInit}
+\textbf{void showResult()} \\
+output to System.out information for start. 
+\end{mybox}
+
+\begin{mybox}[colback=white]{showProgress}
+\textbf{void showProgress()} \\
+output to System.out progress of sending
+\end{mybox}
+
+\begin{mybox}[colback=white]{showResult}
+\textbf{void showResult()} \\
+output to System.out transfer result 
+\end{mybox}
+\pagebreak
+
+\section{Limitierungen}
+\selectlanguage{ngerman}
+{\Large Client kann die letze Acknowledge nicht kriegen }\\
+Es könnte passieren, dass ein Packet vom Server wegen dem
+Packetverlust zum Client nicht ankommen würde. \\
+Der Client wird versuchen resend zu machen. Der Server hat die Routine 
+schon beendet. So wird Client nicht wissen, ob ein Packet verloren
+gegangen oder angekommen ist. \\ \\ Deswegen nehmen wir an, dass die
+Übertragun erfolgreich war, wenn alles geschickt wurde
+und es keine weitere Acknowledges kommt.
+
+\section{Berechnung von maximalen erzielbaren Durchsatz}
+\textbf{Gegeben:}
+$ r_{b} = 1 GB/s $ , 
+$ 2T_{a} = 10ms $ , 
+$ L_{Daten} = 1500B $ , 
+$ L_{Ack} = 3B $ ,
+$ P = 0.1 $ 
+\\ \\
+\textbf{Lösung:} \\
+Übertragungsverzögerung des Datenpackets $ T_{p,Daten} = \cfrac{L_{Daten}}{r_{b}} = 
+\cfrac{1500B}{1 GB/s} = 1.5\mu s $ \\ 
+Übertragungsverzögerung des Acknowledgepackets $ T_{p,Ack} = \cfrac{L_{Ack}}{r_{b}} = 
+\cfrac{3B}{1 GB/s} = 0.003\mu s $ \\ 
+Coderate berechnen $ R = \cfrac{1497B}{1500B} = 0.998 $ \\
+Durchsatz berechnen $ \eta_{sw} = \cfrac{T_{p,Daten}}{T_{p,Daten} + 2T_{a} + T_{p,Ack}} * (1-P)^{2} * R $
+\\$= \cfrac{1.5\mu s}{1.5\mu s + 10ms + 0.003\mu s} \cdot (0.9)^{2} \cdot 0.998 \approx 1.21 \cdot 10^{-4}$ \\ \\
+Datenrate berechnen $ \eta_{sw} \cdot r_{b} = 121238,7 B/s = 121,2 kB/s $ 
+\\ \\
+\textbf{Tatsächlicher Durchsatz} ist deutlich geringer.
+\\ \\
+\textbf{Begründung von Unterschieden im Durchsatz:}
+\begin{itemize}
+\item $r_{b}$ im Praxis kleiner als 1 GB/s
+\item Simulation des Packetverlustes wird durch random nicht genau 0.1 ergeben
+\item Die gegebene Implementierung ist nicht perfekt optimiert
+\end{itemize}
+\pagebreak
+\section{Zustandsdiagramme}
+\subsection{Server}
+% Drawing part, node distance is 1.5 cm and every node
+% is prefilled with white background
+  \begin{tikzpicture}
+  [node distance=1.5cm, every node/.style={fill=lightgray, font=\sffamily}, align=center]
+  % Specification of nodes (position, etc.)
+  \node (n1)      [activityStarts]         {Wait for start};
+  \node (recStart) [decision, right of=n1, xshift=3cm, yshift=2cm] {receive Start};
+  \node (n2)      [process, right of=n1, xshift=8cm]    {Wait for data};
+  \node (timeout) [decision, right of=n1, xshift=3cm, yshift=-2cm] {timeout 1 sec.};
+  
+  \node (ack)   [decision, right of=n2, xshift=1cm, yshift= 3cm]    {receive Data};
+  \node (sack)   [decision, right of=n2, xshift=3cm, yshift= 1.5cm]    {send Acknowledge};
+  \node (wrong) [decision, right of=n2, xshift=1cm, yshift=-3cm]    {receive wrong Nr};
+  \node (resack)   [decision, right of=n2, xshift=3cm, yshift= -1.5cm]    {resend Acknowledge};
+    
+  \draw [->] (n1) -- (recStart);
+  \draw [->] (recStart) -- (n2);
+    
+  \draw [->] (n2) -- (timeout);
+  \draw [->] (timeout) -- (n1);
+  
+  \draw [->] (n2) -- (ack);
+  \draw [->] (ack) -- (sack);
+  \draw [->] (sack) -- (n2);
+  
+  \draw [->] (n2) -- (wrong);
+  \draw [->] (wrong) -- (resack);
+  \draw [->] (resack) -- (n2);
+  
+  \end{tikzpicture}
+\subsection{Client}
+% Drawing part, node distance is 1.5 cm and every node
+% is prefilled with white background
+  \begin{tikzpicture}
+  [node distance=1.5cm, every node/.style={fill=lightgray, font=\sffamily}, align=center]
+  % Specification of nodes (position, etc.)
+  \node (n1)      [activityStarts]         {Wait for Data};
+  \node (sendP) [decision, right of=n1, xshift=3cm, yshift=2cm] {send packet 0 or 1};
+  \node (n2)      [process, right of=n1, xshift=8cm]    {Wait for Acknowledge};
+  \node (recAck) [decision, right of=n1, xshift=3cm, yshift=-2cm] {receive Acknowledge};
+  
+  \node (timeout)   [decision, right of=n2, xshift=1cm, yshift= 1.5cm]    {timeout};
+  \node (resend)   [decision, right of=n2, xshift=1cm, yshift= -1.5cm]    {resend};
+    
+  \draw [->] (n1) -- (sendP);
+  \draw [->] (sendP) -- (n2);
+    
+  \draw [->] (n2) -- (recAck);
+  \draw [->] (recAck) -- (n1);
+  
+  \draw [->] (n2) -- (timeout);
+  \draw [->] (timeout) -- (resend);
+  \draw [->] (resend) -- (n2);
+  
+  \end{tikzpicture}
+\section{Ablaufspläne}
+\subsection{Server}
+\selectlanguage{english}
+
+% Drawing part, node distance is 1.5 cm and every node
+% is prefilled with white background
+  \begin{tikzpicture}
+  [node distance=1.5cm, every node/.style={fill=lightgray, font=\sffamily}, align=center]
+  % Specification of nodes (position, etc.)
+  \node (start)             [activityStarts]              {Activity starts};
+  \node (init)      	[process, below of=start]   {parseArgs, init, initStart};
+  \node (receiveStart)      [process, below of=init]   {receive};
+  \node (receiveDec)      [decision, below of=receiveStart]   {decoded?};
+  \node (decFail) [process, right of=receiveDec, xshift=3cm] {ignore};
+  \node (prepareFile)      [process, below of=receiveDec, yshift=-0.25cm]   {prepareFile};
+  \node (generateAck)      [process, below of=prepareFile]   {generateAck};
+  \node (send)      [process, below of=generateAck]   {send};
+  \node (calcShow)      [process, below of=send]   {calcRTO and showProgress};
+  \node (recLen)      [decision, below of=calcShow]   {file received?};
+  \node (break)      [process, right of=recLen, xshift=3cm]   {break};
+  \node (receiveExec)      [process, below of=recLen, yshift=-0.25cm]   {receiveExec};
+  \node (execTimeout) [decision, below of=receiveExec, yshift=-2cm] {timeout?};
+  \node (execYTime)  [decision, left of=execTimeout, xshift=-5cm] {MAX\_TRIES riched?};
+  \node (execYTimeNotRiched)  [process, above of=execYTime, yshift=0.5cm] {numTries++};
+  \node (execYTimeYRiched)  [process, below of=execYTime, yshift=-1.5cm] {receiveFailed- Tries = true};
+  \node (receiveExecDec) [decision, below of=execTimeout, yshift=-0.25cm]   {right decoded?};
+  \node (execDecSucc) [process, right of=receiveExecDec, xshift=5cm] {numTries=0};
+  \node (execDecFail) [process, left of=receiveExecDec, xshift=-3cm] {ignore};
+  \node (endBlock) [end, below of=receiveExecDec, yshift=-0.5cm,, xshift=1.5cm]   {showResult and exit};
+  
+  \draw [->]             (start) -- (init);
+  \draw [->]             (init) -- (receiveStart);
+  \draw [->]             (receiveStart) -- (receiveDec);
+  
+  \draw [->] (decFail) |- (receiveStart);
+  \draw [->] (receiveDec) -- node[anchor=east] {yes} (prepareFile);
+  \draw [->] (receiveDec) -- node[anchor=south] {no} (decFail);
+  
+  \draw[->]             (prepareFile) -- (generateAck);
+  \draw[->]             (generateAck) -- (send);
+  \draw[->]             (send) -- (calcShow);
+  \draw[->]             (calcShow) -- (recLen);
+  \draw[->]             (recLen) --  node[anchor=east] {no} (receiveExec);
+  \draw[->]             (receiveExec) -- (execTimeout);
+  
+  \draw [->] (execTimeout) -- node[anchor=east] {no} (receiveExecDec); 
+  \draw [->] (execTimeout) -- node[anchor=south] {yes} (execYTime);
+  \draw [->] (execYTime) -- node[anchor=east] {no} (execYTimeNotRiched);
+  \draw [->] (execYTime) -- node[anchor=east] {yes} (execYTimeYRiched);
+  \draw [->] (execYTimeNotRiched) -- (receiveExec);
+  \draw [->] (execYTimeYRiched) |- (endBlock);
+  
+  \draw [->] (receiveExecDec) -- node[anchor=south] {no} (execDecFail); 
+  \draw [->] (receiveExecDec) -- node[anchor=south] {yes} (execDecSucc);
+  \draw [->] (execDecSucc) |- (send);
+  \draw [->] (execDecFail) |- (receiveExec);
+  
+  \draw [->] (recLen) -- node[anchor=south] {yes} (break);
+  \draw [->] (break) |- (endBlock);
+  
+  
+  \end{tikzpicture}
+\subsection{Client}
+% Drawing part, node distance is 1.5 cm and every node
+% is prefilled with white background
+  \begin{tikzpicture}[node distance=1.5cm,
+    every node/.style={fill=lightgray, font=\sffamily}, align=center]
+  % Specification of nodes (position, etc.)
+  \node (start)             [activityStarts]              {Activity starts};
+  \node (init)      	[process, below of=start, yshift=-0.5cm]   {parseArgs, showInit, sendingInit};
+  \node (genStart)      [process, below of=init, yshift=-0.5cm]   {genarate- StartPacket};
+  \node (send)      [process, below of=genStart]   {send};
+  \node (calcShow)      [process, below of=send]   {calcRTO and showProgress};
+  \node (receiveExec)      [process, below of=calcShow]   {receiveExec};
+  \node (check)      [decision, below of=receiveExec, yshift=-0.7cm]   {session- Finished?};
+  \node (break)      [process, right of=check, xshift=3cm]   {break};
+  \node (execTimeout) [decision, below of=check, yshift=-1.5cm] {timeout?};
+  \node (execYTime)  [decision, left of=execTimeout, xshift=-6cm] {MAX\_TRIES riched?};
+  \node (execYTimeNotRiched)  [process, above of=execYTime, yshift=1cm] {numTries++};
+  \node (execYTimeYRiched)  [process, below of=execYTime, yshift=-3cm] {receive-  FailedTries = true};
+  \node (receiveExecDec) [decision, below of=execTimeout, yshift=-1cm]   {rigth decoded?};
+  \node (genNew) [process, right of=receiveExecDec, xshift=6cm]   {updateSend};
+  \node (execDecFail) [process, left of=receiveExecDec, xshift=-3.5cm] {ignore};
+  \node (endBlock) [end, below of=receiveExecDec, yshift=-1cm]   {showResult and exit};
+  
+  \draw [->]             (start) --  (init);
+  \draw [->]             (init) -- (genStart);
+  \draw [->]             (genStart) -- (send);
+  \draw [->]             (send) -- (calcShow);
+  \draw [->]             (calcShow) -- (receiveExec);
+  \draw [->]             (receiveExec) -- (check);
+  \draw [->]             (check) -- node[anchor=south] {no} (break);
+  \draw [->]             (break) |- (endBlock);
+  \draw [->]             (check) -- node[anchor=east] {yes} (execTimeout);
+  \draw [->]             (execTimeout) -- node[anchor=south] {no}(receiveExecDec);
+  \draw [->]             (execTimeout) -- node[anchor=south] {yes}(execYTime);
+  \draw [->]             (execYTime) -- node[anchor=east] {no} (execYTimeNotRiched);
+  \draw [->]             (execYTime) -- node[anchor=east] {yes} (execYTimeYRiched);
+  \draw [->]             (execYTimeNotRiched) -- (receiveExec);
+  \draw [->]             (receiveExecDec) -- node[anchor=east] {yes} (genNew);
+  \draw [->]             (receiveExecDec) -- node[anchor=east] {no} (execDecFail);
+  \draw [->]             (genNew) |- (send);
+  \draw [->]             (execYTimeYRiched) -- (endBlock);
+  \draw [->]             (execDecFail) |- (receiveExec);
+  
+  \end{tikzpicture}
+\end{document}
+\pagebreak
+ 

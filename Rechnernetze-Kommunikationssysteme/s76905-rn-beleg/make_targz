@@ -1,0 +1,5 @@
+#!/bin/bash
+#use to pack all files to archive
+cd ..
+tar -czvf s76905-rn-beleg/s76905.tar.gz s76905-rn-beleg --exclude=s76905-rn-beleg/*.tar.gz --exclude=s76905-rn-beleg/make_targz --exclude=s76905-rn-beleg/.git --exclude=s76905-rn-beleg/.gitignore --exclude=s76905-rn-beleg/alice.txt --exclude=s76905-rn-beleg/test_beleg_lokal.sh --transform 's/s76905-rn-beleg/s76905/'
+
