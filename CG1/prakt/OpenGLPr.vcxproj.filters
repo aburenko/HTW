@@ -45,6 +45,9 @@
     <ClCompile Include="Programme\prakt6.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="Programme\main.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Programme\Dreiecke.fs">
@@ -75,6 +78,12 @@
       <Filter>Ressourcendateien</Filter>
     </None>
     <None Include="Programme\prakt6.vs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="Programme\main.fs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="Programme\main.vs">
       <Filter>Ressourcendateien</Filter>
     </None>
   </ItemGroup>

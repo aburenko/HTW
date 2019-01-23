@@ -21,6 +21,7 @@
     <ClCompile Include="Programme\logo.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Programme\main.cpp" />
     <ClCompile Include="Programme\prakt 2.1.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -37,7 +38,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Programme\prakt6.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -47,6 +48,8 @@
     <None Include="Programme\Dreiecke.vs">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </None>
+    <None Include="Programme\main.fs" />
+    <None Include="Programme\main.vs" />
     <None Include="Programme\prakt3.fs" />
     <None Include="Programme\prakt3.vs" />
     <None Include="Programme\prakt4.fs" />
