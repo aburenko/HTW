@@ -2,3 +2,5 @@
 CG1/prakt/Release
 CG1/prakt/pingme.txt
 CG1/prakt/*.opensdf
+CG1/beleg/doc/*
+!CG1/beleg/doc/doc.tex

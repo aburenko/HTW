@@ -19,8 +19,8 @@ GLuint loadShaders(const char* vertexFilePath,
  const char* tessevaluationFilePath,
  const char* computeFilePath);
 GLint height=100,width=100;
-enum VAO_IDs { Box24, PiramideExTop, Piramide, Triangles, Circle, NumVAOs };
-enum Buffer_IDs { Box24Buffer, PiramideExTopBuffer, PiramideBuffer, TrianglesBuffer, CircleBuffer, NumBuffers };
+enum VAO_IDs { Box24, PiramideExTop, Piramide, NumVAOs };
+enum Buffer_IDs { Box24Buffer, PiramideExTopBuffer, PiramideBuffer, NumBuffers };
 enum Tex_IDs { floorID, wallId, roofId, sunid, texNum };
 enum Attrib_IDs { vPosition, vColor, vNormal, vTexcoord };
 GLuint VAOs[NumVAOs];
@@ -28,7 +28,6 @@ GLuint Buffers[NumBuffers];
 GLuint tex[texNum];
 GLuint renderbuffer;
 GLuint program;
-const GLuint NumVerticesCircle = 120;
 
 GLsizei TexWidth, TexHeight; 
 GLuint framebuffer, texture;
@@ -557,95 +556,6 @@ void drawPiramide(void) {
 	}
 }
 
-// Circle
-void generateCircle(GLfloat r) {
-	GLfloat verticesR[NumVerticesCircle][2];
-	int i = 0;
-	float cc = 0.0;
-	for (int counter = 0; counter < NumVerticesCircle / 3; counter++) {
-		verticesR[i][0] = 0;
-		verticesR[i][1] = 0;
-		i++;
-
-		GLfloat wert = 2 * M_PI * cc / (NumVerticesCircle / 3);
-		verticesR[i][0] = (GLfloat)r*cos(wert);
-		verticesR[i][1] = (GLfloat)r*sin(wert);
-		i++;
-		cc++;
-
-		GLfloat wert1 = 2 * M_PI * cc / (NumVerticesCircle / 3);
-		verticesR[i][0] = (GLfloat)r*cos(wert1);
-		verticesR[i][1] = (GLfloat)r*sin(wert1);
-		i++;
-	}
-
-	GLfloat col[NumVerticesCircle][3];
-	for (int counter = 0; counter < NumVerticesCircle; counter++) {
-		verticesR[counter][0] = 1;
-		verticesR[counter][1] = 0;
-		verticesR[counter][2] = 0;
-	}
-
-
-	glBindVertexArray(VAOs[Circle]);
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[CircleBuffer]);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesR) + sizeof(col), NULL, GL_STATIC_DRAW);
-
-	glBufferSubData(GL_ARRAY_BUFFER, 0,
-		sizeof(verticesR), verticesR);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(verticesR),
-		sizeof(col), col);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(verticesR) + sizeof(col),
-		sizeof(verticesR), verticesR);
-
-	glVertexAttribPointer(vPosition, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glVertexAttribPointer(vColor, 3, GL_FLOAT, GL_FALSE, 0, (void*)sizeof(verticesR));
-	glVertexAttribPointer(vTexcoord, 3, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(verticesR) + sizeof(col)));
-
-	glEnableVertexAttribArray(vPosition);
-	glEnableVertexAttribArray(vColor);
-	glEnableVertexAttribArray(vTexcoord);
-}
-
-void drawCircle(void) {
-	glBindVertexArray(VAOs[Circle]);
-	for (int i = 0; i < NumVerticesCircle; i += 3) {
-		glDrawArrays(GL_TRIANGLES, i, 3);
-	}
-}
-
-// Rectangle
-void generateRectangle() {
-	GLfloat verticesarr[] = {
-		0, 0, 0, 1,
-		1, 0, 1, 1,
-
-		0, 0, 0, 1,
-		1, 0, 1, 1
-	};
-	// vertex attribute array
-	glBindVertexArray(VAOs[Triangles]);
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[TrianglesBuffer]);
-	// data
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesarr), verticesarr, GL_STATIC_DRAW);
-	//PunktePointer: 0 Punkt, 2 Dimensionen, (GLvoid*)0 von wo wir im Array anfangen zu lesen
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	//Texturpointer: 1 , 2 Dimensionen, ab 16. Punkt kommen Textur Koordinaten.
-	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(8 * sizeof(GLfloat)));
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(3);
-}
-
-void drawRectangle(void) {
-	glBindVertexArray(VAOs[Triangles]);
-	glVertexAttrib3f(vColor, 1.0, 0.8f, 0);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	glVertexAttrib3f(vColor, 1.0, 0.8f, 0);
-	glDrawArrays(GL_TRIANGLES, 1, 3);
-}
-
 void init(void)
 {
 	printf("\n%s", (char*)glGetString(GL_RENDERER));
@@ -726,8 +636,6 @@ void init(void)
 	generateBox24();
 	generatePiramideExTop();
 	generatePiramide();
-	generateRectangle();
-	generateCircle(1);
 
 	locMV = glGetUniformLocation(program, "MVMatrix");
 	locNM = glGetUniformLocation(program, "NormalMatrix");

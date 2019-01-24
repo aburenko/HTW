@@ -74,15 +74,70 @@ der Ergebnisse erfolgt spätestens zum Ende der Lehrveranstaltungszeit. \\
 \pagebreak
 
 \section{Function}
-\begin{mybox}[colback=white]{setSocketTimeout}
-\textbf{void setSocketTimeout(DatagramSocket ds, int time)} \\
-sets timeout of socket ds to time. \\
-after timeout socket throws SocketTimeoutException. \\
-\textbf{Parameters:} \\
-ds - DatagramSocket on wich timeout is need to be changed.  \\
-time - time for timeout in ms.
+\begin{mybox}[colback=lightgray]{main}
+\textbf{int main(int argc, char$**$ argv)} \\
+initialisiert das Program, bestimmt Window Size, Namen, und bindet Fuktionen für Aufruf(z.B. keyboard, display).
 \end{mybox}
 
+\begin{mybox}[colback=white]{generateBox24}
+\textbf{void generateBox24()} \\
+generate Positionen, Farben, Normalen und Texturekoordinaten für einen Würfel. 
+Außerdem speichert die für VAO und Position Buffers.
+\end{mybox}
+\begin{mybox}[colback=white]{drawBox24}
+\textbf{void drawBox24()} \\
+zeichnet den Würfel von gegebenen Positionen.
+\end{mybox}
+
+\begin{mybox}[colback=white]{generatePiramideExTop}
+\textbf{void generatePiramideExTop()} \\
+generate Positionen, Farben, Normalen und Texturekoordinaten für einen Dachobject. 
+Außerdem speichert die für VAO und Position Buffers.
+\end{mybox}
+\begin{mybox}[colback=white]{drawPiramideExTop}
+\textbf{void drawPiramideExTop()} \\
+zeichnet das Dachobject von gegebenen Positionen.
+\end{mybox}
+
+\begin{mybox}[colback=white]{generatePiramide}
+\textbf{void generatePiramide()} \\
+generate Positionen, Farben, Normalen und Texturekoordinaten für eine Piramide. 
+Außerdem speichert die für VAO und Position Buffers.
+\end{mybox}
+\begin{mybox}[colback=white]{drawPiramide()}
+\textbf{void drawPiramide()} \\
+zeichnet eine Piramide von gegebenen Positionen.
+\end{mybox}
+
+\begin{mybox}[colback=white]{init}
+\textbf{void init()} \\
+initialisiert Shaders, Texturen, Tiefenpuffer, ruft alle generate* Funktionen und alle Locations für $uniform$s
+\end{mybox}
+
+\begin{mybox}[colback=white]{lichtBerechnung}
+\textbf{void lichtBerechnung()} \\
+berechnet ModelViewProjection, ModelView und NormalMatrix und übergibt die Variablen als $uniform$s.
+\end{mybox}
+
+\begin{mybox}[colback=white]{drawFigures}
+\textbf{void drawFigures()} \\
+wählt richtige Texturen und zeichnet alle Objecte der Szene.
+\end{mybox}
+
+\begin{mybox}[colback=white]{display}
+\textbf{void display()} \\
+stellt View, Viewports bzw. drawFigures
+\end{mybox}
+
+\begin{mybox}[colback=white]{keyboard}
+\textbf{void keyboard(unsigned char theKey, int mouseX, int mouseY)} \\
+implementiert keyboard interaction(siehe Interaction).
+\end{mybox}
+
+\begin{mybox}[colback=white]{mouse}
+\textbf{void mouse(int mouseX, int mouseY)} \\
+implementiert mouse interaction(siehe Interaction).
+\end{mybox}
 
 \pagebreak
 \section{Figure}
@@ -133,12 +188,21 @@ Wenn die Sonne schon unter Niveau vom Grass-block bzw. der Erde ist wird die Far
 
 \section{Interaction}
 Die Szene kann man mit Mouse sowie mit Keyboard steuern.\\\\
+Berechnungen sind in Funktionen keyboard sowie mouse.
+\\
 \textbf{Keyboard mapping} \\\\
 Z ... kleiner \\\\
 V ... größer \\\\
 D ... Tiefenbuffer an/aus \\\\
 1 ... Richtungslich und Ambiente Licht an/aus \\\\
 2 ... Spotlicht an/aus
+
+\section{Quellenverzeichnis}
+\paragraph{OpenGL SuperBible} by Sellers, Wright Jr., Haemel
+
+\paragraph{OpenGL Programming Guide}: The Official Guide to Learning OpenGL, Version 2 
+
+\paragraph{Computergraphik 1 Vorlesungsmaterial} by Prof. Dr. Wolfgang Oertel 
 
 \end{document}
 \pagebreak
