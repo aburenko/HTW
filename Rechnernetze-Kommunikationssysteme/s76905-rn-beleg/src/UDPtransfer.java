@@ -11,7 +11,7 @@ public abstract class UDPtransfer {
     public static final int MTU = 1500;
     public static final int MAX_TRIES = 10;
 		// simulating
-	public static int AVERAGE_DELAY = 20;  // milliseconds
+	public static int AVERAGE_DELAY = 10;  // milliseconds
 	public static double LOSS_RATE = 0.2;
 		// referred to protokol
 	public static final int S_SESSION_NUMBER = 2;
@@ -46,14 +46,15 @@ public abstract class UDPtransfer {
     public static long timeSec = 0;
     public static int fileLenProSec = 0;
 	// ranging variables for WAIT STOP protokol
-	public static int eRTT = 1000; // [ms] estimated Round Trip Time
-	public static final double ALPHA = 0.125;
-	public static final int RTO_MIN = 30; // minimal Roundtrip time
+	public static int eRTT = 3000; // [ms] estimated Round Trip Time
+	public static final double ALPHA = 0.175;
+	public static int RTO_MIN = 40; // minimal Roundtrip time
 	public static int DevRTT = 1500;
 	// user interface vars
 	public static double scaleLength = 10.0; // scale displayed on screen
 
 	public void receiveExec() {
+		if(DEBUG) System.out.println("resEXEC");
 	    // get time on start of RTT
 	    timeFirst = System.currentTimeMillis();
 
@@ -66,6 +67,7 @@ public abstract class UDPtransfer {
 			} catch (SocketTimeoutException ste) {
 				// resend
 				send();
+        			if(DEBUG) System.out.println("resend bei timeout");
 			}
 	        numTries++;
 		}
@@ -77,6 +79,7 @@ public abstract class UDPtransfer {
 	}
 
 	public void send() {
+		if(DEBUG) System.out.println("Darf nicht aufgrufen werden");
 		return;
 	}
 
