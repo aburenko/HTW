@@ -72,8 +72,18 @@ Die Ausgabe der Aufgabenstellung erfolgt zu Beginn der Lehrveranstaltungszeit. D
 der Ergebnisse erfolgt spätestens zum Ende der Lehrveranstaltungszeit. \\
 
 \pagebreak
+\section{Bedienungsanleitung}
+Das Programm verwendet OpenGL und Visual Studio, um die Szene zu kompilieren und auszuführen. Die Hauptbibliothek dafür sind opengl32, freeglut, glew32, FreeImage. Die müssen vorher durch Linker und C++ - compiler gebunden sein.
 
-\section{Function}
+\bigbreak
+
+
+
+\bigbreak
+
+Die Texturen und alle .cpp sowie Headers und Shaders Dateien müssen in dem Verzeichnis "Programme" gespeichert werden. Welche Texturen es gibt kann man im Punkt "Texture" detaliert lesen.
+
+\section{Functionen}
 \begin{mybox}[colback=lightgray]{main}
 \textbf{int main(int argc, char$**$ argv)} \\
 initialisiert das Program, bestimmt Window Size, Namen, und bindet Fuktionen für Aufruf(z.B. keyboard, display).
@@ -140,27 +150,57 @@ implementiert mouse interaction(siehe Interaction).
 \end{mybox}
 
 \pagebreak
+
+\section{Viewports}
+In der Szene sind 2 Viewports aktiv.
+\bigbreak
+\subsection{Viewport von Sonne}
+Das Viewport kann man links sehen. Die "Kamera" bewegt sich mit der Sonne zusammen nach oben und unter. Aus dem Sicht kann man sehr gut das Spotlicht sehen. 
+
+\subsection{Einstellbares Viewport}
+Das Viewport kann man rechts sehen. Die "Kamera" bewegt sich durch Bewegen vom Maus des Benutzers. Aus dem Sicht kann man alles sehen. Außerdem ist es mit dem Viewport möglich das Richtungslicht auf dem Dach bemerken. 
+
+\begin{center}
+\includegraphics[width=15cm, height=7.5cm]{viewports}
+\end{center}
+
+\pagebreak
+
 \section{Figure}
 Für diese Szene sind 3 Figuren verwendet: ein Würfel, eine Piramide und einen Pyramidenstumpf. Alle Figuren haben eine neutrale Farbe, die danach mit einem Texture überdeckt wird. \\
 \subsection{Würfel}
-Der Würfel wird für Grass, Sonne und Gebäudeblocke verwendet.
+Der Würfel wird für Grass, Sonne und Gebäudeblocke verwendet. \\ \\
+\begin{center}
+\includegraphics[width=6cm, height=6cm]{blocks}
+\includegraphics[width=2cm, height=2cm]{sunSCR}
+\includegraphics[width=6cm, height=6cm]{floorSCR}
+\end{center}
 \subsection{Piramide}
 Die Piramide ist nur für Dach von Pagode verwendet.
 \subsection{Pyramidenstumpf}
-Der Pyramidenstumpf ist für den Zwischendach von Pagode verwendet.
+Der Pyramidenstumpf ist für den Zwischendach von Pagode verwendet. \\\\
+\includegraphics[width=6cm, height=5cm]{roofsSCR}
 
 \pagebreak
 
 \section{Texture}
 Es gibt folgende Texturen: roof, wall, grass and sun. \\
-\textbf{roof} \newline
+\textbf{roof:}
+\begin{center}
 \includegraphics[width=4cm, height=4cm]{roof} \\
-\textbf{wall} \newline
+\end{center}
+\textbf{wall:}
+\begin{center}
 \includegraphics[width=8cm, height=4cm]{japwall} \\
-\textbf{grass} \newline
+\end{center}
+\textbf{grass:}
+\begin{center}
 \includegraphics[width=4cm, height=4cm]{grass} \\
-\textbf{sun} \newline
+\end{center}
+\textbf{sun:}
+\begin{center}
 \includegraphics[width=4cm, height=4cm]{sun}
+\end{center}
 
 \pagebreak
 \section{Light}
@@ -172,24 +212,37 @@ In dieser Szene wechselt es die Farbe von Weiß auf Rot und umgekehrt(siehe \tex
 \subsection{Spotlicht}
 \paragraph{Position} Bewegt sich mit der Sonne zusammen.\\\\ 
 Das Spotlicht sieht wie ein Lichtkreis von der Richtung von der Sonne aus. Die Lichtquelle bewegt sich mit dem Licht zusammen (siehe \textbf{Animation}).
-Die Weiße Farbe wird vom Zenter bis Rand immer schwacher. 
+Die Weiße Farbe wird vom Zenter bis Rand immer schwacher. \\\\ 
+\includegraphics[width=6cm, height=6cm]{spotlight}
+\pagebreak
 \subsection{Richtungslicht}
 \paragraph{Position} $(4,4,4)$ Orientiert von der Sonne rechts oben.\\\\ 
-Richtungslicht kann man sehr gut als Blicke auf dem Dach beachten. Die Blicke kann man nur auf zwei Seiten sehen, weil das Licht nur aus einer Seite die Pagode beleuchtet. Am besten ist es zu sehen wenn man das Spotlicht ausmacht (siehe \textbf{Interaction}).
+Richtungslicht kann man sehr gut als Blicke auf dem Dach beachten. Die Blicke kann man nur auf zwei Seiten sehen, weil das Licht nur aus einer Seite die Pagode beleuchtet. Am besten ist es zu sehen wenn man das Spotlicht ausmacht (siehe \textbf{Interaction}).\\\\ 
+\includegraphics[width=6cm, height=6cm]{richtungslicht}
+\includegraphics[width=6cm, height=6cm]{richtungslicht1}
+\paragraph{Richtungslicht und Spotlicht} zusammen \\\
+\includegraphics[width=12cm, height=6cm]{spotANDrichtungslicht}
+
 
 \pagebreak
 
 \section{Animation}
 Animation kann man schon am Anfang der Szene sehen. Die Sonne bewegt sich an der Y-Achse nach oben bzw. unten. \\
 Außerdem ändert sich die Farbe dabei, um Sonnenuntergang zu simulieren.
-Wenn die Sonne schon unter Niveau vom Grass-block bzw. der Erde ist wird die Farbe rot.
+Wenn die Sonne schon unter Niveau vom Grass-block bzw. der Erde ist wird die Farbe rot. \\\\
+\begin{center}
+Sonne oben\\
+\includegraphics[width=12cm, height=6cm]{suntop} 
+\bigbreak
+Sonne unten\\
+\includegraphics[width=12cm, height=6cm]{sunbottom}
+\end{center}
 
 \pagebreak
 
 \section{Interaction}
 Die Szene kann man mit Mouse sowie mit Keyboard steuern.\\\\
-Berechnungen sind in Funktionen keyboard sowie mouse.
-\\
+Berechnungen dazu findet man in Funktionen keyboard sowie mouse.\bigbreak
 \textbf{Keyboard mapping} \\\\
 Z ... kleiner \\\\
 V ... größer \\\\
@@ -197,6 +250,7 @@ D ... Tiefenbuffer an/aus \\\\
 1 ... Richtungslich und Ambiente Licht an/aus \\\\
 2 ... Spotlicht an/aus
 
+\bigbreak
 \section{Quellenverzeichnis}
 \paragraph{OpenGL SuperBible} by Sellers, Wright Jr., Haemel
 
