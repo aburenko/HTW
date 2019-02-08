@@ -5,8 +5,8 @@ Dreiecke
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <glm.hpp>
-//#include <gtx/transform.hpp>
+#include <glm.hpp>
+#include <gtx/transform.hpp>
 #include <glew.h>
 #include <freeglut.h>
 #include <FreeImage.h>
@@ -33,16 +33,12 @@ void init(void)
 	printf("\n%s\n", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
 	program = loadShaders("Dreiecke.vs", "Programme/Dreiecke.fs", "", "", "", "");
 	glUseProgram(program);
-
+	glGenBuffers(NumBuffers, Buffers);
 	glGenVertexArrays(NumVAOs, VAOs);
-	glBindVertexArray(VAOs[Triangles]);
-
 	GLfloat vertices[NumVertices][2] = {
 		{ -0.90, -0.90 }, { 0.85, -0.90 }, { -0.90, 0.85 }, { 0.90, -0.85 }, { 0.90, 0.90 }, { -0.85, 0.90 } };
-
-	glGenBuffers(NumBuffers, Buffers);
+	glBindVertexArray(VAOs[Triangles]);
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[ArrayBuffer]);
-
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(vPosition, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(vPosition);
@@ -69,7 +65,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA);
 	glutInitWindowSize(512, 512);
-	glutInitContextVersion(3, 1);  // (4,2) (3,3);
+	glutInitContextVersion(4, 5);  // (4,2) (3,3);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	//GLUT_COMPATIBILITY_PROFILE
 	glutCreateWindow(argv[0]);

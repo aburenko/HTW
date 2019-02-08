@@ -12,8 +12,6 @@
 #include <freeglut.h>
 #include <FreeImage.h>
 
-# define M_PI           3.14159265358979323846  /* pi */
-
 GLuint loadShaders(const char* vertexFilePath,
  const char* fragmentFilePath,
  const char* geometryFilePath,
@@ -26,7 +24,7 @@ enum Buffer_IDs {ArrayBuffer,NumBuffers};
 enum Attrib_IDs {vPosition,vColor};
 GLuint VAOs[NumVAOs];
 GLuint Buffers[NumBuffers];
-const GLuint NumVerticesCircle = 60;
+const GLuint NumVerticesCircle = 30;
 const GLuint NumFigure = 16;
 GLuint program;
 
@@ -46,8 +44,6 @@ void init(void)
 	glGenVertexArrays(NumVAOs, VAOs);
 	glUniform1f(glGetUniformLocation(program, "posx"), posx);
 	glUniform1f(glGetUniformLocation(program, "posy"), posy);
-	glBindVertexArray(VAOs[Circle]);
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[ArrayBuffer]);
 	generateCircle(0.2f);
 }
 
@@ -66,12 +62,12 @@ void generateCircle(GLfloat r) {
 				verticesR[i][1] = centerY;
 				i++;
 
-				GLfloat wert = (GLfloat)(6 * M_PI * counter / NumVerticesCircle);
+				GLfloat wert = (GLfloat)(6 * 3.14 * counter / NumVerticesCircle);
 				verticesR[i][0] = (GLfloat)r*cos(wert) + centerX;
 				verticesR[i][1] = (GLfloat)r*sin(wert) + centerY;
 				i++;
 
-				GLfloat wert1 = (GLfloat)(6 * M_PI * (counter + 1) / NumVerticesCircle);
+				GLfloat wert1 = (GLfloat)(6 * 3.14 * (counter + 1) / NumVerticesCircle);
 				verticesR[i][0] = (GLfloat)r*cos(wert1) + centerX;
 				verticesR[i][1] = (GLfloat)r*sin(wert1) + centerY;
 				i++;
@@ -104,6 +100,8 @@ void generateCircle(GLfloat r) {
 	std::cout << verticesR[i][1] << std::endl;
 	}
 	*/
+	glBindVertexArray(VAOs[Circle]);
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[ArrayBuffer]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesR), verticesR, GL_STATIC_DRAW);
 	glVertexAttribPointer(vPosition, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(vPosition);
@@ -132,7 +130,7 @@ void display(void)
 	glBindVertexArray(VAOs[Circle]);
 
 	drawCircle();
-	// execute
+
 	glFlush(); 
 }
 

@@ -19,9 +19,9 @@ GLuint loadShaders(const char* vertexFilePath,
  const char* tessevaluationFilePath,
  const char* computeFilePath);
 GLint height=100,width=100;
-enum VAO_IDs { Box, Triangles, Circle, Cone, NumVAOs };
-enum Buffer_IDs { BoxBuffer, TrianglesBuffer, CircleBuffer, ConeBuffer, NumBuffers };
-enum EBO_IDs { BoxEBuffer, ConeEBuffer, NumEBuffers };
+enum VAO_IDs { Box, Triangles, Circle, Piramide, NumVAOs };
+enum Buffer_IDs { BoxBuffer, TrianglesBuffer, CircleBuffer, PiramideBuffer, NumBuffers };
+enum EBO_IDs { BoxEBuffer, PiramideEBuffer, NumEBuffers };
 enum Attrib_IDs { vPosition, vColor };
 GLuint VAOs[NumVAOs];
 GLuint Buffers[NumBuffers];
@@ -29,6 +29,10 @@ GLuint EBuffers[NumEBuffers];
 const GLuint NumVerticesCircle = 60;
 const GLuint NumFigure = 16;
 GLuint program;
+
+bool b_depth = true;
+bool b_blend = true;
+bool b_stencil = true;
 
 GLfloat posx = 0.0f;
 GLfloat posy = 0.0f;
@@ -56,9 +60,9 @@ void genarateBox() {
 		1.0, 1.0, 1.0, 1.0  // 7
 	};
 	static const GLfloat cube_colors[] = {
-		0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0,
-		0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0,
-		0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 };
+		0.0, 1.0, 1.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 1.0, 1.0, 0.5,
+		0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.5,
+		0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5 };
 	static const GLushort cube_indices[] = {
 		0, 1, 2, 3, 6, 7, 4, 5, 0xFFFF, 2, 6, 0, 4, 1, 5, 3, 7 };
 
@@ -117,17 +121,25 @@ void drawRectangle(void) {
 }
 // Circle
 void generateCircle(GLfloat r) {
-	GLfloat verticesR[NumVerticesCircle][2];
+	GLfloat verticesR[NumVerticesCircle*2][3];
 
 	for (int i = 0; i < NumVerticesCircle; i++) {
 		if (i % 3 == 0) {
 			verticesR[i][0] = 0;
 			verticesR[i][1] = 0;
+			verticesR[i][2] = 0;
+			verticesR[NumVerticesCircle + i][0] = 0;
+			verticesR[NumVerticesCircle + i][1] = 0;
+			verticesR[NumVerticesCircle + i][2] = -2.0;
 		}
 		else {
 			GLfloat wert = 2 * M_PI * i / (NumVerticesCircle / 3.0);
 			verticesR[i][0] = (GLfloat)r*cos(wert);
 			verticesR[i][1] = (GLfloat)r*sin(wert);
+			verticesR[i][2] = 0;
+			verticesR[NumVerticesCircle + i][0] = (GLfloat)r*sin(wert);
+			verticesR[NumVerticesCircle + i][1] = (GLfloat)r*cos(wert);
+			verticesR[NumVerticesCircle + i][2] = 0;
 		}
 
 	}
@@ -135,63 +147,112 @@ void generateCircle(GLfloat r) {
 	glBindVertexArray(VAOs[Circle]);
 	glBindBuffer(GL_ARRAY_BUFFER, Buffers[CircleBuffer]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesR), verticesR, GL_STATIC_DRAW);
-	glVertexAttribPointer(vPosition, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribPointer(vPosition, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(vPosition);
 }
 
 void drawCircle(void) {
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glBindVertexArray(VAOs[Circle]);
-	for (int i = 0; i < NumVerticesCircle; i += 3) {
-		if (i % 2 == 0)
-			glVertexAttrib3f(vColor, 0.9f, 0.9f, 0.9f);
+	for (int i = 0; i < NumVerticesCircle*2; i += 3) {
+		if (i < NumVerticesCircle)
+			glVertexAttrib3f(vColor, 0.0f, 0.0f, 1.0f);
 		else
 			glVertexAttrib3f(vColor, 1, 0, 0);
 		glDrawArrays(GL_TRIANGLES, i, 3);
 	}
 }
-// Cone
-void generateCone() {
-	static const GLfloat cube_positions[] = {
+// Piramide
+void generatePiramide() {
+	static const GLfloat piramide_positions[] = {
 		-1.0, 0.0, -1.0, 1.0,     // 0
 		1.0, 0.0, -1.0, 1.0,     // 1
 		-1.0, 0.0, 1.0, 1.0,    // 2
 		1.0, 0.0, 1.0, 1.0,    // 3
 		0.0, 2.0, 0.0, 1.0,   // 4
 	};
-	static const GLfloat cube_colors[] = {
+	static const GLfloat piramide_colors[] = {
 		1.0, 1.0, 1.0, 1.0,		// 0
 		1.0, 1.0, 0.0, 1.0,	   // 1
 		1.0, 0.0, 1.0, 1.0,   // 2
 		1.0, 0.0, 0.0, 1.0,  // 3
 		0.0, 1.0, 1.0, 1.0  // 4
 	};
-	static const GLushort cube_indices[] = {
+	static const GLushort piramide_indices[] = {
 		0, 1, 2, 3, 0xFFFF, 1, 3, 4, 2, 0, 4, 1 
 	};
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[ConeEBuffer]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices,
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[PiramideEBuffer]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(piramide_indices), piramide_indices,
 		GL_STATIC_DRAW);
 
-	glBindVertexArray(VAOs[Cone]);
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[ConeBuffer]);
+	glBindVertexArray(VAOs[Piramide]);
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[PiramideBuffer]);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_positions) + sizeof(cube_colors),
+	glBufferData(GL_ARRAY_BUFFER, sizeof(piramide_positions) + sizeof(piramide_colors),
 		NULL, GL_STATIC_DRAW);
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(cube_positions), cube_positions);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(cube_positions), sizeof(cube_colors),
-		cube_colors);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(piramide_positions), piramide_positions);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(piramide_positions), sizeof(piramide_colors),
+		piramide_colors);
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)sizeof(cube_colors));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)sizeof(piramide_colors));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+}
+
+void drawPiramide(void) {
+	glBindVertexArray(VAOs[PiramideBuffer]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[PiramideEBuffer]);
+
+	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, NULL);
+	glDrawElements(GL_TRIANGLE_STRIP, 7, GL_UNSIGNED_SHORT, (const GLvoid*)(5 * sizeof(GLushort)));
+}
+
+// Cone
+void generateCone() {
+	static const GLfloat cone_positions[] = {
+		-1.0, 0.0, -1.0, 1.0,     // 0
+		1.0, 0.0, -1.0, 1.0,     // 1
+		-1.0, 0.0, 1.0, 1.0,    // 2
+		1.0, 0.0, 1.0, 1.0,    // 3
+		0.0, 2.0, 0.0, 1.0,   // 4
+	};
+	static const GLfloat cone_colors[] = {
+		1.0, 1.0, 1.0, 1.0,		// 0
+		1.0, 1.0, 0.0, 1.0,	   // 1
+		1.0, 0.0, 1.0, 1.0,   // 2
+		1.0, 0.0, 0.0, 1.0,  // 3
+		0.0, 1.0, 1.0, 1.0  // 4
+	};
+	static const GLushort cone_indices[] = {
+		0, 1, 2, 3, 0xFFFF, 1, 3, 4, 2, 0, 4, 1
+	};
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[PiramideEBuffer]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cone_indices), cone_indices,
+		GL_STATIC_DRAW);
+
+	glBindVertexArray(VAOs[Piramide]);
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[PiramideBuffer]);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cone_positions) + sizeof(cone_colors),
+		NULL, GL_STATIC_DRAW);
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(cone_positions), cone_positions);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(cone_positions), sizeof(cone_colors),
+		cone_colors);
+
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)sizeof(cone_colors));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 }
 
 void drawCone(void) {
-	glBindVertexArray(VAOs[ConeBuffer]);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[ConeEBuffer]);
+	glBindVertexArray(VAOs[PiramideBuffer]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBuffers[PiramideEBuffer]);
 
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, NULL);
 	glDrawElements(GL_TRIANGLE_STRIP, 7, GL_UNSIGNED_SHORT, (const GLvoid*)(5 * sizeof(GLushort)));
@@ -205,6 +266,10 @@ void init(void)
 	program = loadShaders("Programme/prakt6.vs", "Programme/prakt6.fs", "", "", "", "");
 	glUseProgram(program);
 
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glEnable(GL_STENCIL_TEST);
+
 	glGenBuffers(NumEBuffers, EBuffers);
 	glGenVertexArrays(NumVAOs, VAOs);
 	glGenBuffers(NumBuffers, Buffers);
@@ -212,13 +277,15 @@ void init(void)
 	genarateBox();
 	generateRectangle(2.0, 2.0);
 	generateCircle(1);
-	generateCone();
+	generatePiramide();
 }
 
 void display(void)
 {
 	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	GLfloat viewpoint[3];
 	viewpoint[0] = dist*sin(beta)*sin(alpha);
@@ -242,8 +309,25 @@ void display(void)
 	Model = translate(Model, vec3(0.0, 0.0, -3.0));
 	ModelViewProjection = Projection*View*Model;
 
+	if (b_stencil) {
+		glStencilFunc(GL_NEVER, 0x01, 0x1);
+		glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+		Model = mat4(1.0);
+		Model = translate(Model, vec3(-1.0, 0.0, 0.0));
+		ModelViewProjection = Projection*View*Model;
+
+		glUniformMatrix4fv(Location, 1, GL_FALSE, &ModelViewProjection[0][0]);
+		drawCone();
+
+		//drawBox();
+		glStencilFunc(GL_EQUAL, 0x01, 0x1);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	}
+	else glStencilFunc(GL_ALWAYS, 0x01, 0x1);
 	glUniformMatrix4fv(Location, 1, GL_FALSE, &ModelViewProjection[0][0]);
-	drawCone();
+	drawPiramide();
+
+
 
 	Model = mat4(1.0);
 	Model = translate(Model, vec3(-2.0, 0.0, 0.0));
@@ -271,6 +355,7 @@ void display(void)
 }
 
 void reshape(int w, int h) {
+	glViewport(0,0,w,h);
 	width = w;
 	height = h;
 }
@@ -280,13 +365,32 @@ void idle(void) {
 	Sleep(15);
 }
 
+
 void keyboard(unsigned char theKey, int mouseX, int mouseY) {
 	GLint x = mouseX;
 	GLint y = height - mouseY;
 	switch (theKey)	{
-	case 'v': dist -= DELTA; display(); break;
-	case 'z': dist += DELTA; display(); break;
-	case 'e': exit(-1);
+		case 'v': dist -= DELTA; display(); break;
+		case 'z': dist += DELTA; display(); break;
+		case 'd': 
+			if (b_depth) glDisable(GL_DEPTH_TEST);
+			else glEnable(GL_DEPTH_TEST);
+			b_depth = !b_depth; 
+			display();
+			break;
+		case 's':
+			if (b_stencil) glDisable(GL_STENCIL);
+			else glEnable(GL_STENCIL);
+			b_stencil = !b_stencil;
+			display();
+			break;
+		case 'b':
+			if (b_blend) glDisable(GL_BLEND);
+			else glEnable(GL_BLEND);
+			b_blend = !b_blend;
+			display();
+			break;
+		case 'e': exit(-1);
 	}
 }
 
@@ -322,9 +426,9 @@ void mouse(int theButton, int State, int mouseX, int mouseY) {
 
 int main(int argc, char** argv){
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL);
 	glutInitWindowSize(512, 512);
-	glutInitContextVersion(3, 1);  // (4,2) (3,3);
+	glutInitContextVersion(4, 2);  // (4,2) (3,3);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	//GLUT_COMPATIBILITY_PROFILE
 	glutCreateWindow(argv[0]);

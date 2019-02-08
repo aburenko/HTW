@@ -134,14 +134,14 @@ void display(void)
 	glBindVertexArray(VAOs[Circle]);
 
 	//prakt4
-	glViewport(0, 0, 512, 512);
+	glViewport(0, 0, 500, 500);
 	Location = glGetUniformLocation(program, "ModelViewProjection");
 	mat4 Projection = mat4(1.0);
 	mat4 Model = mat4(1.0);
 	mat4 View = mat4(1.0);
 	mat4 ModelViewProjection;
-	Projection = frustum(-1.0f, 1.0f, -1.0f, 1.0f, 1.5f, 20.0f);
-	View = lookAt(vec3(0.0, 0.0, 1.0), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
+	Projection = ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 20.0f);
+	View = lookAt(vec3(0.0, 0.0, 10.0), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
 	ModelViewProjection = Projection*View*Model;
 	glUniformMatrix4fv(Location, 1, GL_FALSE, &ModelViewProjection[0][0]);
 
@@ -157,7 +157,6 @@ void display(void)
 
 
 	Model = rotate(Model, 3.14f / 2.0f, vec3(0.0, 0.0, 1.0));
-	Model = scale(Model, vec3(1.0, 1.0, 1.0));
 	ModelViewProjection = Projection*View*Model;
 	glUniformMatrix4fv(Location, 1, GL_FALSE, &ModelViewProjection[0][0]);
 
@@ -166,7 +165,6 @@ void display(void)
 
 
 	Model = rotate(Model, 3.141f / 2.0f, vec3(0.0, 0.0, 1.0));
-	Model = scale(Model, vec3(1.0, 1.5, 1.0));
 	ModelViewProjection = Projection*View*Model;
 	glUniformMatrix4fv(Location, 1, GL_FALSE, &ModelViewProjection[0][0]);
 
