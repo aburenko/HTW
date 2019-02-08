@@ -660,9 +660,9 @@ void lichtBerechnung() {
 }
 
 void drawFigures(void) {
-	//// building
-	//// roof s
-	//// TEXTURE_ROOF
+	// building
+	// roof s
+	// TEXTURE_ROOF
 	glBindTexture(GL_TEXTURE_2D, tex[roofId]);
 
 	Model = mat4(1.0);
@@ -705,8 +705,8 @@ void drawFigures(void) {
 	lichtBerechnung();
 	drawBox24();
 
-	// floor s
-	// TEXTURE_FLOOR
+	//floor s
+	//TEXTURE_FLOOR
 	glBindTexture(GL_TEXTURE_2D, tex[floorID]);
 
 	Model = mat4(1.0);
@@ -715,7 +715,7 @@ void drawFigures(void) {
 	lichtBerechnung();
 	drawBox24();
 
-	// sun
+	//// sun
 	glBindTexture(GL_TEXTURE_2D, tex[sunid]);
 	Model = mat4(1.0);
 	Model = scale(Model, vec3(2, 2.0, 2));
@@ -772,6 +772,7 @@ void display(void)
 		glm::vec3(0.0, 1.0, 0.0)
 	);
 
+	Projection = glm::ortho(-10.f, 10.f, -10.f, 10.f, -10.f, 30.f);
 	glViewport(0, 0, 512, 512);
 	drawFigures();
 

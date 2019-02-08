@@ -12,9 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Programme\LoadShader.cpp" />
-    <ClCompile Include="Programme\main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="Programme\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Programme\main.fs" />
