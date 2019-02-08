@@ -21,13 +21,13 @@ class Server extends UDPtransfer {
 			if (receiveFailedTries == true)
 				break;
 
+			calcRTO();
 			simulateDelay();
 
 			generateAck();
 
 			send();
 
-			calcRTO();
 			showProgress();
 		}
 		showResult();
@@ -159,6 +159,7 @@ class Server extends UDPtransfer {
 	        sendDataBuffer.write(sessionNumber);
 	            // packetNumber
 	        sendDataBuffer.write((byte)packetNumber);
+		if(DEBUG) System.out.println("ACK NEW " + packetNumber);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -174,6 +175,7 @@ class Server extends UDPtransfer {
         byte[] sessionNumberRec = Arrays.copyOfRange(sequence, 0, S_SESSION_NUMBER);
         // get packet Number
         byte packetNumberRec = sequence[2];
+	if(DEBUG) System.out.println("GET " + packetNumberRec);
         boolean b_pnRepeat = (packetNumberRec == packetNumber);
         if (b_pnRepeat) {
             if(DEBUG) System.err.println("Reapeat");

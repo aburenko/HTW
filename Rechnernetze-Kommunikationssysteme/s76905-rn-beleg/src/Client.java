@@ -20,11 +20,11 @@ class Client extends UDPtransfer {
 			if(sessionFinished || receiveFailedTries)
 				break;
 
+			calcRTO();
 			updateSend();
 
 			send();
 
-			calcRTO();
 			showProgress();
 		}
 		showResult();
@@ -75,9 +75,11 @@ class Client extends UDPtransfer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-        if (fileLengthSent == fileLength)
+	
+        if (fileLengthSent == fileLength) {
             sessionFinished = true;
+            setSocketTimeout(thisSocket, RTO_MIN*4);
+	}
         boolean res = checkAck(receiveData);
         return res;
     }
@@ -85,6 +87,7 @@ class Client extends UDPtransfer {
 	@Override
 	public void send() {
 		try {
+        		if(DEBUG) System.out.println("Aufruf...");
 			thisSocket.send(sendPacket);
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -114,11 +117,12 @@ class Client extends UDPtransfer {
         sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
         receivePacket = new DatagramPacket(receiveData, receiveData.length);
         // send the datagram
-		try {
+	/*	try {
+        		if(DEBUG) System.out.println("Aufruf.INIT..");
         	thisSocket.send(sendPacket);
 		} catch(IOException e) {
 			e.printStackTrace();
-		}
+		}*/
         // logging
         if(DEBUG) System.out.println("Start packet sent");
     }
@@ -155,6 +159,7 @@ class Client extends UDPtransfer {
 		ByteArrayOutputStream sendDataBuffer = new ByteArrayOutputStream();
         // increment packageNumber
         packetNumber = (byte)((packetNumber + 0x01) & 0x01);
+	if(DEBUG) System.out.println("GEN " + packetNumber);
         // get data from file
         // calculate size of package
         int packetDataSize = MTU - S_SESSION_NUMBER - S_PACKET_NUMBER;
@@ -168,6 +173,7 @@ class Client extends UDPtransfer {
 	        // combine data packet
 	        sendDataBuffer.write(sessionNumber);
 	        sendDataBuffer.write(packetNumber);
+		if(DEBUG) System.out.println("file to send: " + fileToSend);
         	sendDataBuffer.write(fileData, 0, fileToSend);
 	        // send CRC on last packet
 	        if (fileLengthSent == fileLength) {
@@ -202,6 +208,8 @@ class Client extends UDPtransfer {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	
+	String newName = fileName.substring(fileName.lastIndexOf( "/" ) + 1);
 
         // convert file length into byte array
         fileLength = file.length();
@@ -212,12 +220,16 @@ class Client extends UDPtransfer {
 
         // convert name length to byte array
         byte[] fileNameLengthB = new byte[2];
-        fileNameLengthB[0] = (byte) ((fileName.length() >> 8) & 0xFF);
-        fileNameLengthB[1] = (byte) (fileName.length() & 0xFF);
+        fileNameLengthB[0] = (byte) ((newName.length() >> 8) & 0xFF);
+        fileNameLengthB[1] = (byte) (newName.length() & 0xFF);
 
         // encode file name into UTF 8 for sending
-        ByteBuffer nameUtf = StandardCharsets.UTF_8.encode(fileName);
-
+	byte[] nameUtf = new byte[1];
+	try{
+        	nameUtf = newName.getBytes("UTF-8");;
+	} catch(Exception e) {
+		e.printStackTrace();
+	}
         // create new CRC32
         CRC32 checkGen = new CRC32();
 
@@ -226,9 +238,9 @@ class Client extends UDPtransfer {
 	        sendDataBuffer.write(sessionNumber);
 	        sendDataBuffer.write(packetNumber);
 	        sendDataBuffer.write("Start".getBytes());
-	        sendDataBuffer.write(fileLengthB); // Write file length
+	        sendDataBuffer.write(fileLengthB ); // Write file length
 	        sendDataBuffer.write(fileNameLengthB); // Write name length
-	        sendDataBuffer.write(nameUtf.array()); // Write file name UTF_8
+	        sendDataBuffer.write(nameUtf); // Write file name UTF_8
 
 	        // update CRC over combined bytes
 	        checkGen.update(sendDataBuffer.toByteArray());

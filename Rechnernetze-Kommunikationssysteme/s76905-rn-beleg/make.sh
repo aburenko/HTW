@@ -5,6 +5,7 @@ javac -cp ./bin/ -d ./bin ./src/Client.java
 
 #clean all previous tries
 rm alice1*.txt 2>/dev/null
+rm test1*.jpg 2>/dev/null
 
 echo compile successide
 
