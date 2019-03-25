@@ -1,0 +1,13 @@
+{
+    "name": "IT1",
+    "short_name": "IT",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#fff",
+    "description": "A simple note learning app.",
+    "eslintConfig": {
+        "env": {
+            "browser": true
+        }
+    }
+}
