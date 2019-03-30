@@ -26,13 +26,21 @@ var requestURL = {
 	"alto":"/modules/alto.json",
 }
 
-var choosenTreble = "treble";
+var chosenClef = "treble";
 var loadedNotes;
 var restNotes;
 
-loadModule(requestURL[choosenTreble]);
+loadModule(requestURL[chosenClef]);
 
+/*Function of chosen module in the dropdown menu*/
+function openModule(chosenClef){
 
+} 
+
+/*Chosen answer-button function*/
+function decisionButton(){
+
+}
 function initModule(xhttp) {
 	// init gotten module notes to var(arr)
 	loadedNotes = JSON.parse(xhttp.responseText);
@@ -49,8 +57,8 @@ function nextNote() {
 	var roll = restNotes.splice(randNum, 1);
 	// clear box and draw next
 	clearBox("note");
-	console.log("draw: " + choosenTreble + " " + loadedNotes[roll]);
-	drawClefKey(choosenTreble, loadedNotes[roll]);
+	console.log("draw: " + chosenClef + " " + loadedNotes[roll]);
+	drawClefKey(chosenClef, loadedNotes[roll]);
 	// check if all notes are showed
 	if(restNotes.length == 0)
 		document.getElementById("note").innerHTML = "DONE!!!";

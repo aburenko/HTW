@@ -16,11 +16,17 @@
       </div>
     </div>
      <div id = "myDropdown" class = "dropdown-content">
-          <a href = "#"> Clef 1 </a>
-          <a href = "#"> Clef 2 </a>
+          <a onclick = 'openModule("treble")'> Treble </a>
+          <a onclick = 'openModule("bass")'> Bass </a>
+          <a onclick = 'openModule("alto")'> Alto </a>      
         </div>
-
-    <div id="note"></div>
+    <div id="note" class = "note-box"></div>
+    <div class = "decision-box">
+    	<button1 onclick = "decisionButton()"> A </button1>
+    	<button2 onclick = "decisionButton()"> B </button2>
+    	<button3 onclick = "decisionButton()"> C </button3>
+    	<button4 onclick = "decisionButton()"> D </button4>
+    </div>
     <div id="demo">bam</div>
     <button onclick="nextNote()">next</button>
     <script src="./scripts/vexflow-min.js"></script>
