@@ -67,7 +67,7 @@ function drawClefKey(clefToDraw, keyToDraw) {
 	// Connect it to the rendering context and draw!
 	stave.setContext(context).draw();
 	var notes = [
-	  // A quarter-note C.
+	  // create a given note for drawing.
 	  new VF.StaveNote({clef: clefToDraw, keys: [keyToDraw],
 		duration: "q", auto_stem: true })
 	];
