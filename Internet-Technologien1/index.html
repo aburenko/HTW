@@ -5,11 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="/manifest.json">
-    <link href="/styles/main.css" rel="stylesheet">
+    <link href="./styles/main.css" rel="stylesheet">
   </head>
   <body>
-    <p id="gogo">Let's do!</p>
-    <button onclick="myFunction()">Test</button>
+    <div class="topnav">
+      <div class = "dropdown">
+        <button onclick = "dropdownToggleFunction()" class = "dropbtn">
+         Clef mode
+        </button>
+      </div>
+    </div>
+     <div id = "myDropdown" class = "dropdown-content">
+          <a href = "#"> Clef 1 </a>
+          <a href = "#"> Clef 2 </a>
+        </div>
+
     <script src="./scripts/main.js"></script>
   </body>
 </html>
