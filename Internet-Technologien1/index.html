@@ -8,6 +8,18 @@
     <link href="./styles/main.css" rel="stylesheet">
   </head>
   <body>
+    <div class="topnav">
+      <div class = "dropdown">
+        <button onclick = "dropdownToggleFunction()" class = "dropbtn">
+         Clef mode
+        </button>
+      </div>
+    </div>
+     <div id = "myDropdown" class = "dropdown-content">
+          <a href = "#"> Clef 1 </a>
+          <a href = "#"> Clef 2 </a>
+        </div>
+
     <div id="note"></div>
     <div id="demo">bam</div>
     <button onclick="nextNote()">next</button>
