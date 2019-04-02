@@ -17,7 +17,7 @@ struct sembuf {
     unsigned short sem_num; // semaphore number in set, starts with 0
     short sem_op;           // semaphore operation
                             //  +1 is V()  -1 is P() 
-    short sem_flg;          // semaphore flags
+    short sem_flg;          // semaphore flags z.B SEM_UNDO
 }
 */
 union semun  
