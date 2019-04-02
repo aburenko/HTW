@@ -16,16 +16,16 @@
       </div>
     </div>
      <div id = "myDropdown" class = "dropdown-content">
-          <a onclick = 'openModule("treble")'> Treble </a>
-          <a onclick = 'openModule("bass")'> Bass </a>
-          <a onclick = 'openModule("alto")'> Alto </a>      
+          <a onclick = 'loadModule("treble")'> Treble </a>
+          <a onclick = 'loadModule("bass")'> Bass </a>
+          <a onclick = 'loadModule("alto")'> Alto </a>      
         </div>
     <div id="note" class = "note-box"></div>
     <div class = "decision-box">
-    	<button1 onclick = "decisionButton()"> A </button1>
-    	<button2 onclick = "decisionButton()"> B </button2>
-    	<button3 onclick = "decisionButton()"> C </button3>
-    	<button4 onclick = "decisionButton()"> D </button4>
+    	<button1 id="decisionButton1" onclick ="decisionButton(1)"> . </button1>
+    	<button2 id="decisionButton2" onclick ="decisionButton(2)"> . </button2>
+    	<button3 id="decisionButton3" onclick ="decisionButton(3)"> . </button3>
+    	<button4 id="decisionButton4" onclick ="decisionButton(4)"> . </button4>
     </div>
     <div id="demo">bam</div>
     <button onclick="nextNote()">next</button>

@@ -1,5 +1,6 @@
 "use strict";
 
+
 /* When the user clicks on the button,
 toggle between hiding and showing the dropdown content */
 function dropdownToggleFunction() {
@@ -26,50 +27,75 @@ var requestURL = {
 	"alto":"/modules/alto.json",
 }
 
+var notesPossibilities = {
+	"A":1, "B":2, "C":3,
+	"D":4, "E":5, 
+	"F":6, "G":7
+};
+
 var chosenClef = "treble";
 var loadedNotes;
 var restNotes;
 
-loadModule(requestURL[chosenClef]);
-
-/*Function of chosen module in the dropdown menu*/
-function openModule(chosenClef){
-
-} 
+loadModule(chosenClef);
 
 /*Chosen answer-button function*/
-function decisionButton(){
-
-}
-function initModule(xhttp) {
-	// init gotten module notes to var(arr)
-	loadedNotes = JSON.parse(xhttp.responseText);
-	// init or reinit array to mark already shown notes
-	// any clef has 15 notes
-	restNotes = Array.from(Array(15).keys());
-}
-
-function nextNote() {
-	// pick a random number between 0 and the restNotes length
-	var randNum = Math.floor(Math.random() * restNotes.length);
-	console.log("randNum: " + randNum);
-	// remove that index number from the array
-	var roll = restNotes.splice(randNum, 1);
-	// clear box and draw next
-	clearBox("note");
-	console.log("draw: " + chosenClef + " " + loadedNotes[roll]);
-	drawClefKey(chosenClef, loadedNotes[roll]);
-	// check if all notes are showed
-	if(restNotes.length == 0)
-		document.getElementById("note").innerHTML = "DONE!!!";
+function decisionButton(buttonNumber) {
+	// after any decicision block all buttons
+	enableButtons(false);
+	// get answer and compare it
+	var button = document.getElementById("decisionButton" + buttonNumber);
+	var answer = button.innerHTML;
+	var correct = rightAnswer === answer;
+	if(correct) {
+		button.style.background = "#87D37C";
+	} else {
+		button.style.background = "#FF8080";
+	}
+	// TODO: statistics...
 }
 
-function loadModule(moduleURL) { 
+// reset to first color value
+function rePaintButtons() {
+	var button;
+	for(var i=1; i<=4; i++) {
+		button = document.getElementById("decisionButton" + i);
+		button.style.background = "#4CAF50"; 
+	}
+}
+
+// enables or disables buttons
+function enableButtons(status) {
+	var button;
+	for(var i=1; i<=4; i++) {
+		button = document.getElementById("decisionButton" + i);
+		if(!status) button.onclick = null;
+		else {
+			switch(i) {
+				case 1: button.onclick = function() {decisionButton(1)};
+					break;
+				case 2: button.onclick = function() {decisionButton(2)};
+					break;
+				case 3: button.onclick = function() {decisionButton(3)};
+					break;
+				case 4: button.onclick = function() {decisionButton(4)};
+					break;
+				default: throw "wrong button id";
+			}
+		}
+	}
+}
+
+/*Function of chosen module in the dropdown menu*/
+function loadModule(clef) {
+	chosenClef = clef;
+	var moduleURL = requestURL[clef];
 	// loads module from module URL with AJAX 
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			// call startModule after recieve
+			console.log("loaded module: " + clef);
 			initModule(this);
 		}
 	};
@@ -78,9 +104,72 @@ function loadModule(moduleURL) {
 	xhttp.send();
 }
 
+function initModule(xhttp) {
+	// init gotten module notes to var(arr)
+	loadedNotes = JSON.parse(xhttp.responseText);
+	// init or reinit array to mark already shown notes
+	// any clef has 15 notes
+	restNotes = Array.from(Array(15).keys());
+	nextNote();
+}
+
+function nextNote() {
+	// pick a random number between 0 and the restNotes length
+	var randNum = Math.floor(Math.random() * restNotes.length);
+	console.log("randNum: " + randNum + " number of notes rest:" + restNotes.length);
+	// remove that index number from the array
+	var roll = restNotes.splice(randNum, 1);
+	// clear box and draw next
+	clearBox("note");
+	console.log("draw: " + chosenClef + " " + loadedNotes[roll]);
+	drawClefKey(chosenClef, loadedNotes[roll]);
+	// check if all notes are showed
+	if(restNotes.length == 0) {
+		document.getElementById("note").innerHTML = "DONE!!!"
+		return;
+	}
+	enableButtons(true);
+	rePaintButtons();
+	initButtons(loadedNotes[roll]);
+}
+
+var rightAnswer;
+var notesPossibilities = {
+	0:"A", 1:"B", 2:"C",
+	3:"D", 4:"E", 
+	5:"F", 6:"G"
+};
+function initButtons(chosenNote) {
+	chosenNote = chosenNote.slice(0,1);
+	rightAnswer = chosenNote;
+	// create array for filled buttons
+	var buttonsStatus = [1, 2, 3, 4];
+	var notesPossArr = [0, 1, 2, 3, 4, 5, 6];
+	// remove from possible notes
+	var chosenNoteNum = getKeyByValue(notesPossibilities, chosenNote);
+	notesPossArr.splice(chosenNoteNum, 1);
+	// choose random button to fill and cut from array
+	var randNum = Math.floor(Math.random() * 4);
+	var buttonNum = buttonsStatus.splice(randNum, 1);
+	// fill array
+	document.getElementById("decisionButton" + buttonNum).innerHTML = chosenNote;
+
+	// fill another buttons
+	for (var i = 3; i > 0; i--) {
+		// choose random button to fill and cut from array
+		randNum = Math.floor(Math.random() * i);
+		buttonNum = buttonsStatus.splice(randNum, 1);
+		// choose random note for filling and cut from array
+		randNum = Math.floor(Math.random() * notesPossArr.length);
+		var note = notesPossibilities[notesPossArr.splice(randNum, 1)];
+		// fill
+		document.getElementById("decisionButton" + buttonNum).innerHTML = note;
+	};
+}
+
 function drawClefKey(clefToDraw, keyToDraw) {
 	var VF = Vex.Flow;
-	// Create an SVG renderer and attach it to the DIV element named "boo".
+	// Create an SVG renderer and attach it to the DIV element named "note".
 	var div = document.getElementById("note")
 	var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
 	// Size our svg:
@@ -114,3 +203,7 @@ function clearBox(elementID)
     document.getElementById(elementID).innerHTML = "";
 }
 
+// returns name of key from object by value
+function getKeyByValue(object, value) {
+	return Object.keys(object).find(key => object[key] === value);
+}
