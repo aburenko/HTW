@@ -167,10 +167,6 @@ function nextNote() {
 	initButtons(loadedNotes[roll]);
 }
 
-function saveStatistics() {
-	
-}
-
 var rightAnswer;
 var notesPossibilities = {
 	0:"A", 1:"B", 2:"C",
