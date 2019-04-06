@@ -53,10 +53,12 @@ function decisionButton(buttonNumber) {
 	if(correct) {
 		button.style.background = "#87D37C";
 		answeredRight++;
-		drawProgressBar(answeredRight,15);
+		drawProgressBar(answeredRight, 15, "progressBar");
 	} else {
 		button.style.background = "#FF8080";
 	}
+	answered++;
+	drawProgressBar(answered, 15, "progressBarGeneral");
 	// check if all notes are showed
 	if(restNotes.length == 0) {
 		console.log("module end");
@@ -67,7 +69,7 @@ function decisionButton(buttonNumber) {
 	toggleButton("next");
 }
 
-function drawProgressBar(part, full) {
+function drawProgressBar(part, full, id) {
 	// calc percent of progress
 	try {
 		var percent = Math.ceil(part/full*100);
@@ -75,10 +77,9 @@ function drawProgressBar(part, full) {
 		console.exception(nullException);
 		return; 
 	}
-	var elem = document.getElementById("progressBar");   
+	var elem = document.getElementById(id);   
 	// get curr width and split it until % to get number
 	var width = elem.style.width.split('%')[0];
-	console.log(width + " " + percent);
 	var id = setInterval(frame, 10);
 	function frame() {
 		if (width >= percent) {
@@ -89,6 +90,13 @@ function drawProgressBar(part, full) {
 			elem.innerHTML = width * 1  + '%';
 		}
 	}
+}
+
+function resetProgressBar(id) {
+	var elem = document.getElementById(id);   
+	// reset width of progress bar elem
+	elem.style.width = "0%"; 
+	elem.innerHTML = "0%";
 }
 
 // reset to first color value
@@ -124,7 +132,6 @@ function enableButtons(status) {
 
 /*Function of chosen module in the dropdown menu*/
 function loadModule(clef) {
-	resetStatistics();
 	chosenClef = clef;
 	var moduleURL = requestURL[clef];
 	// loads module from module URL with AJAX 
@@ -142,6 +149,9 @@ function loadModule(clef) {
 }
 
 function initModule(xhttp) {
+	resetStatistics();
+	resetProgressBar("progressBar");
+	resetProgressBar("progressBarGeneral");
 	// init gotten module notes to var(arr)
 	loadedNotes = JSON.parse(xhttp.responseText);
 	// init or reinit array to mark already shown notes
@@ -155,7 +165,6 @@ function nextNote() {
 	toggleButton("next");
 	// pick a random number between 0 and the restNotes length
 	var randNum = Math.floor(Math.random() * restNotes.length);
-	console.log("randNum: " + randNum + " number of notes rest:" + restNotes.length);
 	// remove that index number from the array
 	var roll = restNotes.splice(randNum, 1);
 	// clear box and draw next
@@ -245,6 +254,7 @@ function getKeyByValue(object, value) {
 // resets statistics
 function resetStatistics() {
 	answeredRight = 0;
+	answered = 0;
 }
 
 // toggles enable value of button with ID
@@ -252,5 +262,4 @@ function toggleButton(ID) {
 	var button = document.getElementById(ID);
 	var value = button.disabled;
 	button.disabled = !(value);
-	console.log("set on: " + button.disabled);
 }
