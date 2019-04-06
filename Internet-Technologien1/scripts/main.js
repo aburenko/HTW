@@ -1,6 +1,5 @@
 "use strict";
 
-
 /* When the user clicks on the button,
 toggle between hiding and showing the dropdown content */
 function dropdownToggleFunction() {
@@ -36,6 +35,10 @@ var notesPossibilities = {
 var chosenClef = "treble";
 var loadedNotes;
 var restNotes;
+// vars for statistics
+var answered = 0;
+var answeredRight = 0;
+var answeredRightBest = 0; /* Best score */
 
 loadModule(chosenClef);
 
@@ -49,10 +52,43 @@ function decisionButton(buttonNumber) {
 	var correct = rightAnswer === answer;
 	if(correct) {
 		button.style.background = "#87D37C";
+		answeredRight++;
+		drawProgressBar(answeredRight,15);
 	} else {
 		button.style.background = "#FF8080";
 	}
-	// TODO: statistics...
+	// check if all notes are showed
+	if(restNotes.length == 0) {
+		console.log("module end");
+		// TODO: at the end notify user to choose next module
+		return;
+	}
+	// turn button on
+	toggleButton("next");
+}
+
+function drawProgressBar(part, full) {
+	// calc percent of progress
+	try {
+		var percent = Math.ceil(part/full*100);
+	} catch (nullException) { 
+		console.exception(nullException);
+		return; 
+	}
+	var elem = document.getElementById("progressBar");   
+	// get curr width and split it until % to get number
+	var width = elem.style.width.split('%')[0];
+	console.log(width + " " + percent);
+	var id = setInterval(frame, 10);
+	function frame() {
+		if (width >= percent) {
+			clearInterval(id);
+		} else {
+			width++; 
+			elem.style.width = width + '%'; 
+			elem.innerHTML = width * 1  + '%';
+		}
+	}
 }
 
 // reset to first color value
@@ -88,6 +124,7 @@ function enableButtons(status) {
 
 /*Function of chosen module in the dropdown menu*/
 function loadModule(clef) {
+	resetStatistics();
 	chosenClef = clef;
 	var moduleURL = requestURL[clef];
 	// loads module from module URL with AJAX 
@@ -114,6 +151,8 @@ function initModule(xhttp) {
 }
 
 function nextNote() {
+	// turn button off
+	toggleButton("next");
 	// pick a random number between 0 and the restNotes length
 	var randNum = Math.floor(Math.random() * restNotes.length);
 	console.log("randNum: " + randNum + " number of notes rest:" + restNotes.length);
@@ -123,14 +162,13 @@ function nextNote() {
 	clearBox("note");
 	console.log("draw: " + chosenClef + " " + loadedNotes[roll]);
 	drawClefKey(chosenClef, loadedNotes[roll]);
-	// check if all notes are showed
-	if(restNotes.length == 0) {
-		document.getElementById("note").innerHTML = "DONE!!!"
-		return;
-	}
 	enableButtons(true);
 	rePaintButtons();
 	initButtons(loadedNotes[roll]);
+}
+
+function saveStatistics() {
+	
 }
 
 var rightAnswer;
@@ -206,4 +244,17 @@ function clearBox(elementID)
 // returns name of key from object by value
 function getKeyByValue(object, value) {
 	return Object.keys(object).find(key => object[key] === value);
+}
+
+// resets statistics
+function resetStatistics() {
+	answeredRight = 0;
+}
+
+// toggles enable value of button with ID
+function toggleButton(ID) {
+	var button = document.getElementById(ID);
+	var value = button.disabled;
+	button.disabled = !(value);
+	console.log("set on: " + button.disabled);
 }
