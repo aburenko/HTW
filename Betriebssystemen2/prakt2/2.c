@@ -1,14 +1,15 @@
 #include <stdio.h>
+#include <time.h>
 #include <stdlib.h>
 #include <unistd.h>   
 #include <sys/types.h> 
 #include <sys/wait.h>
 // semaphore libs
 #include <sys/ipc.h>
-#include <sys/sem.h>
+#include <sys/sem.h> 
+// shared memory segment
+#include <sys/shm.h>
 
-#define FILENAME "zahl.dat"
-#define LOOPNUM 20000
 
 union semun  
 {
@@ -22,63 +23,89 @@ void error(const char * str) {
     exit(-1);
 }
 
-void routine() {
-    FILE *f;
+void P(int semaphoreID) {
+    // do P() on write semaphore
+    //printf("do P()\n");
+    struct sembuf singleSembuf = {0, -1, 0};
+    struct sembuf arrSembuf[1] = {singleSembuf};
+    struct sembuf *sops = arrSembuf;
+    if(semop(semaphoreID, sops, 1) < 0)
+        error("cant do P()");
+}
+
+void V(int semaphoreID) {
+    // do V() on semaphore
+    //printf("do V()\n");
+    struct sembuf singleSembuf = {0, 1, 0};
+    struct sembuf arrSembuf[1] = {singleSembuf};
+    struct sembuf *sops = arrSembuf;
+    if(semop(semaphoreID, sops, 1) < 0)
+        error("cant do V()");
+}
+
+void reader(int *shmAdress, int semaphoreWrite, int mutexRead) {
+    P(mutexRead);
+    *shmAdress += 1; 
+    if(*shmAdress == 1)
+        P(semaphoreWrite) ;
+    V(mutexRead);    
     
-    int ret, i, value;
+    /* lesender Zugriff */
+    printf("%d lese... \n", getpid());
+    sleep(1);
+    printf("%d gelesen... \n", getpid());
     
-    for(i=0; i<LOOPNUM; i++) {
-        printf("lauf i %d with pid %d\n", i, getpid());
-        //open
-        f = fopen(FILENAME, "r+t");
-        if(f==NULL) {
-            printf("Cannt open\n");
-        }
-        else {
-            // read value from file
-            ret = fscanf(f, "%d", &value);
-            if(ret <= 0)
-                printf("Cannt find a value in FILENAME\n");
-            // inkrement the value
-            value++;
-            //printf("value %d\n", value);
-            // clear file
-            f = freopen(FILENAME, "wt", f);
-            if(f == NULL)
-                printf("Cannt reopen FILENAME\n");
-            // write value
-            ret = fprintf(f, "%d", value);
-            if(ret <= 0)
-                printf("Cannt write a value to file\n");
-        }
-        // close file
-        ret = fclose(f);
-        if(ret!=0)
-            printf("Cannt close\n");
-    }
+    P(mutexRead);
+    *shmAdress -= 1; 
+    if(*shmAdress == 0)
+        V(semaphoreWrite) ;
+    V(mutexRead) ;
+}
+
+void writer(int *shmAdress, int semaphoreWrite) {
+    P(semaphoreWrite);
+    
+    /* schreibender Zugriff */
+    printf("%d schreibe... \n", getpid());
+    sleep(1);
+    printf("%d geschrieben \n", getpid());
+    
+    V(semaphoreWrite);
 }
 
 int main () {
     printf("starts\n");
     
-    FILE *f = fopen(FILENAME, "wt");
-    fprintf(f, "0");
-    fclose(f);
+    // create shared memory segment for var rc
+    // get key
+    int shmID  = shmget(IPC_PRIVATE, 1, IPC_CREAT | 0660 );
+    if (shmID == -1)
+        error("cant get key for shared memory segment");
+    // attach memory to key
+    int *shmAdress = shmat(shmID, NULL, SHM_RND);
+    if (shmAdress == (int *)-1)
+        error("cant attach shared memory segment to key");
+    
+    *shmAdress = 0;
+    printf("shared memory segment assigned with %d\n", *shmAdress);
     
     pid_t ret_t;
     pid_t retArr[5];
     int i, ret;
     int forkNum = 5;
     
-    // create semaphore
     printf("create semaphore\n");
     // get semaphore
-    int semID = semget(IPC_PRIVATE, 1, IPC_CREAT | 0660 );
-    if(semID < 0)
+    int semaphoreWrite  = semget(IPC_PRIVATE, 1, IPC_CREAT | 0660 );
+    int mutexRead = semget(IPC_PRIVATE, 1, IPC_CREAT | 0660 );
+    if(semaphoreWrite < 0 || mutexRead < 0)
         error("cant create semaphore");
     // SETVAL for semaphore
     sem_attr.val = 1; // unlocked
-    if (semctl (semID, 0, SETVAL, sem_attr) == -1)
+    if (
+        semctl (semaphoreWrite,  0, SETVAL, sem_attr) == -1 ||
+        semctl (mutexRead, 0, SETVAL, sem_attr) == -1
+    )
         error("semctl SETVAL");
     
     for(i=0; i<forkNum; i++) {
@@ -91,36 +118,11 @@ int main () {
         }
         // son
         else if(ret_t == 0) {
-            printf("son born\n");
+            //printf("son born\n");
             
-            // do P() on semaphore
-            printf("do P() pid:%d\n", getpid());
-            struct sembuf singleSembuf = {0, -1, SEM_UNDO};
-            struct sembuf arrSembuf[1] = {singleSembuf};
-            struct sembuf *sops = arrSembuf;
-            ret = semop(semID, sops, 1);
-            if(ret < 0)
-                error("cant do P()");
-           
-            if(i==0) {
-                printf("abort!\n");
-                abort();
-            }
+            if(i>2)         reader(shmAdress, semaphoreWrite, mutexRead);
+            else if(i <= 2) writer(shmAdress, semaphoreWrite);
             
-            routine();
-            
-            // do V() on semaphore
-            printf("do V()\n");
-            struct sembuf singleSembufV = {0, 1, SEM_UNDO};
-            struct sembuf arrSembufV[1] = {singleSembufV};
-            struct sembuf *sopsV = arrSembufV;
-            printf("1\n");
-            ret = semop(semID, sopsV, 1);
-            printf("2\n");
-            if(ret < 0)
-                error("cant do V()");
-            
-            printf("exit\n");
             exit(0);
         }
         // father
@@ -129,18 +131,22 @@ int main () {
         }
     }
     for(i=0; i<forkNum; i++) {
-        printf("father waits\n");
+        //printf("father waits\n");
         ret = waitpid(retArr[i], NULL, 0);
         if(ret < 0)
             printf("son proccess error\n");
-        else
-            printf("son %d finished\n", ret);
+        //else printf("son %d finished\n", ret);
     }
     // delete semaphore
-    printf("deleting semaphore...\n");
-    ret = semctl(semID, 1, IPC_RMID);
+    printf("deleting semaphores...\n");
+    ret = semctl(semaphoreWrite, 1, IPC_RMID);
     if(ret < 0)
         error("cant delete samaphore");
+    
+    ret = semctl(mutexRead, 1, IPC_RMID);
+    if(ret < 0)
+        error("cant delete samaphore");
+    
     printf("father dies\n");
     return 0;
 }

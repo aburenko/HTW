@@ -6,4 +6,4 @@ CG1/beleg/doc/*
 !CG1/beleg/doc/doc.tex
 !CG1/beleg/doc/doc.pdf
 #BS2
-Betriebssystemen2/*.out
+Betriebssystemen2/*/*.out
