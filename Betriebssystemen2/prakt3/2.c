@@ -102,7 +102,7 @@ void reader(int w, int r, int mutexrc, int priowriter, int *rc) {
     P(priowriter);
     P(r);
     P(mutexrc);
-    *rc += 1; 
+    *rc = *rc + 1; 
     if(*rc == 1)
         P(w) ;
     V(mutexrc);
@@ -115,7 +115,7 @@ void reader(int w, int r, int mutexrc, int priowriter, int *rc) {
     readFile();
     
     P(mutexrc);
-    *rc--;
+    *rc = *rc - 1;
     if (*rc == 0)
         V(w);
     V(mutexrc);
@@ -123,7 +123,7 @@ void reader(int w, int r, int mutexrc, int priowriter, int *rc) {
 
 void writer(int w, int r, int mutexwc, int *wc) {
     P(mutexwc);
-    *wc++;
+    *wc = *wc + 1;
     if (*wc == 1)
         P(r);
     V(mutexwc);
@@ -136,7 +136,7 @@ void writer(int w, int r, int mutexwc, int *wc) {
     
     V(w);
     P(mutexwc);
-    *wc--;
+    *wc = *wc - 1;
     if (*wc == 0)
         V(r);
     V(mutexwc);
@@ -177,9 +177,9 @@ int main () {
     printf("WC shared memory segment assigned with %d\n", *wc);
     
     pid_t ret_t;
-    pid_t retArr[5];
-    int i, ret;
     int forkNum = 10;
+    pid_t retArr[forkNum];
+    int i, ret;
     
     printf("create semaphore\n");
     // get semaphore
@@ -190,10 +190,10 @@ int main () {
     int mutexwc    = semget(IPC_PRIVATE, 1, IPC_CREAT | 0660 );
     if (
         priowriter < 0 || 
-        w         < 0 ||
-        r         < 0 ||
-        mutexrc   < 0 || 
-        mutexwc   < 0 
+        w          < 0 ||
+        r          < 0 ||
+        mutexrc    < 0 || 
+        mutexwc    < 0 
     )
         error("cant create semaphore");
     // SETVAL for semaphore
@@ -219,9 +219,8 @@ int main () {
         else if(ret_t == 0) {
             //printf("son born\n");
             
-            //if(i!=1 || i!=5) reader(w, r, mutexrc, priowriter, rc);
-            //else     
-                writer(w, r, mutexwc, wc);
+            if(i<9) reader(w, r, mutexrc, priowriter, rc);
+            else writer(w, r, mutexwc, wc);
             
             exit(0);
         }
