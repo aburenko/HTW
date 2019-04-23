@@ -11,6 +11,7 @@
 #include <sys/shm.h>
 
 #include <time.h>
+#include <errno.h>
 
 union semun  
 {
@@ -60,7 +61,6 @@ void routineClient(int semID, char *timeShmID) {
         P(semID);
         
         printf("forkson: %s\n",timeShmID);
-        fflush(stdout);
         
         V(semID);
     }
@@ -87,7 +87,8 @@ int main () {
     // create semaphore
     printf("create semaphore\n");
     // get semaphore
-    int semID = semget(IPC_PRIVATE, 1, IPC_CREAT | 0660 );
+    key_t semAllID = ftok("/bin/cat", 0);
+    int semID = semget(semAllID, 1, IPC_CREAT | 0660 );
     if(semID < 0)
         error("cant create semaphore");
     // SETVAL for semaphore
@@ -97,7 +98,8 @@ int main () {
     
     // create shared memory segment for var RC
     // get key
-    int shmKey  = shmget(IPC_PRIVATE, 6, IPC_CREAT | 0660 );
+    key_t shmAllKey = ftok("/bin/ls", 0);
+    int shmKey = shmget(shmAllKey, 6, IPC_CREAT | 0640 );
     if (shmKey == -1)
         error("RC cant get key for shared memory segment");
     // attach memory to key
@@ -115,13 +117,14 @@ int main () {
     // son
     else if(ret_t == 0) {
         printf("unverwandter son born\n");
-        // TODO: zu implementieren
-        execl("1_Client.c", 
-            "1_Client.c", shmKey, semID 
+        char bufShmKey[50];
+        sprintf(bufShmKey, "%d", shmAllKey);
+        char bufSemID[50];
+        sprintf(bufSemID, "%d", semAllID);
+        execlp("1_Client.out", 
+            "1_Client.out", bufShmKey, bufSemID, 
             (char*) NULL);
-        
-        printf("unverwandter son exit\n");
-        exit(0);
+        printf(strerror(errno));
     }
     
     ret_t = fork();

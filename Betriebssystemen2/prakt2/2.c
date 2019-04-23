@@ -10,6 +10,7 @@
 // shared memory segment
 #include <sys/shm.h>
 
+#define FILENAME "zahl.dat"
 
 union semun  
 {
@@ -43,6 +44,60 @@ void V(int semaphoreID) {
         error("cant do V()");
 }
 
+void writeFile() {
+    FILE *f;
+    int ret, value;
+    //open
+    f = fopen(FILENAME, "r+t");
+    if(f==NULL) {
+        printf("Cannt open\n");
+    }
+    else {
+        // read value from file
+        ret = fscanf(f, "%d", &value);
+        if(ret <= 0)
+            printf("Cannt find a value in FILENAME\n");
+        // inkrement the value
+        value++;
+        //printf("value %d\n", value);
+        // clear file
+        f = freopen(FILENAME, "wt", f);
+        if(f == NULL)
+            printf("Cannt reopen FILENAME\n");
+        // write value
+        ret = fprintf(f, "%d", value);
+        printf("Wert %d reingeschrieben\n", value);
+        if(ret <= 0)
+            printf("Cannt write a value to file\n");
+    }
+    // close file
+    ret = fclose(f);
+    if(ret!=0)
+        printf("Cannt close\n");
+}
+
+void readFile() {
+    FILE *f;
+    int ret, value;
+    //open
+    f = fopen(FILENAME, "r+t");
+    if(f==NULL) {
+        printf("Cannt open\n");
+    }
+    else {
+        // read value from file
+        ret = fscanf(f, "%d", &value);
+        if(ret <= 0)
+            printf("Cannt find a value in FILENAME\n");
+        else // print value
+            printf("Wert %d ausgelesen\n", value);
+    }
+    // close file
+    ret = fclose(f);
+    if(ret!=0)
+        printf("Cannt close\n");
+}
+
 void reader(int *shmAdress, int semaphoreWrite, int mutexRead) {
     P(mutexRead);
     *shmAdress += 1; 
@@ -52,6 +107,7 @@ void reader(int *shmAdress, int semaphoreWrite, int mutexRead) {
     
     /* lesender Zugriff */
     printf("%d lese... \n", getpid());
+    readFile();
     sleep(1);
     printf("%d gelesen... \n", getpid());
     
@@ -67,6 +123,7 @@ void writer(int *shmAdress, int semaphoreWrite) {
     
     /* schreibender Zugriff */
     printf("%d schreibe... \n", getpid());
+    writeFile();
     sleep(1);
     printf("%d geschrieben \n", getpid());
     
@@ -75,6 +132,11 @@ void writer(int *shmAdress, int semaphoreWrite) {
 
 int main () {
     printf("starts\n");
+    // make file and write 0
+    FILE *f = fopen(FILENAME, "wt");
+    fprintf(f, "0");
+    fclose(f);
+    
     
     // create shared memory segment for var rc
     // get key
@@ -120,8 +182,8 @@ int main () {
         else if(ret_t == 0) {
             //printf("son born\n");
             
-            if(i>2)         reader(shmAdress, semaphoreWrite, mutexRead);
-            else if(i <= 2) writer(shmAdress, semaphoreWrite);
+            if(i==2 || i==3) reader(shmAdress, semaphoreWrite, mutexRead);
+            else     writer(shmAdress, semaphoreWrite);
             
             exit(0);
         }
