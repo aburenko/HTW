@@ -1,0 +1,54 @@
+
+header {
+    background:tomato;
+    grid-area: header;
+}
+
+article {
+    background:gold;
+    grid-area: content;
+}
+
+aside {
+    background:lightgreen;
+    grid-area: sidebar;
+}
+
+footer {
+    background:lightblue;
+    grid-area: footer;
+}
+
+
+
+.container {
+    height:100vh;
+    display: grid;
+    grid-template-rows: 50% 20% 20% 10%;
+    grid-template-columns: 100%;
+    grid-template-areas: 
+        "header"
+        "content"
+        "sidebar"
+        "footer"
+    ;
+}
+
+
+
+@media screen and (min-width: 44.001em) {
+
+    .container {
+        height:100vh;
+        display: grid;
+        grid-template-rows: 50% 20% 20% 10%;
+        grid-template-columns: 50%;
+        grid-template-areas: 
+            "header"
+            "content"
+            "sidebar"
+            "footer"
+        ;
+    }
+
+}
