@@ -5,5 +5,9 @@ CG1/prakt/*.opensdf
 CG1/beleg/doc/*
 !CG1/beleg/doc/doc.tex
 !CG1/beleg/doc/doc.pdf
-#BS2
+
+# BS2
 Betriebssystemen2/*/*.out
+
+# exclude compiled java: .class
+*.class
