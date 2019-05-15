@@ -1,0 +1,15 @@
+For www.heise.de:
+
+openssl s_client -crlf -connect www.heise.de:https
+
+GET / HTTP/1.1
+Host: www.heise.de
+
+
+
+For www2.htw-dresden.de
+
+openssl s_client -crlf -connect www2.htw-dresden.de:https
+
+GET / HTTP/1.1
+Host: www2.htw-dresden.de

@@ -9,5 +9,5 @@ CG1/beleg/doc/*
 # BS2
 Betriebssystemen2/*/*.out
 
-# exclude compiled java: .class
-*.class
+#IT1
+Internet-Technologien1/*/*.class

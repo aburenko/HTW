@@ -1,0 +1,7 @@
+In Console:
+telnet www-cache.htw-dresden.de 3128
+
+GET http://checkip.dyndns.org / HTTP/1.1
+Host: 
+<enter>
+<enter>
