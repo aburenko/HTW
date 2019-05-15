@@ -50,15 +50,17 @@ function decisionButton(buttonNumber) {
 	var button = document.getElementById("decisionButton" + buttonNumber);
 	var answer = button.innerHTML;
 	var correct = rightAnswer === answer;
+	// repaint progress bars
 	if(correct) {
-		button.style.background = "#87D37C";
 		answeredRight++;
 		drawProgressBar(answeredRight, 15, "progressBar");
-	} else {
-		button.style.background = "#FF8080";
-	}
+	} 
 	answered++;
 	drawProgressBar(answered, 15, "progressBarGeneral");
+	// mark the righth button
+	var buttonRight = document.getElementById("decisionButton" + rightAnswerIndex);
+	buttonRight.style.background = "#33cc33";
+	console.log("decisionButton" + rightAnswerIndex);
 	// check if all notes are showed
 	if(restNotes.length == 0) {
 		console.log("module end");
@@ -158,6 +160,8 @@ function initModule(xhttp) {
 	// any clef has 15 notes
 	restNotes = Array.from(Array(15).keys());
 	nextNote();
+	// set next button to disabled
+	document.getElementById("next").disabled = true;
 }
 
 function nextNote() {
@@ -177,6 +181,7 @@ function nextNote() {
 }
 
 var rightAnswer;
+var rightAnswerIndex;
 var notesPossibilities = {
 	0:"A", 1:"B", 2:"C",
 	3:"D", 4:"E", 
@@ -196,6 +201,7 @@ function initButtons(chosenNote) {
 	var buttonNum = buttonsStatus.splice(randNum, 1);
 	// fill array
 	document.getElementById("decisionButton" + buttonNum).innerHTML = chosenNote;
+	rightAnswerIndex = buttonNum;
 
 	// fill another buttons
 	for (var i = 3; i > 0; i--) {
