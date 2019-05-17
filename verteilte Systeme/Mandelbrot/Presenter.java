@@ -4,6 +4,11 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import java.awt.Graphics;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import java.awt.image.WritableRaster;
+
 
 public class Presenter
 {
@@ -13,6 +18,8 @@ public class Presenter
         Presenter p = new Presenter();
         Model m = new Model(w,h,p);
         ViewGUI v = new ViewGUI(w,h,m);
+        m.setView(v);
+        m.calcImage();
         p.start();
     }
     
@@ -41,49 +48,77 @@ public class Presenter
 
 class Model {
     Presenter p;
+    ViewGUI v;
     int w,h;
-    public boolean [][]imageArr; 
-    
+    public int [][]imageArr; 
+    public void setView(ViewGUI v) {
+        this.v = v;
+    }
     public Model(int w, int h, Presenter p) {
         this.w = w;
         this.h = h;
         this.p = p;
     }
     
-    private void calcImage() {
+    public void calcImage() {
         imageArr = new int[w][h];
         int threadNumber = 8;
         //while(true) {
-            calcImagePart(threadsNum);
+        System.out.println("let call part count");
+            calcImagePart(threadNumber);
         //}
     }    
     
     private void calcImagePart(int threadNumber) {
         Thread []threads = new Thread[threadNumber];
+        System.out.println("let count");
         // create Threads
         for (int i=0; i<threadNumber; i++) { 
-            ThreadBool calcPart= new CalcImagePart(i*(h/n),(i+1)*(h/n),w,h,this);
+            CalcImagePart calcPart= new CalcImagePart(i*(h/threadNumber),(i+1)*
+            (h/threadNumber),w,h,this);
             threads[i] = new Thread(calcPart);
             threads[i].start();
         }        
+        System.out.println("let wait");
         // wait at all threads
-        for (int i=0; i<n; i++) {
+        for (int i=0; i<threadNumber; i++) {
             try {
                 threads[i].join();
             } catch(Exception e) {
                 e.printStackTrace();
             }
         }
+        System.out.println("let repaint");
+        v.paintComponent();
     }
     
     private void setParam(int w, int h) {
         this.w = w;
         this.h = h;
     }
+    
+    public Image getImageFromArray() {
+        BufferedImage image = new BufferedImage(w, h,
+            BufferedImage.TYPE_INT_ARGB);
+        WritableRaster raster = (WritableRaster) image.getData();
+        
+        int i = 0;
+        int []pixelsOne = new int[w*h];
+        // turn two dem array to one dem array
+        for (int[] sublist : imageArr) {
+            for (int elem : sublist) {
+                pixelsOne[i] = elem;
+            }
+        }
+        
+        
+        raster.setPixels(0,0,w,h,pixelsOne);
+        return image;
+    }
 }
 
 class CalcImagePart implements Runnable {
-    int yS,yE,w;
+    int yS,yE,w,h;
     Model m;
     public CalcImagePart(int yS,int yE, int w, int h, Model m) {
         this.yS = yS;
@@ -96,8 +131,14 @@ class CalcImagePart implements Runnable {
     public void run() {
         for(int i=yS; i<yE; i++) {
             for(int j=0; j<w; j++) {
-                m.imageArr[i][j] = iter(toMOTO(i),toMOTO(j));
+                System.out.println("st");
+                if( iter(toMOTO(i,yE),toMOTO(j,w)))
+                    m.imageArr[i][j] = 1;
+                else   
+                    m.imageArr[i][j] = 0;
+                System.out.println("end");
             }
+                System.out.println("raus");
         }
     }
     // a,b = -1...0...1
@@ -122,39 +163,43 @@ class CalcImagePart implements Runnable {
         return ((double)x) / ((double)xMax) * 2.0 - 1.0;
     }
 }
+
 //http://www.java2s.com/Tutorial/Java/0261__2D-Graphics/CreateBufferredImagewithcolorsbasedonintegerarray.htm
-class ViewGUI extends JComponent {
+class ViewGUI extends JPanel {
     int w;
     int h;
     Model m;
+    JFrame frame;
+    JLabel jl;
+    JButton jb;
     
-    public ViewGUI(int w, int h, Model m) {
-        JFrame frame = new JFrame("ColorPan");
-        frame.getContentPane().add(new ColorPan());
+    public ViewGUI(int w, int h, Model m) 
+    {
+        frame = new JFrame();
         frame.setSize(w, h);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(new FlowLayout());
+        jl = new JLabel();
+        frame.getContentPane().add(jl);
+        JButton jb = new JButton("test");
+        frame.getContentPane().add(jb);
+        frame.pack();
         frame.setVisible(true);
         this.w = w;
         this.h = h;
         this.m = m;
     }
     
-    public void paint(Graphics g) {
-        int width = getSize().width;
-        int height = getSize().height;
-        m.imageArr;
-        int i = 0;
-        for (int y = 0; y < height; y++) {
-        int red = (y * 255) / (height - 1);
-        for (int x = 0; x < width; x++) {
-            int green = (x * 255) / (width - 1);
-            int blue = 128;
-            data[i++] = (red << 16) | (green << 8) | blue;
-        }
-        }
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        image.setRGB(0, 0, width, height, data, 0, width);
-        g.drawImage(image, 0, 0, this);
+    public void paintComponent() {
+        System.out.println("do repaint");
+        frame = new JFrame();
+        frame.getContentPane().setLayout(new FlowLayout());
+        Image img = m.getImageFromArray();
+        jl = new JLabel(new ImageIcon(img));
+        frame.getContentPane().add(jl);
+        JButton jb = new JButton("testABC");
+        frame.getContentPane().add(jb);
+        frame.pack();
+        frame.setVisible(true);
     }
 
 }
