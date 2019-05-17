@@ -21,17 +21,17 @@
           <a onclick = 'loadModule("bass")'> Bass </a>
           <a onclick = 'loadModule("alto")'> Alto </a>      
         </div>
-    <div id="note" class = "note-box"></div>
+    <div id="note" class = "note-box"> </div>
     <div class = "decision-box">
-    	<button1 id="decisionButton1" onclick ="decisionButton(1)"> . </button1>
-    	<button2 id="decisionButton2" onclick ="decisionButton(2)"> . </button2>
-    	<button3 id="decisionButton3" onclick ="decisionButton(3)"> . </button3>
-    	<button4 id="decisionButton4" onclick ="decisionButton(4)"> . </button4>
+    	<button id="decisionButton1" onclick ="decisionButton(1)"> . </button>
+    	<button id="decisionButton2" onclick ="decisionButton(2)"> . </button>
+    	<button id="decisionButton3" onclick ="decisionButton(3)"> . </button>
+    	<button id="decisionButton4" onclick ="decisionButton(4)"> . </button>
     </div>
     <div class="w3-light-grey">
-    <div id="progressBar" class="w3-container w3-green w3-center" style="width:0%">0%</div>
-    <div class="w3-light-grey">
-    <div id="progressBarGeneral" class="w3-container w3-green w3-center" style="width:0%">0%</div>
+      <div id="progressBar" class="w3-container w3-green w3-center" style="width:0%">0%</div>  
+      <div id="progressBarGeneral" class="w3-container w3-green w3-center" style="width:0%">0%
+    </div>
     <button id="next" onclick="nextNote()">next</button>
     <script src="./scripts/vexflow-min.js"></script>
     <script src="./scripts/main.js"></script>
