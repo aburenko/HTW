@@ -1,0 +1,13 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+int main() {
+    char array[] = {"arithmetics"};
+    printf("Your array: %s\n", array);
+    
+    int * p=array;
+    
+    prinf("p int: %d || p adress: %p");
+    
+    return 0;
+}
