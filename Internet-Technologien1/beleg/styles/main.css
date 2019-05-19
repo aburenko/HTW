@@ -35,8 +35,8 @@ body {
  
  /* Dropdown Button */
 .dropbtn {
-  background-color: #5CEDA4;
-  color: white;
+  background-color: #4CAF50;
+  color: black;
   padding: 16px;
   font-size: 16px;
   border: none;
@@ -69,9 +69,10 @@ body {
 /* Links inside the dropdown */
 .dropdown-content a {
   color: black;
-  padding: 12px 16px;
+  padding: 12px 34px;
   text-decoration: none;
   display: block;
+  cursor: pointer;
 }
 
 .dropdown-content{
@@ -86,7 +87,7 @@ body {
 /*Note-Box*/
 .note-box{
   margin-top: 15px;
-  margin-left: 25%;
+  margin-left: 35%;
   padding-left: 5%;
   border-style: ridge;
   width: 380px;
@@ -96,7 +97,7 @@ body {
 .decision-box{
   position: relative;
   margin: auto auto;
-  margin-left: 25.1%;
+  margin-left: 35.1%;
   
 }
 
@@ -122,19 +123,27 @@ body {
 }
 /*Button next called by id*/
 #next{
-  font-weight: 700;
-  color: white;
-  text-decoration: none;
-  padding: .8em 1em calc(.8em + 3px);
-  border-radius: 3px;
-  background: rgb(64,199,129);
-  box-shadow: 0 -3px rgb(53,167,110) inset;
-  transition: 0.2s;
+  display: inline-block;
+  margin-top: 8px;
+  margin-left: 57%;
+  padding: 15px 32px;
+  font-size: 16px;
+  font: arial;
+  cursor: pointer;
+  border-radius:0.12em;
+  text-align: center;
+  background-color: white;
+  color: black;
+  border: 2px solid #4CAF50;
  }
-#next: hover{ background: rgb(53, 167, 110); }
-#next: active {
-  background: rgb(33,147,90);
-  box-shadow: 0 3px rgb(33,147,90) inset;}
+
+#next:hover {background-color: #4CAF50}
+#next: active{
+  border: 2px solid white;
+  box-shadow: 0 5px #666;
+  transform:translateY(2px);
+}
+
 
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
 .show {display:block;} 
@@ -144,6 +153,7 @@ body {
   .note-box{
   margin-top: 15px;
   margin-left: 5%; 
+  padding-bottom: 15px;
   padding-left: 5%;
   padding-right: 15%;
   border-style: ridge;
