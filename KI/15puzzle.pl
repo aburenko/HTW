@@ -1,6 +1,6 @@
 solution(Puzzle,ReturnPath) :- goal(Goal),idas(Puzzle,Goal,ReturnPath),printPath(ReturnPath),!.
 
-test(ReturnPath) :- testPuzzle(P),solution(P,ReturnPath).
+test(ReturnPath) :- testPuzzle4(P),solution(P,ReturnPath).
 
 printBox(Box) :- maplist(writeln,Box),write('\n').
 printPath(Path) :- maplist(printBox,Path).
