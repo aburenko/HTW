@@ -1,5 +1,22 @@
 "use strict";
 
+/* Service worker registering */
+window.addEventListener('load', () => {
+	registerSW();
+	loadModule(chosenClef);
+})
+
+async function registerSW(){
+	if('serviceWorker' in navigator){
+		try{
+			await navigator.serviceWorker.register('/sw.js');
+		} catch (e){
+			console.log("SW registration failed");
+		}
+	}
+}
+
+
 /* When the user clicks on the button,
 toggle between hiding and showing the dropdown content */
 function dropdownToggleFunction() {
@@ -40,7 +57,6 @@ var answered = 0;
 var answeredRight = 0;
 var answeredRightBest = 0; /* Best score */
 
-loadModule(chosenClef);
 
 /*Chosen answer-button function*/
 function decisionButton(buttonNumber) {
