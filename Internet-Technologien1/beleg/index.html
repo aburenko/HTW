@@ -20,16 +20,20 @@
           <a onclick = 'loadModule("treble")'> Treble </a>
           <a onclick = 'loadModule("bass")'> Bass </a>
           <a onclick = 'loadModule("alto")'> Alto </a>      
-        </div>
-    <div id="note" class = "note-box"> </div>
-    <div class = "decision-box">
-    	<button id="decisionButton1" onclick ="decisionButton(1)"> . </button>
+     </div>	    
+	 <div id="note" class = "note-box"> </div>
+	 <div class = "decision-box">
+	   	<button id="decisionButton1" onclick ="decisionButton(1)"> . </button>
     	<button id="decisionButton2" onclick ="decisionButton(2)"> . </button>
-    	<button id="decisionButton3" onclick ="decisionButton(3)"> . </button>
-    	<button id="decisionButton4" onclick ="decisionButton(4)"> . </button>
-    </div>
-    <div class="w3-light-grey">
+ 	    <button id="decisionButton3" onclick ="decisionButton(3)"> . </button>
+	    <button id="decisionButton4" onclick ="decisionButton(4)"> . </button>
+	 </div>
+    <p class="label"> Right answers </p>
+    <div id="ProgressBarDiv" class="w3-light-grey">
       <div id="progressBar" class="w3-container w3-green w3-center" style="width:0%">0%</div>  
+  	</div>
+  	<p class="label"> Progress </p>
+  	<div id="progressBarGeneralDiv" class="w3-light-grey">
       <div id="progressBarGeneral" class="w3-container w3-green w3-center" style="width:0%">0%</div>
     </div>
     <button id="next" onclick="nextNote()">next</button>

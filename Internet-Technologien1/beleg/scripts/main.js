@@ -163,7 +163,7 @@ function initModule(xhttp) {
 	// set next button to disabled
 	document.getElementById("next").disabled = true;
 }
-
+ var key;
 function nextNote() {
 	// turn button off
 	toggleButton("next");
@@ -173,6 +173,7 @@ function nextNote() {
 	var roll = restNotes.splice(randNum, 1);
 	// clear box and draw next
 	clearBox("note");
+	key = loadedNotes[roll];
 	console.log("draw: " + chosenClef + " " + loadedNotes[roll]);
 	drawClefKey(chosenClef, loadedNotes[roll]);
 	enableButtons(true);
@@ -216,15 +217,25 @@ function initButtons(chosenNote) {
 	};
 }
 
+var x = window.matchMedia("(max-width: 620px)")
+x.addListener(function() {drawClefKey(chosenClef, key)})
+
 function drawClefKey(clefToDraw, keyToDraw) {
+	// clear box and draw next
+	clearBox("note");
 	var VF = Vex.Flow;
 	// Create an SVG renderer and attach it to the DIV element named "note".
 	var div = document.getElementById("note")
 	var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
 	// Size our svg:
 	// TODO: ... if render for mobile -> change size
-	renderer.resize(250, 250);
-	// And get a drawing context:
+	if(x.matches){
+		renderer.resize(250, 180);
+	}
+	else{
+		renderer.resize(250, 250);
+	}
+		// And get a drawing context:
 	var context = renderer.getContext();
 	// Create a stave at position 10, 40 of width 400 on the canvas.
 	var stave = new VF.Stave(10, 40, 400);
@@ -244,6 +255,7 @@ function drawClefKey(clefToDraw, keyToDraw) {
 	var formatter = new VF.Formatter().joinVoices([voice]).format([voice], 400);
 	// Render voice
 	voice.draw(context, stave);
+	
 }
 
 function clearBox(elementID)
