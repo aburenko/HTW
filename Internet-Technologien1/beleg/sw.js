@@ -2,6 +2,7 @@ const cacheName = 'note_cache';
 const staticAssets = [
   '/',
   '/index.html',
+  '/manifest.json',
   '/styles/main.css',
   '/styles/w3_schools.css',
   '/scripts/main.js',
@@ -9,6 +10,9 @@ const staticAssets = [
   '/img/icon.png',
   '/img/icon128.png',
   '/img/icon256.png',
+  '/modules/alto.json',
+  '/modules/bass.json',
+  '/modules/treble.json'
   ];
 
 self.addEventListener('install', async e => {
