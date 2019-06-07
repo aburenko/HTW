@@ -1,6 +1,6 @@
 solution(Puzzle,ReturnPath) :- goal(Goal),idas(Puzzle,Goal,ReturnPath),printPath(ReturnPath),!.
 
-test(ReturnPath) :- testPuzzle4(P),solution(P,ReturnPath).
+test(ReturnPath) :- testPuzzleS(P),solution(P,ReturnPath).
 
 printBox(Box) :- maplist(writeln,Box),write('\n').
 printPath(Path) :- maplist(printBox,Path).
@@ -11,6 +11,7 @@ testPuzzle4([[1,2,3,4],[5,6,7,8],[16,10,11,12],[9,13,14,15]]).
 testPuzzle5([[1,2,3,16],[5,6,7,4],[9,10,11,8],[13,14,15,12]]).
 testPuzzle6([[1,2,3,4],[5,6,7,8],[15,16,12,11],[9,14,10,13]]).
 testPuzzleS([[1,2,3,4],[5,7,8,11],[9,6,16,12],[13,15,14,10]]).
+testPuzzleSS([[16,15,14,13],[12,11,10,9],[8,7,6,5],[4,3,2,1]]).
 
 
 adj0([A,B,C,D],[L,B,C,D]) :- member(16,A),adjLine(A,L). 
@@ -61,6 +62,7 @@ h(Head,H) :- hm(Head,Hm),hc(Head,Hc), H is Hm+Hc.
 
 % % Manhattan-Distanz
 hm(Head,G) :- flatten(Head,Flatt),goalF(GF),maplist(elemDistance,Flatt,GF,Y),sumlist(Y,G).
+elemDistance(16,_,0).
 elemDistance(Elem,Pos,Distance) :- RealX is (Pos-1)  mod 4, RealY is (Pos-1)  div 4,
     							   EndX  is (Elem-1) mod 4, EndY  is (Elem-1) div 4,
     XDiff is RealX-EndX, YDiff is RealY-EndY, abs(XDiff,XDabs), abs(YDiff,YDabs), Distance is XDabs + YDabs.
@@ -75,7 +77,7 @@ hc(_,0).
 % p,q must have end positions in List
 % end position of p must be on the left side of q
 % checks for every q and p
-checkQPPos(N,List,IdxQ,IdxP) :- nth0(IdxQ,List,Q),nth0(IdxP,List,P),checkQPEnd(N,Q,P);
+checkQPPos(N,List,IdxQ,IdxP) :- nth0(IdxQ,List,Q),nth0(IdxP,List,P),not(Q is 16),not(P is 16),checkQPEnd(N,Q,P);
     							nextQS(IdxQ,IdxP,IdxQN,IdxPN),checkQPPos(N,List,IdxQN,IdxPN).
 % get new index for q and p
 nextQS(IQ,IP,IQ,IPN) :- IQ < 2, IP < 3, IPN is IP+1.
