@@ -13,7 +13,7 @@ const staticAssets = [
   '/modules/alto.json',
   '/modules/bass.json',
   '/modules/treble.json',
-  '/img/favincon.ico'
+  '/img/favicon.ico'
   ];
 
 self.addEventListener('install', async e => {
