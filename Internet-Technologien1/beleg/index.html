@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>IT1: learning musical notes</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/manifest.json"rel="manifest" >
+    <link href="./styles/main.css" rel="stylesheet">
+    <link href="./styles/w3_schools.css" rel="stylesheet" >
+    <link rel="icon" href="./img/favicon.ico" sizes="16x16">
+  </head>
+  <body>
+    <div class="topnav">
+      <div class = "dropdown">
+        <button onclick = "dropdownToggleFunction()" class = "dropbtn">
+         Clef mode
+        </button>
+      </div>
+    </div>
+     <div id = "myDropdown" class = "dropdown-content">
+          <a onclick = 'loadModule("treble")'> Treble </a>
+          <a onclick = 'loadModule("bass")'> Bass </a>
+          <a onclick = 'loadModule("alto")'> Alto </a>      
+     </div>	    
+	 <div id="note" class = "note-box"> </div>
+	 <div class = "decision-box">
+	   	<button id="decisionButton1" onclick ="decisionButton(1)"> . </button>
+    	<button id="decisionButton2" onclick ="decisionButton(2)"> . </button>
+ 	    <button id="decisionButton3" onclick ="decisionButton(3)"> . </button>
+	    <button id="decisionButton4" onclick ="decisionButton(4)"> . </button>
+	 </div>
+    <p class="label"> Right answers </p>
+    <div id="ProgressBarDiv" class="w3-light-grey">
+      <div id="progressBar" class="w3-container w3-green w3-center" style="width:0%">0%</div>  
+  	</div>
+  	<p class="label"> Progress </p>
+  	<div id="progressBarGeneralDiv" class="w3-light-grey">
+      <div id="progressBarGeneral" class="w3-container w3-green w3-center" style="width:0%">0%</div>
+    </div>
+    <button id="next" onclick="nextNote()">next</button>
+  </br>
+    <div id='installer'>
+      <button id='install'>Install</button>
+    </div>
+    <script src="./scripts/vexflow.js"></script>
+    <script src="./scripts/main.js"></script>    
+    <script>
+      if('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(function(registration) {
+                console.log('Service Worker Registered');
+          });
+        navigator.serviceWorker.ready.then(function(registration) {
+           console.log('Service Worker Ready');
+        });
+      }
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-59325548-2', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </body>
+</html>
