@@ -4,8 +4,9 @@
     "start_url": "index.html",
     "display": "standalone",
     "background_color": "#fff",
-    "theme-color": "5FAAE5",
+    "theme-color": "#2196F3",
     "description": "A simple note learning app.",
+    "orientation": "any", 
     "icons": [
         {
             "src": "/img/icon.png",

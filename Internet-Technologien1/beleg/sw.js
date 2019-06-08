@@ -1,5 +1,6 @@
 const cacheName = 'note_cache';
 const staticAssets = [
+  'index.html',
   '/',
   '/index.html',
   '/manifest.json',
