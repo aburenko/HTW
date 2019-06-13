@@ -1,0 +1,44 @@
+führe das Kommando, um en Server mit der höchsten Priorität bei der Verfügbarkeit von mehreren Servern zu bestimmen
+
+host -t MX  informatik.htw-dresden.de
+
+Ausgabe:
+informatik.htw-dresden.de mail is handled by 20 rmx4.rz.htw-dresden.de.
+informatik.htw-dresden.de mail is handled by 20 rmx5.rz.htw-dresden.de.
+informatik.htw-dresden.de mail is handled by 20 rmx6.rz.htw-dresden.de.
+informatik.htw-dresden.de mail is handled by 10 imail1.informatik.htw-dresden.de.
+
+bekomme IP-Adresse für informatik.htw-dresden.de mit
+
+nslookup -type=MX informatik.htw-dresden.de
+
+Ausgabe:
+...
+imail1.informatik.htw-dresden.de	internet address = 141.56.132.30
+...
+
+Mittels telnet schicke Email mit Standartport 25:
+
+telnet 141.56.132.30 25
+Ausgabe/Eingabe:
+
+Trying 141.56.132.30...
+Connected to 141.56.132.30.
+Escape character is '^]'.
+220 mail.informatik.htw-dresden.de ESMTP Postfix
+MAIL FROM: s76905@htw-dresden.de
+250 2.1.0 Ok
+RCPT TO:s76905@htw-dresden.de
+250 2.1.5 Ok
+DATA
+354 End data with <CR><LF>.<CR><LF>
+subject: Testmail
+hi man yo bro
+.
+250 2.0.0 Ok: queued as 205D7140E82
+QUIT
+221 2.0.0 Bye
+Connection closed by foreign host.
+
+
+
