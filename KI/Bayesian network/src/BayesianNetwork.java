@@ -3,7 +3,7 @@ import java.util.LinkedList;
 public class BayesianNetwork {
     private LinkedList<NodeProbability> nodes;
 
-    BayesianNetwork () {
+    public BayesianNetwork () {
         nodes = new LinkedList<>();
     }
 

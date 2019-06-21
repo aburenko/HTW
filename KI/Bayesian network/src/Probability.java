@@ -34,4 +34,44 @@ public class Probability {
         }
         return trueCount / (double) samples.size();
     }
+
+    public void showCalculateAnd(String first, String second) {
+        System.out.print("probability of " + first + " and " + second + " is ");
+        System.out.println(calculateAnd(first, second));
+    }
+
+    private double calculateAnd(String first, String second) {
+        int positionF = samplingOrder.indexOf(first);
+        int positionS = samplingOrder.indexOf(second);
+        if (positionF == -1 || positionS == -1)
+            throw new IllegalArgumentException("do not know one of given arguments");
+        double trueCount = 0.0;
+        for (Sample sample : samples) {
+            if (sample.getSigns()[positionF] == 't' && sample.getSigns()[positionS] == 't')
+                trueCount++;
+        }
+        return trueCount / (double) samples.size();
+    }
+
+    public void showCalculateConditional(String event, String condition) {
+        System.out.print("probability of " + event + " under the condition " + condition + " is ");
+        System.out.println(calculateConditional(event, condition));
+    }
+
+    private double calculateConditional(String event, String condition) {
+        int positionE = samplingOrder.indexOf(event);
+        int positionC = samplingOrder.indexOf(condition);
+        if (positionE == -1 || positionC == -1)
+            throw new IllegalArgumentException("do not know one of given arguments");
+        double trueCount = 0.0;
+        double conditionTrueCount = 0.0;
+        for (Sample sample : samples) {
+            if (sample.getSigns()[positionC] == 't') {
+                conditionTrueCount++;
+                if (sample.getSigns()[positionE] == 't')
+                    trueCount++;
+            }
+        }
+        return trueCount / conditionTrueCount;
+    }
 }
