@@ -1,0 +1,6 @@
+Z:\PvK\prakt\word_cloud\bin\Debug\word_cloud.exe.config
+Z:\PvK\prakt\word_cloud\bin\Debug\word_cloud.exe
+Z:\PvK\prakt\word_cloud\bin\Debug\word_cloud.pdb
+Z:\PvK\prakt\word_cloud\obj\Debug\word_cloud.csprojResolveAssemblyReference.cache
+Z:\PvK\prakt\word_cloud\obj\Debug\word_cloud.exe
+Z:\PvK\prakt\word_cloud\obj\Debug\word_cloud.pdb

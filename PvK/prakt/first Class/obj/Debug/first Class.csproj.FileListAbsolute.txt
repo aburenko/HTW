@@ -1,0 +1,12 @@
+T:\Temp\prakt\first Class\bin\Debug\first Class.exe.config
+T:\Temp\prakt\first Class\obj\Debug\first Class.csprojResolveAssemblyReference.cache
+T:\Temp\prakt\first Class\bin\Debug\first Class.exe
+T:\Temp\prakt\first Class\bin\Debug\first Class.pdb
+T:\Temp\prakt\first Class\obj\Debug\first Class.exe
+T:\Temp\prakt\first Class\obj\Debug\first Class.pdb
+Z:\PvK\prakt\first Class\bin\Debug\first Class.exe.config
+Z:\PvK\prakt\first Class\obj\Debug\first Class.exe
+Z:\PvK\prakt\first Class\obj\Debug\first Class.pdb
+Z:\PvK\prakt\first Class\bin\Debug\first Class.exe
+Z:\PvK\prakt\first Class\bin\Debug\first Class.pdb
+Z:\PvK\prakt\first Class\obj\Debug\first Class.csprojResolveAssemblyReference.cache

@@ -1,0 +1,6 @@
+Z:\PvK\prakt\Bruch\bin\Debug\Bruch.exe.config
+Z:\PvK\prakt\Bruch\bin\Debug\Bruch.exe
+Z:\PvK\prakt\Bruch\bin\Debug\Bruch.pdb
+Z:\PvK\prakt\Bruch\obj\Debug\Bruch.exe
+Z:\PvK\prakt\Bruch\obj\Debug\Bruch.pdb
+Z:\PvK\prakt\Bruch\obj\Debug\Bruch.csprojResolveAssemblyReference.cache

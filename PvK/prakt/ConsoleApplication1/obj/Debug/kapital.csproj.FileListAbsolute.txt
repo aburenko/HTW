@@ -1,0 +1,10 @@
+T:\Temp\prakt\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
+T:\Temp\prakt\ConsoleApplication1\obj\Debug\ConsoleApplication1.exe
+T:\Temp\prakt\ConsoleApplication1\obj\Debug\ConsoleApplication1.pdb
+T:\Temp\prakt\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
+T:\Temp\prakt\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
+T:\Temp\prakt\ConsoleApplication1\obj\Debug\kapital.csprojResolveAssemblyReference.cache
+Z:\PvK\prakt\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
+Z:\PvK\prakt\ConsoleApplication1\obj\Debug\ConsoleApplication1.exe
+Z:\PvK\prakt\ConsoleApplication1\obj\Debug\ConsoleApplication1.pdb
+Z:\PvK\prakt\ConsoleApplication1\bin\Debug\kapital.exe.config
