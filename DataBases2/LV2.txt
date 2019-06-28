@@ -1,0 +1,463 @@
+﻿--- 1.1 ---
+Select AufNr, MitID, e.KunOrt from Auftrag a
+join Kunde e
+on a.KunNr = e.KunNr
+order by AufNr
+
+SELECT AufNr, EtBezeichnung, Anzahl, EtPreis, Anzahl*EtPreis as Lagerbestandwert 
+from Montage m, Ersatzteil e 
+where m.EtID = e.EtID
+order by Aufnr
+
+SELECT a.AufNr, a.ErlDat, e.EtID from Auftrag a
+join Montage m
+on a.AufNr = m.AufNr
+join Ersatzteil e
+on m.EtID = e.EtID
+order by AufNr
+
+--- 1.2 ---
+--- a
+select left(k.KunPLZ, 2)
+from Kunde k
+group by left(k.KunPLZ, 2)
+--- b
+SELECT * INTO Niederlassung FROM trommelhelden..Niederlassung;
+SELECT * INTO Gebiet FROM trommelhelden..quelleGebiet;
+
+alter table Gebiet add primary key (GebietID)
+alter table Niederlassung add primary key (NLNr)
+alter table Gebiet add foreign key (NLNr) references Niederlassung (NLNr)
+--- c-f
+-- neue spalte anlegen
+alter table Mitarbeiter
+add NLNr int
+-- foreign key anlegen
+alter table Mitarbeiter
+add foreign key (NLNr) 
+references Niederlassung (NLNr) 
+-- die daten übertragen
+update Mitarbeiter set NLNr =
+CASE
+	when MitEinsatzort like 'Dresden' then 1
+	when MitEinsatzort like 'Chemnitz' then 2
+	when MitEinsatzort like 'Radebeul' then 3
+	else 3
+END
+-- die alte Spalte löschen
+alter table Mitarbeiter 
+drop column MitEinsatzort
+
+--- 1.3 ---
+Create view Aufg13 
+as 
+select a.AufNr, k.KunNr, m.MitID
+from Auftrag a
+join Kunde k
+on k.KunNr = a.KunNr
+join Gebiet g
+on g.GebietID = LEFT(k.KunPLZ, 2)
+join Mitarbeiter m
+on g.NLNr = m.NLNr
+where a.MitID is NULL
+group by k.KunNr, a.AufNr, m.MitID
+
+--- 1.4 ---
+insert Kunde select * from trommelhelden..quelleKunde where KunNr in (
+	select distinct KunNr from trommelhelden..quelledbs2Auftrag
+	where KunNr not in (select KunNr from Kunde)
+)
+
+insert into Auftrag select * from trommelhelden..quelledbs2Auftrag
+
+insert Ersatzteil select * from trommelhelden..quelleErsatzteil where EtID in (
+	select distinct EtID from trommelhelden..quelleErsatzteil
+	where EtID not in (select EtID from Ersatzteil)
+)
+
+insert into Montage select * from trommelhelden..quelledbs2Montage
+
+--- 1.5 ---
+create Table Rechnung (
+	KunNr int not null,
+	AufNr int not null,
+	RechDat date not null,
+	RechBetrag smallmoney not null
+)
+
+alter Table Rechnung add Primary key (KunNr, AufNr)
+
+alter Table Rechnung add foreign key (KunNr)
+	references Kunde (KunNr)
+
+alter Table Rechnung add foreign key (AufNr)
+	references Auftrag (AufNr)
+
+--- 1.6 ---
+
+*Skizze*
+
+--- 1.7 ---
+create procedure aufgabe1p7 @myID INT, @myWeekNumber INT
+as
+declare @tmpAufnr INT
+declare @Datum date
+declare @Name varchar(20)
+declare @Strasse varchar(20)
+declare @myPLZ char(5)
+declare @Ort varchar(20)
+
+declare myC cursor 
+for 
+select AufNr from Auftrag
+where MitID = @myID
+	and Dauer is null
+	and datepart(ww,AufDat) = @myWeekNumber
+	        
+open myC
+        
+fetch myC
+    into @tmpAufnr
+            
+if (@@FETCH_STATUS = -2) --Cursor leer?
+    begin
+    print 'Keine Aufträge gefunden'
+    return
+    end
+        
+declare @mname varchar(20)
+declare @mlastname varchar(20)
+set @mname = (select MitName from Mitarbeiter where MitID = @myID)
+set @mlastname = (select MitVorname from Mitarbeiter where MitID = @myID)
+print @mname + ' ' + @mlastname
+while (@@FETCH_STATUS = 0)
+    begin
+			
+    set @Datum = (select AufDat from Auftrag where AufNr = @tmpAufnr)
+    set @Name = (select KunName from Kunde k
+					join Auftrag a on a.KunNr = k.KunNr 
+					where AufNr = @tmpAufnr)
+    set @Strasse = (select KunStrasse from Kunde k 
+					join Auftrag a 
+					on a.KunNr = k.KunNr 
+					where AufNr = @tmpAufnr)
+    set @myPLZ = (select KunPLZ from Kunde k 
+					join Auftrag a 
+					on a.KunNr = k.KunNr 
+					where AufNr = @tmpAufnr)
+    set @Ort = (select KunOrt from Kunde k 
+					join Auftrag a 
+					on a.KunNr = k.KunNr 
+					where AufNr = @tmpAufnr)
+	print convert(char(10),@Datum) + '   ' + convert(char(20),@Name) + '  ' + convert(char(20),@Ort) + '  ' 
+		+ convert(char(20),@myPLZ) + ' ' +  convert(char(20),@Strasse)
+    fetch myC
+        into @tmpAufnr
+    end     
+-- cursor löschen
+close myC
+deallocate myC
+-- test --
+exec aufgabe1p7 101,23
+exec aufgabe1p7 101,41
+
+
+-----------
+--- 3.1 ---
+create function anfahrtpreis (@Anfahrt int)
+returns smallmoney
+	as
+	begin
+		declare @preis smallmoney
+		select @preis = @Anfahrt * 2.5
+		if(@preis < 30) 
+			select @preis = 30
+		return @preis
+	end
+
+Select AufNr, dbo.anfahrtpreis(Anfahrt) from Auftrag
+
+--- 3.2 ---
+create function lagerbestandUnten (@max int)
+returns @table Table (
+	EtID char(5),
+	EtBezeichnung varchar(100),
+	EtPreis smallmoney,
+	EtAnzLager int,
+	EtHersteller varchar(30)
+)
+as
+begin
+	INSERT INTO @table
+		select EtID, EtBezeichnung, EtPreis, EtAnzLager, EtHersteller
+		from Ersatzteil
+		where EtAnzLager < @max
+	return
+end
+
+select * from dbo.lagerbestandUnten(10)
+
+-----------
+--- 4.1a ---
+alter table Mitarbeiter add constraint DF_Mit_Job
+default 'Monteur' for MitJob
+-- prüfen
+select * from Mitarbeiter 
+Insert into Mitarbeiter (MitID, MitName, MitVorname, MitGebDat, MitStundensatz, NLNr)
+Values('113','Joseph','Stalin','18-12-1878',125,1)
+--- 4.1b ---
+alter table Auftrag add constraint DF_AufDat
+default getdate() for AufDat
+--prüfen
+select * from Auftrag
+Insert into Auftrag (AufNr, KunNr) Values(4000,1335)
+
+--- 4.2 ---
+--- a
+alter table Auftrag add constraint CK_AufErlDat
+check(ErlDat >= AufDat)
+--prüfen
+Insert into Auftrag (AufNr, KunNr, AufDat, ErlDat) 
+Values(4001,1335, GETDATE()+1, GETDATE())
+--- b
+alter table Mitarbeiter add constraint CK_MitID
+check(MitID like '[0-9][0-9][0-9]')
+--prüfen
+select * from Mitarbeiter
+insert into Mitarbeiter (MitID, MitName, MitGebDat) values('abv', 'new',GETDATE())
+
+--- 4.3 ---
+-- löschen
+alter table Montage
+drop constraint fk_AufNr
+-- mit Löschübergabe anlegen
+alter table Montage
+add constraint fk_AufNr
+foreign key (AufNr) references
+Auftrag (AufNr)
+	on delete cascade
+-- a
+-- wird auch alles in montage gelöscht
+delete Auftrag where  AufNr like '1168'
+
+
+--- 5  ---
+--- 5.1 ---
+create or alter trigger MonteurAzubiStundensatzNotNull
+on Mitarbeiter for update, insert
+as
+if(
+	select count(*) from Mitarbeiter
+	where MitStundensatz is NULL
+		and (MitJob like 'Monteur' or MitJob like 'Meister') 
+) > 0
+begin
+	print 'Abbruch, da null als MitStundensatz eingegeben ist'
+    select * from inserted where MitStundensatz is null
+	ROLLBACK TRANSACTION
+end
+-- a
+select * from Mitarbeiter
+insert into Mitarbeiter (MitID, MitName, MitGebDat, MitJob, MitStundensatz) values('999', 'new',GETDATE(), 'Monteur', null)
+-- b
+update Mitarbeiter set MitJob = 'Monteur' where MitName like 'new'
+-- c
+update Mitarbeiter set MitJob = 'Monteur',MitStundensatz = '80' where MitName like 'new'
+
+--- 5.2 ---
+create or alter trigger MonteurAzubiStundensatzNotNull
+on Mitarbeiter for update, insert
+as
+if(
+	select count(*) from Mitarbeiter
+	where MitStundensatz is NULL
+		and (MitJob like 'Monteur' or MitJob like 'Meister') 
+) > 0
+begin
+	print 'Abbruch, da null als MitStundensatz eingegeben ist'
+    select * from inserted where MitStundensatz is null
+	ROLLBACK TRANSACTION
+end
+
+create or alter trigger RechMögl
+on Rechnung for update, insert
+as
+if(
+	select count(*) from Auftrag a
+	join inserted i on a.AufNr = i.AufNr
+	where (a.ErlDat is NULL or a.Dauer is NULL or a.Anfahrt is null)
+	or i.RechBetrag < dbo.anfahrtpreis(a.Anfahrt)
+) > 0
+begin
+	print 'Abbruch, ungültige daten'
+	select * from inserted i join Auftrag a on i.AufNr = a.AufNr
+		where (a.ErlDat is NULL or a.Dauer is NULL or a.Anfahrt is null)
+	or i.RechBetrag < dbo.anfahrtpreis(a.Anfahrt)
+	ROLLBACK TRANSACTION
+end
+
+-- a
+select * from Mitarbeiter
+insert into Mitarbeiter (MitID, MitName, MitGebDat, MitJob, MitStundensatz) values('999', 'new',GETDATE(), 'Monteur', null)
+-- b
+update Mitarbeiter set MitJob = 'Monteur' where MitName like 'new'
+-- c
+update Mitarbeiter set MitJob = 'Monteur',MitStundensatz = '80' where MitName like 'new'
+
+-- a
+insert into Rechnung values('1049', '2005', '03.09.2018', '724.42')
+insert into Rechnung values('1405', '2007', '05.09.2018', '100.00')
+-- b
+insert into Rechnung select KunNr, AufNr, Erldat, 1000 from Auftrag 
+where AufNr in (2009, 2010, 2011, 2012)
+
+insert into Rechnung select Kunnr, AufNr, Erldat, 58
+from Auftrag where Aufnr in (2013,2014,2015)
+
+--- 5.3 ---
+--- a
+alter table Auftrag
+alter column Beschreibung varchar(200)
+
+--- b
+SELECT * INTO AuftragPro FROM trommelhelden..quelleAuftrag;
+delete AuftragPro
+alter table AuftragPro add zeitstempel datetime NOT NULL
+alter table AuftragPro add nutzer varchar(50) NOT NULL
+alter table AuftragPro add transArt varchar(10) NOT NULL
+
+select * INTO RechnungPro FROM Rechnung;
+delete RechnungPro
+alter table RechnungPro add zeitstempel datetime NOT NULL
+alter table RechnungPro add nutzer varchar(50) NOT NULL
+alter table RechnungPro add transArt varchar(10) NOT NULL
+
+select * INTO MontagePro FROM Montage;
+delete MontagePro
+alter table MontagePro add zeitstempel datetime NOT NULL
+alter table MontagePro add nutzer varchar(50) NOT NULL
+alter table MontagePro add transArt varchar(10) NOT NULL
+
+-- c 
+create or alter trigger deleteAuftraege
+on Auftrag for delete
+as
+begin
+INSERT INTO AuftragPro 
+select *, CURRENT_TIMESTAMP, CURRENT_USER, 'delete' from deleted
+
+delete Rechnung where KunNr in (select KunNr from deleted)
+
+select * from AuftragPro
+select * from MontagePro
+
+ROLLBACK
+end
+
+create or alter trigger deleteMontage
+on Montage for delete
+as
+begin
+
+INSERT INTO MontagePro 
+select *, CURRENT_TIMESTAMP, CURRENT_USER, 'delete' from deleted
+
+end
+
+-- check (c)
+select * from Auftrag where AufDat = '2018-04-30'
+delete Auftrag where AufDat = '2018-04-30'
+insert into Auftrag 
+select AufNr, MitID, KunNr, AufDat, ErlDat, dauer, Anfahrt, Beschreibung from AuftragPro
+
+-- montage wiederherstellen, falls zufällig gelöscht
+select AufNr from Montage  where Aufnr in (select aufnr from Auftrag where AufDat = '2018-04-30')
+insert Montage select * from trommelhelden..quelleMontage where AufNr in (
+	select aufnr from Auftrag where AufDat = '2018-04-30'
+)
+
+-- d
+select * from Auftrag where (datepart(mm,ErlDat) = 4) and ErlDat is not null
+
+BEGIN TRANSACTION
+delete from Auftrag where (datepart(mm,ErlDat) = 4) and ErlDat is not null
+ROLLBACK TRANSACTION
+
+--- 6 ---
+--- 6.1
+-- a
+BEGIN TRANSACTION
+delete Montage
+select * from Montage
+ROLLBACK TRANSACTION
+
+select * from Montage
+--- 6.2
+-- a
+use ii17s76939
+-- b
+create User User_B for Login s76905 with DEFAULT_SCHEMA = extern
+-- c
+create User User_B for Login [smb\s76...] with DEFAULT_SCHEMA = extern
+create Schema extern authorization User_B
+grant select on schema:extern to User_B
+
+drop schema extern
+drop User User_B
+-- d
+use ii17s76939
+-- e
+geht nicht; keine Berechtigung bis jetzt gegeben
+select * from Auftrag
+-- f
+grant select on Auftrag to User_B
+-- g 
+geht
+-- h 
+sp_who
+-- i
+begin transaction
+select * from Auftrag WITH (HOLDLOCK)
+{rollback}
+-- j
+update Auftrag set Beschreibung = 'test' where Aufnr = 999
+-- k
+
+-- l
+rollback
+-- m
+es klappt
+-- n
+geht nicht
+-- o
+grant delete on Auftrag to User_B
+-- p
+klappt
+delete Auftrag where Aufnr = 999
+-- q
+JA SIEHT GUT AUS
+-- r
+grant create table to User_B
+-- s
+create Table Rechnung (
+	KunNr int not null,
+	AufNr int not null,
+	RechDat date not null,
+	RechBetrag smallmoney not null
+)
+
+Insert into Rechnung
+Values('999','11111',GETDATE(),555)
+-- t
+geht
+-- u 
+geht
+-- v 
+drop table Rechnung
+-- w
+revoke select on Auftrag to User_B
+revoke delete on Auftrag to User_B
+revoke create table to User_B
+drop shema extern
+drop User User_B
+revoke create table to User_B

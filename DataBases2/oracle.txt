@@ -1,0 +1,402 @@
+--- 1
+--- 1.1 ---
+CREATE TABLE Fahrzeug (
+         FzNr             NUMBER(5) PRIMARY KEY,
+         Bezeichnung      VARCHAR2(15) NOT NULL,
+         Gewicht          float(10)
+)
+
+CREATE TABLE Bauteil (
+         BtNr              NUMBER(5) PRIMARY KEY,
+         Teilename         VARCHAR2(20) NOT NULL,
+         Einbauzeit        NUMBER(5),
+         HstNr             VARCHAR2(10),
+         Baugruppe         NUMBER(5) REFERENCES Bauteil (BtNr)
+)
+
+CREATE TABLE Einbau (
+         EbNr             VARCHAR2(10) PRIMARY KEY,
+         BtNr             NUMBER(5) NOT NULL references Bauteil (BtNr),
+         FzNr             NUMBER(5) NOT NULL references Fahrzeug (FzNr) on delete cascade,
+         Anzahl           NUMBER(5)
+)
+--- 1.2 ---
+create unique index bt_fz ON einbau(Btnr, FzNr)
+--- 1.3 ---
+create table Hersteller
+as (select * from db01.hersteller)
+--- 1.4 ---
+-- prüfen
+select * from all_constraints
+where owner = 'DB01' 
+and table_name = 'HERSTELLER'
+-- hinzufügen
+alter table Hersteller
+add constraint PK_HSTNR primary key (HSTNR)
+-- prüfen
+select * from ALL_TAB_COLUMNS
+where owner = 'DB01' 
+and table_name = 'HERSTELLER'
+-- hinzufügen
+alles da
+-- prüfen
+select * from ALL_CONS_COLUMNS
+where owner = 'DB01' 
+and table_name = 'HERSTELLER'
+-- hinzufügen
+ist dasselbe was die erste abfrage
+--- 1.5 ---
+insert into hersteller 
+values (693253, 'Tower Zwickau', 'Kopernikusstr. 60', '08056', 'Zwickau', current_date)
+--- 1.6 ---
+select HSTNAME, PLZ, Ort from Hersteller 
+order by PLZ
+--- 1.7 ---
+select * from Hersteller
+where extract(year from (current_date)) - extract(year from (kontaktaufnahme)) < 3 
+order by PLZ
+--- 1.8 ---
+alter table bauteil
+add constraint fk_HSTNR foreign key (HstNr)
+references Hersteller (HstNr)
+--- 2 
+--- 2.1 ---
+CREATE OR REPLACE TYPE TPreis AS OBJECT
+(   
+    Preis number(10,2),
+    MEMBER FUNCTION Netto RETURN NUMBER,
+    MEMBER FUNCTION Brutto RETURN NUMBER,
+    MEMBER FUNCTION Umrechnung(Faktor number) RETURN NUMBER
+);
+--- 2.2 ---
+CREATE OR REPLACE TYPE BODY TPreis AS
+
+MEMBER FUNCTION Netto
+RETURN NUMBER IS
+BEGIN
+RETURN Preis;
+END Netto;
+
+MEMBER FUNCTION Brutto
+RETURN NUMBER IS
+BEGIN
+RETURN Preis + Preis*0.19;
+END Brutto;
+
+MEMBER FUNCTION Umrechnung(Faktor number)
+RETURN NUMBER IS
+BEGIN
+RETURN Preis*Faktor;
+END Umrechnung; 
+
+END; 
+--- 2.3 ---
+alter table fahrzeug
+add Listenpreis TPreis;
+--- 3
+--- 3.1 ---
+create or replace Type AnzTueren
+AS varray(5) of char(10)
+--- 3.2 ---
+alter table fahrzeug
+add Tuerzahl AnzTueren;
+--- 3.3 ---
+insert into Fahrzeug
+values(10000,'BMW Z4 Roadstar',900,TPreis(60000),AnzTueren('3-Türer'))
+insert into Fahrzeug
+values(10001,'VW Golf GTI',800,TPreis(25000),AnzTueren('3-Türer','5-Türer'))
+insert into Fahrzeug
+values(10002,'Audi A3',850,TPreis(30000),AnzTueren('3-Türer'))
+--- 3.4 ---
+select Fznr, Bezeichnung, f.LISTENPREIS.Umrechnung(1.15) as Umrechnung, Tuerzahl 
+from Fahrzeug f
+
+select Fznr, Bezeichnung, f.LISTENPREIS.Umrechnung(1.15) as Umrechnung, t.*
+from Fahrzeug f, table (f.Tuerzahl) t 
+--- 4
+--- 4.1 ---
+CREATE OR REPLACE TYPE tPreisentwicklung AS OBJECT
+(   
+    PeNr varchar2(10),
+    Netto number(10,2),
+    Datum Date
+);
+--- 4.2 ---
+create type ntPreisentwicklung as Table of tPreisentwicklung
+--- 4.3 ---
+alter table Bauteil
+add Preis ntPreisentwicklung
+nested table Preis store as NTPreis;
+--- 4.4 ---
+--5000
+insert into Bauteil
+values(5000,'Tuer links',20,'134556', NULL, ntPreisentwicklung() );
+
+insert into table (SELECT b.Preis from Bauteil b where b.btnr = 5000)
+values(tPreisentwicklung('7007',900,TO_DATE('12.10.2018' )) );
+
+--5001
+insert into Bauteil
+values(5001,'Speigel rechts',10,'588797', NULL, ntPreisentwicklung() );
+
+insert into table (SELECT b.Preis from Bauteil b where b.btnr = 5001)
+values(tPreisentwicklung('7008',100,TO_DATE('12.10.2018' )) );
+
+--5002
+insert into Bauteil
+values(5002,'Auspuff',30,'693253', NULL, ntPreisentwicklung() );
+
+insert into table (SELECT b.Preis from Bauteil b where b.btnr = 5002)
+values(tPreisentwicklung('7009',2000,TO_DATE('12.10.2018' )) );
+--- 4.5 ---
+insert into Table (select b.Preis from bauteil b where b.BtNr=5000) values ('7019', 910, to_date('20.10.2017'));
+insert into bauteil values (5003, 'Tuergriff links', 15, '134556', 5000, ntPreisentwicklung());
+insert into Table (select b.Preis from bauteil b where b.BtNr=5003) values ('7010', 20, to_date('12.10.2017'));
+insert into Table (select b.Preis from bauteil b where b.BtNr=5003) values ('7018', 22, to_date('12.11.2017'));
+insert into bauteil values (5004, 'Schlossriegel links', 5, '134556', 5000, ntPreisentwicklung());
+insert into Table (select b.Preis from bauteil b where b.BtNr=5004) values ('7011', 10, to_date('12.10.2017'));
+insert into bauteil values (5005, 'Türgummi', 3, '134556', 5000, ntPreisentwicklung());
+insert into Table (select b.Preis from bauteil b where b.BtNr=5005) values ('7012', 5, to_date('12.10.2017'));
+insert into bauteil values (5006, 'Auspuffrohr', 25, '693253', 5002, ntPreisentwicklung());
+insert into Table (select b.Preis from bauteil b where b.BtNr=5006) values ('7013', 30, to_date('12.10.2017'));
+insert into bauteil values (5007, 'Schelle', 5, '693253', 5002, ntPreisentwicklung());
+insert into Table (select b.Preis from bauteil b where b.BtNr=5007) values ('7014', 0.5, to_date('12.10.2017'));
+insert into bauteil values (5008, 'Schraube', 1, '693253', 5007, ntPreisentwicklung());
+insert into Table (select b.Preis from bauteil b where b.BtNr=5008) values ('7015', 0.1, to_date('12.10.2017'));
+insert into bauteil values (5009, 'Spiegelglas', 10, '588797', 5001, ntPreisentwicklung());
+insert into Table (select b.Preis from bauteil b where b.BtNr=5009) values ('7016', 2.30, to_date('12.10.2017'));
+insert into bauteil values (5010, 'Gehäuse', 12, '693253', 5001, ntPreisentwicklung());
+insert into Table (select b.Preis from bauteil b where b.BtNr=5010) values ('7017', 6, to_date('12.10.2017'));
+--- 4.6 ---
+-- a
+SELECT LEVEL, LPAD(' ',2*LEVEL-1) || BTNR as Baugruppe, teilename, einbauzeit
+from Bauteil
+connect by prior BTNR=baugruppe
+START WITH Baugruppe is NULL;
+-- b
+SELECT LEVEL, BTNR, LPAD(' ',2*LEVEL-3) ||  teilename, einbauzeit
+from Bauteil
+connect by prior BTNR=baugruppe
+--- 4.7 ---
+select b.btnr, b.teilename, c.Netto, c.Datum
+from Bauteil b, table(b.Preis) c
+--- 4.8 ---
+select b.btnr, b.teilename, c.Netto, c.Datum
+from Bauteil b, table(b.Preis) c
+where ROWNUM <= 10
+--- 4.9 ---
+-- a
+SELECT btnr, teilename, einbauzeit, hstnr, baugruppe,
+   RANK() OVER (Partition by Baugruppe ORDER BY einbauzeit) "Rank"
+   FROM bauteil
+-- b
+
+--- 5
+--- 5.1 ---
+CREATE OR REPLACE TYPE TADRESSE AS OBJECT
+(   
+    Ort varchar2(50),
+    Strasse varchar2(5),
+    PLZ varchar(50)
+);
+
+--- 5.2 
+create table Lieferant (
+    LiefNr number(6) PRIMARY KEY,
+    Name varchar2(20) NOT NULL,
+    Adresse TADRESSE
+)
+
+--5.3
+create View Lieferant_OV AS
+    Select l.liefnr,l.name,l.adresse.Strasse as Strasse,l.adresse.PLZ as PLZ,l.adresse.Ort as Ort 
+    from Lieferant l
+
+--5.4
+insert into Lieferant_OV 
+values(752443,'Laepple Teublitz','Maxstr. 12','93158','Teublitz')
+
+--geht nicht
+
+--- 6
+--- 6.1
+ertsellen Index und Foreigne Keys
+
+--- 6.2
+create or replace trigger trg_LieferantOV_insert
+    instead of insert on Lieferant_OV
+begin
+    insert into Lieferant (LiefNr,Name,Adresse)
+        values (:new.LiefNr,:new.Name,tAdresse(:new.Strasse,:new.PLZ,:new.Ort));
+end trg_LieferantOV_insert;
+
+insert into Lieferant_OV 
+values(752443,'Laepple Teublitz','Maxstr. 12','93158','Teublitz')
+
+--- 6.3
+--a)
+create sequence sq_einbau
+increment by 1
+start with   2000
+minvalue     2000
+maxvalue     999999999
+nocycle nocache;
+
+--b
+create or replace trigger trig_Einbau
+before insert or update on Einbau 
+for each row
+begin
+    if INSERTING then
+        select concat('E',sq_einbau.nextVal) into :new.bbnr from dual;
+    end if;
+
+    if UPDATING then
+        select :old.bBNR into :new.bBNR from dual;
+    end if;
+
+end;
+
+--c
+insert into Einbau 
+values (NULL,5000,10000,1)
+
+select * from Einbau   
+
+--- 6.4
+CREATE OR REPLACE TRIGGER trigger_einbau
+  BEFORE INSERT OR UPDATE ON Einbau
+  FOR EACH ROW
+  DECLARE
+    counter INT;
+    exce EXCEPTION;
+  BEGIN
+  
+    IF INSERTING THEN
+      --exeption
+      SELECT COUNT(*) INTO counter
+      FROM Bauteil b
+      WHERE b.BAUGRUPPE IS NULL AND :NEW.Btnr = b.Btnr;
+      IF counter = 0 THEN
+        RAISE exce;
+      END IF;
+      -- ersetzen
+      SELECT 'E' || sq_einbau.NEXTVAL
+      INTO :NEW.EbNr FROM dual;
+    END IF;
+    
+    IF UPDATING THEN
+      :NEW.EbNr := :OLD.Ebnr;
+    END IF;
+    
+    EXCEPTION
+    WHEN exce THEN
+      raise_application_error(-20042, 'keine Baugruppe.');
+  
+  END;
+--- 6.5
+insert into Einbau 
+values (NULL,5001,10001,1)
+
+insert into Einbau 
+values (NULL,5010,10002,2)
+--- 6.6
+-- es wurde 10001 von beiden Tabellen gelöscht
+-- wegen cascade in einbau
+SELECT * FROM Einbau;
+SELECT * FROM Fahrzeug;
+DELETE Fahrzeug WHERE FzNr = 10001
+SELECT * FROM Einbau;
+SELECT * FROM Fahrzeug;
+
+--- 7
+set serveroutput on
+--- 7.1
+CREATE OR REPLACE PROCEDURE gewicht_liste_fz (topGewicht IN INT)
+IS
+  CURSOR curs IS
+    SELECT FzNr, Bezeichnung, Gewicht 
+    FROM Fahrzeug
+    WHERE Gewicht <= topGewicht;
+  BEGIN
+    FOR item IN curs
+    LOOP
+      DBMS_OUTPUT.PUT_LINE('FzNr: ' || item.FzNr);
+      DBMS_OUTPUT.PUT_LINE('Bez.  ' || item.Bezeichnung);
+      DBMS_OUTPUT.PUT_LINE('Gew.  ' || item.Gewicht);
+      DBMS_OUTPUT.PUT_LINE('--');
+    END LOOP;
+  END;
+
+exec gewicht_liste_fz(850);
+
+--- 7.2
+-- aus einbau.sql
+insert into einbau values (1,'5001', '10000', 1);
+insert into einbau values (1,'5002', '10000', 2);
+insert into einbau values (1,'5000', '10002', 1);
+insert into einbau values (1,'5001', '10002', 1);
+
+select * from einbau
+
+CREATE OR REPLACE PROCEDURE proc7u2
+IS
+  CURSOR cur1 IS
+    SELECT DISTINCT Bezeichnung, f.FzNr
+    FROM Fahrzeug f JOIN Einbau e ON e.FzNr = f.FzNr;
+  CURSOR cur2 IS
+    SELECT Teilename, e.FzNr
+    FROM Bauteil b JOIN Einbasu e ON e.BTNR = b.BTNR;
+  BEGIN
+    FOR fahrzeugCursor IN cur1
+    LOOP
+      DBMS_OUTPUT.PUT_LINE(fahrzeugCursor.Bezeichnung);
+      FOR bauteilCursor IN cur2
+      LOOP
+        IF bauteilCursor.FzNr = fahrzeugCursor.FzNr THEN
+          DBMS_OUTPUT.PUT_LINE('    '|| bauteilCursor.Teilename);
+        END IF;
+      END LOOP;
+    END LOOP;
+  END;
+  
+  exec proc7u2
+--- 7.3
+create or replace procedure proc7u3 is
+begin 
+    declare     p_fznr number;
+                p_bez varchar(15);
+                p_teiln varchar(20);
+                p_btnr number;
+                
+    cursor cursorFZ is select distinct f.FZNR, f.Bezeichnung from Fahrzeug f, Einbau e where f.FZNR = e.FZNR;
+    cursor cursorBTfznr is select b.BTNR, b.Teilename from Bauteil b, Fahrzeug f, Einbau e where e.FZNR = f.FZNR and e.BTNR = b.BTNR and f.FZNR = p_fznr;
+    cursor cursorBG is select b.BTNR, b.Teilename from Bauteil b where b.Baugruppe = p_btnr;
+
+    begin
+        open cursorFZ;
+        loop 
+            fetch cursorFZ into p_fznr, p_bez;
+            exit when cursorFZ%NOTFOUND;
+            DBMS_OUTPUT.put_line(p_bez);
+            open cursorBTfznr;
+            loop
+                fetch cursorBTfznr into p_btnr, p_teiln;
+                exit when cursorBTfznr%NOTFOUND;
+                DBMS_OUTPUT.put_line('   ->' || p_btnr || '  -  ' ||p_teiln);
+                open cursorBG;
+                loop
+                    fetch cursorBG into p_btnr, p_teiln;
+                    exit when cursorBG%NOTFOUND;
+                    DBMS_OUTPUT.put_line('      ->' || p_btnr || '  -  ' || p_teiln);
+                end loop;
+                close cursorBG;
+            end loop;
+            close cursorBTfznr;
+        end loop;
+        close cursorFZ;
+    end;
+
+end proc7u3;
+
+exec proc7u3;
