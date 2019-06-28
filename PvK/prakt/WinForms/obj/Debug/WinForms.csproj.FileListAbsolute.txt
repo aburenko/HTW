@@ -1,0 +1,9 @@
+Z:\PvK\prakt\WinForms\bin\Debug\WinForms.exe.config
+Z:\PvK\prakt\WinForms\bin\Debug\WinForms.exe
+Z:\PvK\prakt\WinForms\bin\Debug\WinForms.pdb
+Z:\PvK\prakt\WinForms\obj\Debug\WinForms.csprojResolveAssemblyReference.cache
+Z:\PvK\prakt\WinForms\obj\Debug\WinForms.Form1.resources
+Z:\PvK\prakt\WinForms\obj\Debug\WinForms.Properties.Resources.resources
+Z:\PvK\prakt\WinForms\obj\Debug\WinForms.csproj.GenerateResource.Cache
+Z:\PvK\prakt\WinForms\obj\Debug\WinForms.exe
+Z:\PvK\prakt\WinForms\obj\Debug\WinForms.pdb

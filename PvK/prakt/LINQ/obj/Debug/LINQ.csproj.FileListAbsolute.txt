@@ -1,0 +1,8 @@
+Z:\PvK\prakt\LINQ\bin\Debug\LINQ.exe.config
+Z:\PvK\prakt\LINQ\bin\Debug\LINQ.exe
+Z:\PvK\prakt\LINQ\bin\Debug\LINQ.pdb
+Z:\PvK\prakt\LINQ\obj\Debug\LINQ.csprojResolveAssemblyReference.cache
+Z:\PvK\prakt\LINQ\obj\Debug\LINQ.exe
+Z:\PvK\prakt\LINQ\obj\Debug\LINQ.pdb
+Z:\PvK\prakt\LINQ\bin\Debug\Bruch.exe
+Z:\PvK\prakt\LINQ\bin\Debug\Bruch.pdb

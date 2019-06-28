@@ -1,0 +1,9 @@
+Z:\PvK\prakt\chat\bin\Debug\chat.exe.config
+Z:\PvK\prakt\chat\obj\Debug\chat.csprojResolveAssemblyReference.cache
+Z:\PvK\prakt\chat\obj\Debug\chat.Form1.resources
+Z:\PvK\prakt\chat\obj\Debug\chat.Properties.Resources.resources
+Z:\PvK\prakt\chat\obj\Debug\chat.csproj.GenerateResource.Cache
+Z:\PvK\prakt\chat\bin\Debug\chat.exe
+Z:\PvK\prakt\chat\bin\Debug\chat.pdb
+Z:\PvK\prakt\chat\obj\Debug\chat.exe
+Z:\PvK\prakt\chat\obj\Debug\chat.pdb

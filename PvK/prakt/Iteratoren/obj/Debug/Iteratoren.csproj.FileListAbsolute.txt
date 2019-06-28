@@ -1,0 +1,6 @@
+Z:\PvK\prakt\Iteratoren\bin\Debug\Iteratoren.exe.config
+Z:\PvK\prakt\Iteratoren\obj\Debug\Iteratoren.csprojResolveAssemblyReference.cache
+Z:\PvK\prakt\Iteratoren\bin\Debug\Iteratoren.exe
+Z:\PvK\prakt\Iteratoren\bin\Debug\Iteratoren.pdb
+Z:\PvK\prakt\Iteratoren\obj\Debug\Iteratoren.exe
+Z:\PvK\prakt\Iteratoren\obj\Debug\Iteratoren.pdb

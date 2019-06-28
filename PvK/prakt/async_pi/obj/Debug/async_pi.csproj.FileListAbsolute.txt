@@ -1,0 +1,6 @@
+Z:\PvK\prakt\async_pi\bin\Debug\async_pi.exe.config
+Z:\PvK\prakt\async_pi\bin\Debug\async_pi.exe
+Z:\PvK\prakt\async_pi\bin\Debug\async_pi.pdb
+Z:\PvK\prakt\async_pi\obj\Debug\async_pi.csprojResolveAssemblyReference.cache
+Z:\PvK\prakt\async_pi\obj\Debug\async_pi.exe
+Z:\PvK\prakt\async_pi\obj\Debug\async_pi.pdb

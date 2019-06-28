@@ -1,0 +1,11 @@
+Z:\PvK\prakt\word_cloud_interface\bin\Debug\word_cloud_interface.exe.config
+Z:\PvK\prakt\word_cloud_interface\bin\Debug\word_cloud_interface.exe
+Z:\PvK\prakt\word_cloud_interface\bin\Debug\word_cloud_interface.pdb
+Z:\PvK\prakt\word_cloud_interface\obj\Debug\word_cloud_interface.Properties.Resources.resources
+Z:\PvK\prakt\word_cloud_interface\obj\Debug\word_cloud_interface.csproj.GenerateResource.Cache
+Z:\PvK\prakt\word_cloud_interface\obj\Debug\word_cloud_interface.exe
+Z:\PvK\prakt\word_cloud_interface\obj\Debug\word_cloud_interface.pdb
+Z:\PvK\prakt\word_cloud_interface\obj\Debug\word_cloud_interface.csprojResolveAssemblyReference.cache
+Z:\PvK\prakt\word_cloud_interface\obj\Debug\word_cloud_interface.Form1.resources
+Z:\PvK\prakt\word_cloud_interface\bin\Debug\word_cloud.exe
+Z:\PvK\prakt\word_cloud_interface\bin\Debug\word_cloud.pdb

@@ -1,0 +1,6 @@
+Z:\PvK\prakt\ConsoleApplication3\bin\Debug\ConsoleApplication3.exe.config
+Z:\PvK\prakt\ConsoleApplication3\bin\Debug\ConsoleApplication3.exe
+Z:\PvK\prakt\ConsoleApplication3\bin\Debug\ConsoleApplication3.pdb
+Z:\PvK\prakt\ConsoleApplication3\obj\Debug\number_pi.csprojResolveAssemblyReference.cache
+Z:\PvK\prakt\ConsoleApplication3\obj\Debug\ConsoleApplication3.exe
+Z:\PvK\prakt\ConsoleApplication3\obj\Debug\ConsoleApplication3.pdb

@@ -1,0 +1,6 @@
+Z:\PvK\prakt\lambdaAndDelegates\bin\Debug\lambdaAndDelegates.exe.config
+Z:\PvK\prakt\lambdaAndDelegates\bin\Debug\lambdaAndDelegates.exe
+Z:\PvK\prakt\lambdaAndDelegates\bin\Debug\lambdaAndDelegates.pdb
+Z:\PvK\prakt\lambdaAndDelegates\obj\Debug\lambdaAndDelegates.csprojResolveAssemblyReference.cache
+Z:\PvK\prakt\lambdaAndDelegates\obj\Debug\lambdaAndDelegates.exe
+Z:\PvK\prakt\lambdaAndDelegates\obj\Debug\lambdaAndDelegates.pdb
