@@ -7,8 +7,12 @@ public class Main {
         Probability probability = new Probability(sampling);
         probability.showBasicProbabilities();
         probability.showCalculateAnd("alarm","john");
+        probability.showCalculateAnd("earthquake","john");
+        probability.showCalculateAnd("john","lightning");
         probability.showCalculateConditional("john", "alarm");
         probability.showCalculateConditional("alarm", "earthquake");
         probability.showCalculateConditional("alarm", "robbery");
+        probability.showCalculateConditional("john", "robbery");
+        probability.showCalculateConditional("john", "alarm", "robbery");
     }
 }

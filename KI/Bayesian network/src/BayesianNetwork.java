@@ -42,9 +42,11 @@ public class BayesianNetwork {
         BayesianNetwork bn = new BayesianNetwork();
         bn.addNode("earthquake","","t:0.002 f:0.998");
         bn.addNode("robbery","","t:0.001 f:0.999");
+        bn.addNode("lightning", "", "t:0.01 f:0.99");
 
-        bn.addNode("alarm", "earthquake robbery",
-                "ttt:0.95 ftt:0.05 ttf:0.94 ftf:0.06 tft:0.29 fft:0.71 tff:0.001 fff:0.999");
+        bn.addNode("alarm", "earthquake robbery lightning",
+                "tttf:0.95 fttf:0.05 ttff:0.29 ftff:0.71 tftf:0.94 fftf:0.06 tfff:0.001 ffff:0.999" +
+                           " tttt:0.95 fttt:0.05 ttft:0.29 ftft:0.71 tftt:0.94 fftt:0.06 tfft:0.05 ffft:0.95" );
 
         bn.addNode("john","alarm","tt:0.9 ft:0.1 tf:0.05 ff:0.95");
         bn.addNode("mary","alarm","tt:0.7 ft:0.3 tf:0.01 ff:0.99");

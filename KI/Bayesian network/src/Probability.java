@@ -74,4 +74,29 @@ public class Probability {
         }
         return trueCount / conditionTrueCount;
     }
+
+    public void showCalculateConditional(String target, String event, String condition) {
+        System.out.print("probability of " + target + " under the condition " + event + " and " + condition + " is ");
+        System.out.println(calculateConditional(target, event, condition));
+    }
+
+    private double calculateConditional(String event, String condition1, String condition2) {
+        int positionE = samplingOrder.indexOf(event);
+        int positionC1 = samplingOrder.indexOf(condition1);
+        int positionC2 = samplingOrder.indexOf(condition2);
+        if (positionE == -1 || positionC1 == -1 || positionC2 == -1)
+            throw new IllegalArgumentException("do not know one of given arguments");
+        double trueCount = 0.0;
+        double conditionTrueCount = 0.0;
+        for (Sample sample : samples) {
+            if (sample.getSigns()[positionC1] == 't') {
+                if(sample.getSigns()[positionC2] == 't') {
+                    conditionTrueCount++;
+                    if (sample.getSigns()[positionE] == 't')
+                        trueCount++;
+                }
+            }
+        }
+        return trueCount / conditionTrueCount;
+    }
 }
