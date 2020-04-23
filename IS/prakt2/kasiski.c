@@ -3,21 +3,25 @@
 #include <string.h>
 #include <ctype.h>
 
-char str[256];
+char str[512];
 int dis[100];
 int countPlaces = 0;
+int distance = 7;
 
-void getSubstrPositions(const char * haystack, const char *needle, int i)
+int getSubstrPositions(const char * haystack, const char *needle, int i)
 {
-//     printf("%d needle %s\n", i, needle);
-    const char *tmp = strstr(haystack + i + 3, needle);
+    const char *tmp = strstr(haystack + i + distance, needle);
     if (tmp == NULL) {
 //         printf("ret\n");
-        return;
+        return 0;
     }
-    dis[countPlaces] = (int)(((int)(tmp-haystack)) - i);
+    printf("%d - %d\n", tmp, needle);
+    dis[countPlaces] = tmp - haystack - i;
+    printf("distance %d\n", dis[countPlaces]);
     countPlaces++;
-//     printf("cp %d tmp %s\n",  countPlaces, tmp);
+    printf("%d needle %s\n", i, needle);
+    printf("cp %d tmp %s\n\n",  countPlaces, tmp );
+    return 1;
 }
 
 char* substr(const char *src, int m, int n)
@@ -64,7 +68,7 @@ int main(int argc, char* argv[])
   
   while (!feof(fin)) {
     in = fgetc(fin);
-    if (isalpha(in)) {
+    if (isalpha(in) && in != '\n') {
       str[count] = (char)in;
       count++;
     }
@@ -77,15 +81,17 @@ int main(int argc, char* argv[])
   }
   
   int i;
-  for(i = 0; i < count/10 - 4; i++) {
-      char * substring3 = substr(str, i, i + 3);
-      getSubstrPositions(str, substring3, i);
+  for(i = 0; i < count - distance - 1; i++) {
+      char * substring3 = substr(str, i, i + distance);
+      if (getSubstrPositions(str, substring3, i) == 1) {
+        i += 4;
+      }
   }
   
   printf("matches: \n");
   for (c=0; c<100; c++) {
     if (dis[c] == 0) {
-        printf(" break %d\n", c);
+        printf(" found %d\n", c);
         break;
     }
     printf("%d\n", dis[c]);
