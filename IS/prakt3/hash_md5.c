@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
   fread(buf, filesize, 1, fin);
   fclose(fin);
 
-  if ((EVP_DigestInit(&c, EVP_sha1())) == 0) {
+  if ((EVP_DigestInit(&c, EVP_md5())) == 0) {
     err_exit();
   }
   if ((EVP_DigestUpdate(&c, buf, filesize)) == 0) {
