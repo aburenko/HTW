@@ -24,7 +24,7 @@ void err_exit(void)
   ERR_free_strings();
   exit(EXIT_FAILURE);
 }
-
+ // CALL WITH -lcrypto !!!
 int main(int argc, char *argv[])
 {
   FILE *fin;
@@ -34,7 +34,8 @@ int main(int argc, char *argv[])
   // z ist variable that holds "context"
   EVP_MD_CTX c;
   unsigned char md[SHA_DIGEST_LENGTH];
-
+  
+  /* Load the human readable error strings for libcrypto */
   ERR_load_crypto_strings();
 
   EVP_MD_CTX_init(&c);  /* not necessary when not using _ex */
