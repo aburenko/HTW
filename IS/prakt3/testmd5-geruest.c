@@ -12,6 +12,14 @@
 #define CMD1 "md5sum < "FILE1" | cut -f1 -d ' '> "DATFILE
 #define CMD2 "md5sum < "FILE2" | cut -f1 -d ' '>> "DATFILE
 
+unsigned long countChangedBits(unsigned long long xor) {
+    unsigned long count = 0; 
+    while (xor) { 
+        count += xor & 1; 
+        xor >>= 1; 
+    } 
+    return count; 
+}
 
 int main(void)
 {
@@ -63,11 +71,14 @@ int main(void)
     lllo1 = strtoull(buf, NULL, 16);
     printf("Hash of file1: %016llx:%016llx\n", llhi1, lllo1);
     
-    getc(f3);   /* read \n from DATFILE */
+    getc(f3);   
+    /* read \n from DATFILE */
     /* Hash of file2 */
-    /* TODO 
-       read the second hash into llhi2 und lllo2 (from the same file!)
-    */
+    fread(buf, 16, 1, f3);
+    llhi2 = strtoull(buf, NULL, 16);
+    fread(buf, 16, 1, f3);
+    lllo2 = strtoull(buf, NULL, 16);
+    printf("Hash of file2: %016llx:%016llx\n", llhi2, lllo2);
     
     fclose(f3);
 
@@ -75,9 +86,8 @@ int main(void)
     xor2 = lllo1 ^ lllo2;
   
     bits_changed = 0;
-    /* TODO
-       count set bits in xor1 and xor2, store in bits_changed 
-    */
+    bits_changed += countChangedBits(xor1);
+    bits_changed += countChangedBits(xor2);
     printf("Bits changed: %d\n", bits_changed);
 
     /* update statistics */
@@ -101,11 +111,7 @@ int main(void)
   } /* Master Loop */
 
   /* Results */
-
-  /* TODO
-     Compute the number of changed bits per iteration,
-     store it in chbits_per_iteration
-   */
+  chbits_per_iteration = sum_bits_changed / N;
   printf("On average, %.2f bits have changed for %i test cases.", 
 	 chbits_per_iteration, N);
   printf(" That are %.2f%%.\n", chbits_per_iteration/1.28);

@@ -11,6 +11,7 @@ static char *pt(unsigned char *md)
   static char buf[80];
   
   for (i=0; i<SHA_DIGEST_LENGTH; i++) {
+    // write as hexadecimal to buf
     sprintf(&(buf[i*2]), "%02x", md[i]);
   }
   return(buf);
@@ -23,16 +24,18 @@ void err_exit(void)
   ERR_free_strings();
   exit(EXIT_FAILURE);
 }
-
+ // CALL WITH -lcrypto !!!
 int main(int argc, char *argv[])
 {
   FILE *fin;
   long filesize;
   char *buf;
 
+  // z ist variable that holds "context"
   EVP_MD_CTX c;
   unsigned char md[SHA_DIGEST_LENGTH];
-
+  
+  /* Load the human readable error strings for libcrypto */
   ERR_load_crypto_strings();
 
   EVP_MD_CTX_init(&c);  /* not necessary when not using _ex */
@@ -41,7 +44,8 @@ int main(int argc, char *argv[])
     printf("Usage: %s <file>\n", argv[0]);
     exit(EXIT_FAILURE);
   }
-
+  
+  // open and calculate size
   if ((fin = fopen(argv[1], "r")) == NULL){
     printf("Error opening %s.\n", argv[1]);
     exit(EXIT_FAILURE);
@@ -49,7 +53,8 @@ int main(int argc, char *argv[])
   fseek(fin, 0L, SEEK_END);
   filesize = ftell(fin);
   rewind(fin);
-
+  
+  // read out the file in a buf
   if (!(buf=malloc(filesize))) {
     printf("Memory exhausted. Stop.\n");
     exit(EXIT_FAILURE);
@@ -67,8 +72,10 @@ int main(int argc, char *argv[])
     err_exit();
   }
 
+  // print as hexadecimal
   printf("%s\n", pt(md));
 
+  // clean ups
   EVP_MD_CTX_cleanup(&c);
   free(buf);
   ERR_free_strings();
