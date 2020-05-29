@@ -130,7 +130,7 @@ int main(void)
                                         decryptedtext);
 
   cipherFile = fopen("output.pdf", "w+");
-  write(decryptedtext, sizeof(unsigned char), size, cipherFile);
+  fwrite(decryptedtext, sizeof(unsigned char), size, cipherFile);
   fclose(cipherFile);
 
   // terminate
