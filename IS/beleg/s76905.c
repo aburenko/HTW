@@ -82,7 +82,7 @@ int main(void)
   size_t result = 0;
 
   keyFile = fopen("s76905-source-key-corrupt.bin", "rb");
-  if (keyFile == NULL)<stdlib.h>
+  if (keyFile == NULL)
   {
     fputs("File error", stderr);
     exit(1);
@@ -92,7 +92,7 @@ int main(void)
   unsigned char *key = (unsigned char *)malloc(sizeof(char) * 32);
   /* A 128 bit IV */
   unsigned char *iv = (unsigned char *)malloc(sizeof(char) * 16);
-  if (key == NULL || key == NULL)
+  if (key == NULL || iv == NULL)
   {
     fputs("Memory error", stderr);
     exit(2);
@@ -111,7 +111,10 @@ int main(void)
   // Reading size of file
   FILE *cipherFile = fopen("s76905-source-cipher.bin", "r+");
   if (cipherFile == NULL)
-    return;
+  {
+    fputs("Reading error", stderr);
+    exit(3);
+  }
   fseek(cipherFile, 0, SEEK_END);
   long int size = ftell(cipherFile);
   rewind(cipherFile);
