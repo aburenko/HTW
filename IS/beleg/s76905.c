@@ -67,7 +67,7 @@ int brutforce_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned ch
     key[11] = (char)i;
     brutforce_decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
-    if (plaintext[0] == '%' || plaintext[0] == 'P' || plaintext[0] == 'D' || plaintext[0] == 'F')
+    if (plaintext[0] == '%' || plaintext[1] == 'P' || plaintext[2] == 'D' || plaintext[3] == 'F')
     {
       printf("found\n");
       break;
@@ -82,7 +82,7 @@ int main(void)
   size_t result = 0;
 
   keyFile = fopen("s76905-source-key-corrupt.bin", "rb");
-  if (keyFile == NULL)
+  if (keyFile == NULL)<stdlib.h>
   {
     fputs("File error", stderr);
     exit(1);
