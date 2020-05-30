@@ -67,7 +67,7 @@ int brutforce_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned ch
   {
     printf("bf value is: %d\n", i);
     key[11] = (char)i;
-    int len = brutforce_decrypt(ciphertext, ciphertext_len, key, iv,
+    int len = decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
     if (plaintext[0] == '%' || plaintext[1] == 'P' || plaintext[2] == 'D' || plaintext[3] == 'F')
     {
