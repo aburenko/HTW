@@ -81,7 +81,6 @@ int main(void)
 {
   printf("start main\n");
   FILE *keyFile;
-  char *buffer;
   size_t result = 0;
 
   printf("reading keys out of a file\n");
@@ -103,8 +102,8 @@ int main(void)
   }
 
   // copy the file into the keys:
-  result += fread(buffer, 1, 32, keyFile);
-  result += fread(buffer, 1, 16, keyFile);
+  result += fread(key, 1, 32, keyFile);
+  result += fread(iv, 1, 16, keyFile);
   fclose(keyFile);
   if (result != 48)
   {
@@ -142,7 +141,8 @@ int main(void)
 
   printf("free buffers and exit\n");
   // terminate
-  free(buffer);
+  free(key);
+  free(iv);
   free(ciphertext);
   free(decryptedtext);
 
