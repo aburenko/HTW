@@ -20,7 +20,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   printf("init vars");
   EVP_CIPHER_CTX *ctx;
   int len;
-  int plaintext_len;  
+  int plaintext_len;
   /* Load the human readable error strings for libcrypto */
   ERR_load_crypto_strings();
 
@@ -28,7 +28,6 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   /* Create and initialise the context */
   if (!(ctx = EVP_CIPHER_CTX_new()))
     handleErrors();
-
 
   printf("decrypt init\n");
   /*
@@ -80,7 +79,6 @@ int brutforce_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned ch
   {
     printf("bf value is: %d\n", i);
     key[11] = (char)i;
-    printf("changed key");
     int len = decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
     if (plaintext[0] == '%' || plaintext[1] == 'P' || plaintext[2] == 'D' || plaintext[3] == 'F')
@@ -148,21 +146,18 @@ int main(void)
 
   int decryptedtext_len, ciphertext_len;
 
-    
-    key = (unsigned char *)"01234567890123456789012345678901";
+  key = (unsigned char *)"01234567890123456789012345678901";
 
-    /* A 128 bit IV */
-    iv = (unsigned char *)"0123456789012345";
+  /* A 128 bit IV */
+  iv = (unsigned char *)"0123456789012345";
 
-    /* Message to be encrypted */
-    ciphertext =
-        (unsigned char *)"The quick brown fox jumps over the lazy dog";
-
+  /* Message to be encrypted */
+  ciphertext =
+      (unsigned char *)"The quick brown fox jumps over the lazy dog";
 
   /* Decrypt the ciphertext */
   decryptedtext_len = brutforce_decrypt(ciphertext, ciphertext_len, key, iv,
                                         decryptedtext);
-
 
   printf("saving decrypted text\n");
   cipherFile = fopen("output.pdf", "w+");
