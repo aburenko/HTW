@@ -17,9 +17,12 @@ void handleErrors(void)
 int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
             unsigned char *iv, unsigned char *plaintext)
 {
+  printf("init vars");
   EVP_CIPHER_CTX *ctx;
   int len;
-  int plaintext_len;
+  int plaintext_len;  
+  /* Load the human readable error strings for libcrypto */
+  ERR_load_crypto_strings();
 
   printf("init context\n");
   /* Create and initialise the context */
@@ -35,7 +38,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
      * IV size for *most* modes is the same as the block size. For AES this
      * is 128 bits
      */
-  if (1 != EVP_DecryptInit_ex(ctx, EVP_camellia_256_cfb1(), NULL, key, iv))
+  if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
     handleErrors();
 
   printf("decrypt update\n");
@@ -59,6 +62,12 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   printf("decrypt clean up\n");
   /* Clean up */
   EVP_CIPHER_CTX_free(ctx);
+  /* Removes all digests and ciphers */
+  EVP_cleanup();
+  /* if you omit the next, a small leak may be left when you make use of the BIO (low level API) for e.g. base64 transformations */
+  CRYPTO_cleanup_all_ex_data();
+  /* Remove error strings */
+  ERR_free_strings();
 
   return plaintext_len;
 }
@@ -71,6 +80,7 @@ int brutforce_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned ch
   {
     printf("bf value is: %d\n", i);
     key[11] = (char)i;
+    printf("changed key");
     int len = decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
     if (plaintext[0] == '%' || plaintext[1] == 'P' || plaintext[2] == 'D' || plaintext[3] == 'F')
@@ -132,6 +142,17 @@ int main(void)
   fclose(cipherFile);
 
   int decryptedtext_len, ciphertext_len;
+
+    
+    key = (unsigned char *)"01234567890123456789012345678901";
+
+    /* A 128 bit IV */
+    iv = (unsigned char *)"0123456789012345";
+
+    /* Message to be encrypted */
+    ciphertext =
+        (unsigned char *)"The quick brown fox jumps over the lazy dog";
+
 
   /* Decrypt the ciphertext */
   decryptedtext_len = brutforce_decrypt(ciphertext, ciphertext_len, key, iv,
