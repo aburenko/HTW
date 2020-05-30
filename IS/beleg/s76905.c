@@ -18,15 +18,16 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
             unsigned char *iv, unsigned char *plaintext)
 {
   EVP_CIPHER_CTX *ctx;
-
   int len;
-
   int plaintext_len;
 
+  printf("init context\n");
   /* Create and initialise the context */
   if (!(ctx = EVP_CIPHER_CTX_new()))
     handleErrors();
 
+
+  printf("decrypt init\n");
   /*
      * Initialise the decryption operation. IMPORTANT - ensure you use a key
      * and IV size appropriate for your cipher
@@ -37,6 +38,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   if (1 != EVP_DecryptInit_ex(ctx, EVP_camellia_256_cfb1(), NULL, key, iv))
     handleErrors();
 
+  printf("decrypt update\n");
   /*
      * Provide the message to be decrypted, and obtain the plaintext output.
      * EVP_DecryptUpdate can be called multiple times if necessary.
@@ -45,6 +47,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
     handleErrors();
   plaintext_len = len;
 
+  printf("decrypt final\n");
   /*
      * Finalise the decryption. Further plaintext bytes may be written at
      * this stage.
@@ -53,6 +56,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
     handleErrors();
   plaintext_len += len;
 
+  printf("decrypt clean up\n");
   /* Clean up */
   EVP_CIPHER_CTX_free(ctx);
 
