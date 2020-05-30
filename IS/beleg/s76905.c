@@ -63,7 +63,7 @@ int brutforce_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned ch
                       unsigned char *iv, unsigned char *plaintext)
 {
   printf("starting brutforce\n");
-  for (size_t i = 0; i < 256; i++)
+  for (int i = 0; i < 256; i++)
   {
     printf("\rLoop value is: %d", i);
     key[11] = (char)i;
