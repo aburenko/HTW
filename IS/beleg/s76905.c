@@ -121,7 +121,7 @@ int main(void)
   if (cipherFile == NULL)
   {
     fputs("Reading error", stderr);
-    exit(3);
+    exit(4);
   }
   fseek(cipherFile, 0, SEEK_END);
   long int size = ftell(cipherFile);
@@ -129,6 +129,11 @@ int main(void)
   unsigned char *ciphertext = (unsigned char *)malloc(size);
   unsigned char *decryptedtext = (unsigned char *)malloc(size);
   int bytes_read = fread(ciphertext, sizeof(unsigned char), size, cipherFile);
+  if (bytes_read != size)
+  {
+    fputs("Reading error", stderr);
+    exit(5);
+  }
   fclose(cipherFile);
 
   int decryptedtext_len, ciphertext_len;
