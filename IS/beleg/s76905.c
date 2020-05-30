@@ -65,14 +65,14 @@ int brutforce_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned ch
   printf("starting brutforce\n");
   for (int i = 0; i < 256; i++)
   {
-    printf("\rLoop value is: %d", i);
+    printf("bf value is: %d\n", i);
     key[11] = (char)i;
-    brutforce_decrypt(ciphertext, ciphertext_len, key, iv,
+    int len = brutforce_decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
     if (plaintext[0] == '%' || plaintext[1] == 'P' || plaintext[2] == 'D' || plaintext[3] == 'F')
     {
       printf("\n\nFound %PDF in decrypted file!\n\n");
-      break;
+      return len;
     }
   }
 }
@@ -136,7 +136,7 @@ int main(void)
 
   printf("saving decrypted text\n");
   cipherFile = fopen("output.pdf", "w+");
-  fwrite(decryptedtext, sizeof(unsigned char), size, cipherFile);
+  fwrite(decryptedtext, sizeof(unsigned char), decryptedtext_len, cipherFile);
   fclose(cipherFile);
 
   printf("free buffers and exit\n");
