@@ -62,14 +62,16 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
 int brutforce_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
                       unsigned char *iv, unsigned char *plaintext)
 {
+  printf("starting brutforce\n");
   for (size_t i = 0; i < 256; i++)
   {
+    printf("\rLoop value is: %d", i);
     key[11] = (char)i;
     brutforce_decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
     if (plaintext[0] == '%' || plaintext[1] == 'P' || plaintext[2] == 'D' || plaintext[3] == 'F')
     {
-      printf("found\n");
+      printf("\n\nFound %PDF in decrypted file!\n\n");
       break;
     }
   }
@@ -77,10 +79,12 @@ int brutforce_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned ch
 
 int main(void)
 {
+  printf("start main\n");
   FILE *keyFile;
   char *buffer;
   size_t result = 0;
 
+  printf("reading keys out of a file\n");
   keyFile = fopen("s76905-source-key-corrupt.bin", "rb");
   if (keyFile == NULL)
   {
@@ -108,6 +112,7 @@ int main(void)
     exit(3);
   }
 
+  printf("reading cipher text out of a file\n");
   // Reading size of file
   FILE *cipherFile = fopen("s76905-source-cipher.bin", "r+");
   if (cipherFile == NULL)
@@ -129,10 +134,13 @@ int main(void)
   decryptedtext_len = brutforce_decrypt(ciphertext, ciphertext_len, key, iv,
                                         decryptedtext);
 
+
+  printf("saving decrypted text\n");
   cipherFile = fopen("output.pdf", "w+");
   fwrite(decryptedtext, sizeof(unsigned char), size, cipherFile);
   fclose(cipherFile);
 
+  printf("free buffers and exit\n");
   // terminate
   free(buffer);
   free(ciphertext);
