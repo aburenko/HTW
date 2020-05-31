@@ -14,8 +14,8 @@ void handleErrors(void)
   abort();
 }
 
-int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
-            unsigned char *iv, unsigned char *plaintext)
+int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
+            unsigned char iv[], unsigned char plaintext[])
 {
   printf("init vars");
   EVP_CIPHER_CTX *ctx;
@@ -71,8 +71,8 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   return plaintext_len;
 }
 
-int brutforce_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char key[],
-                      unsigned char *iv, unsigned char *plaintext)
+int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
+                      unsigned char iv[], unsigned char plaintext[])
 {
   printf("starting brutforce\n");
   for (int i = 0; i < 256; i++)
@@ -97,6 +97,7 @@ int main(void)
 
   printf("reading keys out of a file\n");
   keyFile = fopen("s76905-source-key-corrupt.bin", "rb");
+  //keyFile = fopen("s76905-source-key-corrupt-test.bin", "rb");
   if (keyFile == NULL)
   {
     fputs("File error", stderr);
@@ -106,13 +107,7 @@ int main(void)
   /* A 256 bit key */
   unsigned char key[32];
   /* A 128 bit IV */
-  unsigned char *iv = (unsigned char *)malloc(sizeof(char) * 16);
-
-  if (key == NULL || iv == NULL)
-  {
-    fputs("Memory error", stderr);
-    exit(2);
-  }
+  unsigned char iv[16];
 
   // copy the file into the keys:
   result += fread(key, 1, 32, keyFile);
@@ -121,7 +116,7 @@ int main(void)
   if (result != 48)
   {
     fputs("Reading error", stderr);
-    exit(3);
+    exit(2);
   }
   printf("key: %s legth: %d\n", key, strlen(key));
   printf("iv: %s legth: %d\n", iv, strlen(iv));
@@ -132,18 +127,18 @@ int main(void)
   if (cipherFile == NULL)
   {
     fputs("Reading error", stderr);
-    exit(4);
+    exit(3);
   }
   fseek(cipherFile, 0, SEEK_END);
   long int size = ftell(cipherFile);
   rewind(cipherFile);
-  unsigned char *ciphertext = (unsigned char *)malloc(size);
-  unsigned char *decryptedtext = (unsigned char *)malloc(size);
+  unsigned char ciphertext[size];
+  unsigned char decryptedtext[size];
   int bytes_read = fread(ciphertext, sizeof(unsigned char), size, cipherFile);
   if (bytes_read != size)
   {
     fputs("Reading error", stderr);
-    exit(5);
+    exit(4);
   }
   fclose(cipherFile);
 
@@ -158,11 +153,6 @@ int main(void)
   fwrite(decryptedtext, sizeof(unsigned char), decryptedtext_len, cipherFile);
   fclose(cipherFile);
 
-  printf("free buffers and exit\n");
-  // terminate
-  free(iv);
-  free(ciphertext);
-  free(decryptedtext);
-
+  printf("exit\n");
   return 0;
 }
