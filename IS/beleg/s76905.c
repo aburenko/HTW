@@ -37,7 +37,7 @@ int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
      * IV size for *most* modes is the same as the block size. For AES this
      * is 128 bits
      */
-  if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+  if (1 != EVP_DecryptInit_ex(ctx, EVP_camellia_256_cfb1(), NULL, key, iv))
     handleErrors();
 
   printf("decrypt update\n");
