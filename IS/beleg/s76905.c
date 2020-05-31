@@ -123,8 +123,8 @@ int main(void)
     fputs("Reading error", stderr);
     exit(3);
   }
-  printf("key: %s\n", key);
-  printf("iv: %s\n", iv);
+  printf("key: %s legth: \n", key, strlen(key));
+  printf("iv: %s legth: \n", iv, strlen(iv));
 
   printf("reading cipher text out of a file\n");
   // Reading size of file
