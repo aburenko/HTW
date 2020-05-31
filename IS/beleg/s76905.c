@@ -55,8 +55,14 @@ int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
      * this stage.
      */
   if (1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len))
-    handleErrors();
-  plaintext_len += len;
+  {
+    plaintext_len = -1;
+    printf("decryption failed\n");
+  }
+  else
+  {
+    plaintext_len += len;
+  }
 
   printf("decrypt clean up\n");
   /* Clean up */
@@ -81,7 +87,7 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
     key[11] = (char)i;
     int len = decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
-    if (plaintext[0] == '%' || plaintext[1] == 'P' || plaintext[2] == 'D' || plaintext[3] == 'F')
+    if (len != -1 && plaintext[0] == '%' && plaintext[1] == 'P' && plaintext[2] == 'D' && plaintext[3] == 'F')
     {
       printf("\n\nFound %PDF in decrypted file!\n\n");
       return len;
