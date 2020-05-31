@@ -96,8 +96,8 @@ int main(void)
   size_t result = 0;
 
   printf("reading keys out of a file\n");
-  keyFile = fopen("s76905-source-key-corrupt.bin", "rb");
-  //keyFile = fopen("s76905-source-key-corrupt-test.bin", "rb");
+  //keyFile = fopen("s76905-source-key-corrupt.bin", "rb");
+  keyFile = fopen("s76905-source-key-corrupt-test.bin", "rb");
   if (keyFile == NULL)
   {
     fputs("File error", stderr);
@@ -118,8 +118,8 @@ int main(void)
     fputs("Reading error", stderr);
     exit(2);
   }
-  printf("key: %s legth: %d\n", key, strlen(key));
-  printf("iv: %s legth: %d\n", iv, strlen(iv));
+  printf("key: %s legth: %d\n", key);
+  printf("iv: %s legth: %d\n", iv);
 
   printf("reading cipher text out of a file\n");
   // Reading size of file
