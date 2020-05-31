@@ -104,7 +104,7 @@ int main(void)
   }
 
   /* A 256 bit key */
-  unsigned char key[] = (unsigned char *)malloc(sizeof(char) * 32);
+  unsigned char key[32];
   /* A 128 bit IV */
   unsigned char *iv = (unsigned char *)malloc(sizeof(char) * 16);
 
