@@ -13,7 +13,14 @@ void handleErrors(void)
   ERR_print_errors_fp(stderr);
   abort();
 }
-
+void clean_up() {
+  /* Removes all digests and ciphers */
+  EVP_cleanup();
+  /* if you omit the next, a small leak may be left when you make use of the BIO (low level API) for e.g. base64 transformations */
+  CRYPTO_cleanup_all_ex_data();
+  /* Remove error strings */
+  ERR_free_strings();
+}
 int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
             unsigned char iv[], unsigned char plaintext[])
 {
@@ -66,12 +73,6 @@ int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
   printf("decrypt clean up\n");
   /* Clean up */
   EVP_CIPHER_CTX_free(ctx);
-  /* Removes all digests and ciphers */
-  EVP_cleanup();
-  /* if you omit the next, a small leak may be left when you make use of the BIO (low level API) for e.g. base64 transformations */
-  CRYPTO_cleanup_all_ex_data();
-  /* Remove error strings */
-  ERR_free_strings();
 
   return plaintext_len;
 }
@@ -86,7 +87,7 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
     key[11] = (char)i;
     int len = decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
-    printf("starts with");
+    printf("starts with: ");
     for (int i = 0; i < 5; i++)
     {
       printf("%02x", plaintext[i]);
@@ -97,6 +98,7 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
       printf("\n\nFound %PDF in decrypted file!\n\n");
       return len;
     }
+    clean_up();
   }
 }
 
