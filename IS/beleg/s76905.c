@@ -118,10 +118,17 @@ int main(void)
     fputs("Reading error", stderr);
     exit(2);
   }
-  printf("key: %s legth: %d\n", key);
-  printf("iv: %s legth: %d\n", iv);
-
-  printf("reading cipher text out of a file\n");
+  printf("key: ");
+  for (int i = 0; i < 32; i++)
+  {
+    printf("%02x", key[i]);
+  }
+  printf("\niv: ");
+  for (int i = 0; i < 16; i++)
+  {
+    printf("%02x", iv[i]);
+  }
+  printf("\nreading cipher text out of a file\n");
   // Reading size of file
   FILE *cipherFile = fopen("s76905-source-cipher.bin", "r+");
   if (cipherFile == NULL)
