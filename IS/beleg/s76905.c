@@ -24,7 +24,6 @@ int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
   /* Load the human readable error strings for libcrypto */
   ERR_load_crypto_strings();
 
-  printf("init context\n");
   /* Create and initialise the context */
   if (!(ctx = EVP_CIPHER_CTX_new()))
     handleErrors();
@@ -87,6 +86,12 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
     key[11] = (char)i;
     int len = decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
+    printf("starts with");
+    for (int i = 0; i < 5; i++)
+    {
+      printf("%02x", plaintext[i]);
+    }
+    printf("\n");
     if (len != -1 && plaintext[0] == '%' && plaintext[1] == 'P' && plaintext[2] == 'D' && plaintext[3] == 'F')
     {
       printf("\n\nFound %PDF in decrypted file!\n\n");
