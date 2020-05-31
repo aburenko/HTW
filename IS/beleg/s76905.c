@@ -96,8 +96,7 @@ int main(void)
   size_t result = 0;
 
   printf("reading keys out of a file\n");
-  //keyFile = fopen("s76905-source-key-corrupt.bin", "rb");
-  keyFile = fopen("s76905-source-key-corrupt-test.bin", "rb");
+  keyFile = fopen("s76905-source-key-corrupt.bin", "rb");
   if (keyFile == NULL)
   {
     fputs("File error", stderr);
