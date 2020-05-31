@@ -71,7 +71,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   return plaintext_len;
 }
 
-int brutforce_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+int brutforce_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char key[],
                       unsigned char *iv, unsigned char *plaintext)
 {
   printf("starting brutforce\n");
@@ -107,6 +107,7 @@ int main(void)
   unsigned char key[] = (unsigned char *)malloc(sizeof(char) * 32);
   /* A 128 bit IV */
   unsigned char *iv = (unsigned char *)malloc(sizeof(char) * 16);
+
   if (key == NULL || iv == NULL)
   {
     fputs("Memory error", stderr);
@@ -122,6 +123,8 @@ int main(void)
     fputs("Reading error", stderr);
     exit(3);
   }
+  printf("key: %s\n", key);
+  printf("iv: %s\n", iv);
 
   printf("reading cipher text out of a file\n");
   // Reading size of file
@@ -145,15 +148,6 @@ int main(void)
   fclose(cipherFile);
 
   int decryptedtext_len, ciphertext_len;
-
-  // key = (unsigned char *)"01234567890123456789012345678901";
-
-  // /* A 128 bit IV */
-  // iv = (unsigned char *)"0123456789012345";
-
-  // /* Message to be encrypted */
-  // ciphertext =
-  //     (unsigned char *)"The quick brown fox jumps over the lazy dog";
 
   /* Decrypt the ciphertext */
   decryptedtext_len = brutforce_decrypt(ciphertext, ciphertext_len, key, iv,
