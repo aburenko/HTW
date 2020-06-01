@@ -37,6 +37,7 @@ static char *pt(unsigned char *md)
 
 unsigned char *md4_hash(unsigned char plaintext[])
 {
+  printf("creating md4 hash");
   FILE *fin;
   long filesize;
 
@@ -60,7 +61,7 @@ unsigned char *md4_hash(unsigned char plaintext[])
   }
 
   // print as hexadecimal
-  printf("%s\n", pt(md));
+  printf("hash was %s\n", pt(md));
 
   // clean ups
   EVP_MD_CTX_cleanup(&c);
@@ -128,11 +129,7 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
   {
     printf("bf value is: %d\n", i);
     key[11] = (char)i;
-    // TODO check ciphertext
-    for (int j = 0; j < 5; j++)
-    {
-      printf("%02x", ciphertext[j]);
-    }
+
     int len = decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
     printf("starts with: ");
@@ -221,13 +218,12 @@ int main(void)
     printf("\nno match for %PDF found\n");
     exit(5);
   }
-  else
-  {
-    printf("\nsaving decrypted text\n");
-    cipherFile = fopen("output.pdf", "w+");
-    fwrite(decryptedtext, sizeof(unsigned char), decryptedtext_len, cipherFile);
-    fclose(cipherFile);
-  }
+  printf("\nsaving decrypted text\n");
+  cipherFile = fopen("output.pdf", "w+");
+  fwrite(decryptedtext, sizeof(unsigned char), decryptedtext_len, cipherFile);
+  fclose(cipherFile);
+
+  unsigned char *md4Hash = md4_hash(decryptedtext);
 
   printf("exit\n");
   return 0;
