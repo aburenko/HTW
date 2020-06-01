@@ -15,6 +15,14 @@ void handleErrors(void)
   abort();
 }
 
+void err_exit(void)
+{
+  printf("%s\n", ERR_error_string(ERR_get_error(), NULL));
+
+  ERR_free_strings();
+  exit(EXIT_FAILURE);
+}
+
 static char *pt(unsigned char *md)
 {
   int i;
@@ -33,7 +41,7 @@ unsigned char *md4_hash(unsigned char plaintext[])
   long filesize;
 
   EVP_MD_CTX c;
-  unsigned char md[16];
+  unsigned char md = malloc(sizeof(unsigned char) * 16);
 
   ERR_load_crypto_strings();
   EVP_MD_CTX_init(&c);
