@@ -4,6 +4,7 @@
 #include <openssl/conf.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
+#include <openssl/sha.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +13,52 @@ void handleErrors(void)
 {
   ERR_print_errors_fp(stderr);
   abort();
+}
+
+static char *pt(unsigned char *md)
+{
+  int i;
+  static char buf[16];
+  for (i = 0; i < 16; i++)
+  {
+    // write as hexadecimal to buf
+    sprintf(&(buf[i * 2]), "%02x", md[i]);
+  }
+  return (buf);
+}
+
+unsigned char *md4_hash(unsigned char plaintext[])
+{
+  FILE *fin;
+  long filesize;
+
+  EVP_MD_CTX c;
+  unsigned char md[16];
+
+  ERR_load_crypto_strings();
+  EVP_MD_CTX_init(&c);
+
+  if ((EVP_DigestInit(&c, EVP_md4())) == 0)
+  {
+    err_exit();
+  }
+  if ((EVP_DigestUpdate(&c, plaintext, filesize)) == 0)
+  {
+    err_exit();
+  }
+  if ((EVP_DigestFinal(&c, md, NULL)) == 0)
+  {
+    err_exit();
+  }
+
+  // print as hexadecimal
+  printf("%s\n", pt(md));
+
+  // clean ups
+  EVP_MD_CTX_cleanup(&c);
+  ERR_free_strings();
+
+  return md;
 }
 
 void clean_up()
@@ -73,6 +120,11 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
   {
     printf("bf value is: %d\n", i);
     key[11] = (char)i;
+    // TODO check ciphertext
+    for (int j = 0; j < 5; j++)
+    {
+      printf("%02x", ciphertext[j]);
+    }
     int len = decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
     printf("starts with: ");
