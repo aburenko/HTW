@@ -13,7 +13,9 @@ void handleErrors(void)
   ERR_print_errors_fp(stderr);
   abort();
 }
-void clean_up() {
+
+void clean_up()
+{
   /* Removes all digests and ciphers */
   EVP_cleanup();
   /* if you omit the next, a small leak may be left when you make use of the BIO (low level API) for e.g. base64 transformations */
@@ -21,6 +23,7 @@ void clean_up() {
   /* Remove error strings */
   ERR_free_strings();
 }
+
 int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
             unsigned char iv[], unsigned char plaintext[])
 {
@@ -35,31 +38,16 @@ int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
   if (!(ctx = EVP_CIPHER_CTX_new()))
     handleErrors();
 
-  printf("decrypt init\n");
-  /*
-     * Initialise the decryption operation. IMPORTANT - ensure you use a key
-     * and IV size appropriate for your cipher
-     * In this example we are using 256 bit AES (i.e. a 256 bit key). The
-     * IV size for *most* modes is the same as the block size. For AES this
-     * is 128 bits
-     */
+  // printf("decrypt init\n");
   if (1 != EVP_DecryptInit_ex(ctx, EVP_camellia_256_cfb1(), NULL, key, iv))
     handleErrors();
 
   printf("decrypt update\n");
-  /*
-     * Provide the message to be decrypted, and obtain the plaintext output.
-     * EVP_DecryptUpdate can be called multiple times if necessary.
-     */
   if (1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
     handleErrors();
   plaintext_len = len;
 
   printf("decrypt final\n");
-  /*
-     * Finalise the decryption. Further plaintext bytes may be written at
-     * this stage.
-     */
   if (1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len))
   {
     plaintext_len = -1;
@@ -88,9 +76,9 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
     int len = decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
     printf("starts with: ");
-    for (int i = 0; i < 5; i++)
+    for (int j = 0; j < 5; j++)
     {
-      printf("%02x", plaintext[i]);
+      printf("%02x", plaintext[j]);
     }
     printf("\n");
     if (len != -1 && plaintext[0] == '%' && plaintext[1] == 'P' && plaintext[2] == 'D' && plaintext[3] == 'F')
@@ -100,6 +88,7 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
     }
     clean_up();
   }
+  return -1;
 }
 
 int main(void)
@@ -167,10 +156,18 @@ int main(void)
   decryptedtext_len = brutforce_decrypt(ciphertext, ciphertext_len, key, iv,
                                         decryptedtext);
 
-  printf("saving decrypted text\n");
-  cipherFile = fopen("output.pdf", "w+");
-  fwrite(decryptedtext, sizeof(unsigned char), decryptedtext_len, cipherFile);
-  fclose(cipherFile);
+  if (decryptedtext_len == -1)
+  {
+    printf("\nno match for %PDF found\n");
+    exit(5);
+  }
+  else
+  {
+    printf("\nsaving decrypted text\n");
+    cipherFile = fopen("output.pdf", "w+");
+    fwrite(decryptedtext, sizeof(unsigned char), decryptedtext_len, cipherFile);
+    fclose(cipherFile);
+  }
 
   printf("exit\n");
   return 0;
