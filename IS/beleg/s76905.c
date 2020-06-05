@@ -132,7 +132,7 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
 
     int len = decrypt(ciphertext, ciphertext_len, key, iv,
                       plaintext);
-    printf("starts with: ");
+    printf("len was: %d. Starts with: ", len);
     for (int j = 0; j < 5; j++)
     {
       printf("%02x", plaintext[j]);
