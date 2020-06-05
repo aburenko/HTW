@@ -23,52 +23,52 @@ void err_exit(void)
   exit(EXIT_FAILURE);
 }
 
-static char *pt(unsigned char *md)
-{
-  int i;
-  static char buf[16];
-  for (i = 0; i < 16; i++)
-  {
-    // write as hexadecimal to buf
-    sprintf(&(buf[i * 2]), "%02x", md[i]);
-  }
-  return (buf);
-}
+// static char *pt(unsigned char *md)
+// {
+//   int i;
+//   static char buf[16];
+//   for (i = 0; i < 16; i++)
+//   {
+//     // write as hexadecimal to buf
+//     sprintf(&(buf[i * 2]), "%02x", md[i]);
+//   }
+//   return (buf);
+// }
 
-unsigned char *md4_hash(unsigned char plaintext[])
-{
-  printf("creating md4 hash");
-  FILE *fin;
-  long filesize;
+// unsigned char *md4_hash(unsigned char plaintext[])
+// {
+//   printf("creating md4 hash");
+//   FILE *fin;
+//   long filesize;
 
-  EVP_MD_CTX c;
-  unsigned char md = malloc(sizeof(unsigned char) * 16);
+//   EVP_MD_CTX c;
+//   unsigned char md = malloc(sizeof(unsigned char) * 16);
 
-  ERR_load_crypto_strings();
-  EVP_MD_CTX_init(&c);
+//   ERR_load_crypto_strings();
+//   EVP_MD_CTX_init(&c);
 
-  if ((EVP_DigestInit(&c, EVP_md4())) == 0)
-  {
-    err_exit();
-  }
-  if ((EVP_DigestUpdate(&c, plaintext, filesize)) == 0)
-  {
-    err_exit();
-  }
-  if ((EVP_DigestFinal(&c, md, NULL)) == 0)
-  {
-    err_exit();
-  }
+//   if ((EVP_DigestInit(&c, EVP_md4())) == 0)
+//   {
+//     err_exit();
+//   }
+//   if ((EVP_DigestUpdate(&c, plaintext, filesize)) == 0)
+//   {
+//     err_exit();
+//   }
+//   if ((EVP_DigestFinal(&c, md, NULL)) == 0)
+//   {
+//     err_exit();
+//   }
 
-  // print as hexadecimal
-  printf("hash was %s\n", pt(md));
+//   // print as hexadecimal
+//   printf("hash was %s\n", pt(md));
 
-  // clean ups
-  EVP_MD_CTX_cleanup(&c);
-  ERR_free_strings();
+//   // clean ups
+//   EVP_MD_CTX_cleanup(&c);
+//   ERR_free_strings();
 
-  return md;
-}
+//   return md;
+// }
 
 void clean_up()
 {
@@ -223,7 +223,7 @@ int main(void)
   fwrite(decryptedtext, sizeof(unsigned char), decryptedtext_len, cipherFile);
   fclose(cipherFile);
 
-  unsigned char *md4Hash = md4_hash(decryptedtext);
+  // unsigned char *md4Hash = md4_hash(decryptedtext);
 
   printf("exit\n");
   return 0;
