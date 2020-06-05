@@ -83,7 +83,7 @@ void clean_up()
 int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
             unsigned char iv[], unsigned char plaintext[])
 {
-  printf("init vars");
+  printf("init vars\n");
   EVP_CIPHER_CTX *ctx;
   int len;
   int plaintext_len;
