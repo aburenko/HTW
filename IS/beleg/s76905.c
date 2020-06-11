@@ -207,7 +207,8 @@ int main(void)
   }
   fclose(cipherFile);
 
-  int decryptedtext_len, ciphertext_len;
+  int ciphertext_len = size;
+  int decryptedtext_len = 0;
 
   /* Decrypt the ciphertext */
   decryptedtext_len = brutforce_decrypt(ciphertext, ciphertext_len, key, iv,
