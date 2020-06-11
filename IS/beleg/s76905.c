@@ -78,7 +78,7 @@ void clean_up()
 }
 
 int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
-            unsigned char iv[], unsigned char plaintext[], const EVP_CIPHER * type)
+            unsigned char iv[], unsigned char plaintext[], const EVP_CIPHER *type)
 {
   printf("init vars\n");
   EVP_CIPHER_CTX *ctx;
@@ -285,7 +285,7 @@ int main(void)
   printf("start test\n");
   unsigned char testtext[dest_size];
   int testtext_len = decrypt(encryptedhashedtext, encrypted_len, keyAes, ivAes,
-                         testtext, EVP_aes_192_ofb());
+                             testtext, EVP_aes_192_ofb());
   if (testtext_len != dest_size)
   {
     printf("test: size error\n");
@@ -293,12 +293,16 @@ int main(void)
   }
   if (testtext[0] == '%' || testtext[1] == 'P' || testtext[2] == 'D' || testtext[3] == 'F')
   {
+    for (int j = 0; j < 5; j++)
+    {
+      printf("%02x", plaintext[j]);
+    }
     printf("test: pdf not found error\n");
     exit(7);
   }
-  if (testtext[dest_size-1] == md4Hash[14] || testtext[dest_size] == md4Hash[15] )
+  if (testtext[dest_size - 1] == md4Hash[14] || testtext[dest_size] == md4Hash[15])
   {
-    printf("test: pdf not found error\n");
+    printf("test: hash not found error\n");
     exit(7);
   }
   printf("end test\n");
