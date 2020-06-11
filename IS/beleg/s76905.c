@@ -256,21 +256,14 @@ int main(void)
   /* concatenate decrypted text with hash */
   int dest_size = size + 16;
   unsigned char hashedtext[dest_size];
-  strcpy(hashedtext, decryptedtext);
-  strcat(hashedtext, md4Hash);
-
-  /* save decrypted pdf file */
-  printf("\nsaving decrypted text\n");
-  cipherFile = fopen("outputtesttext", "w+");
-  fwrite(decryptedtext, sizeof(unsigned char), decryptedtext_len, cipherFile);
-  fclose(cipherFile);
-
-  /* save decrypted pdf file */
-  printf("\nsaving decrypted text - hash\n");
-  cipherFile = fopen("outputtest", "w+");
-  fwrite(hashedtext, sizeof(unsigned char), dest_size, cipherFile);
-  fclose(cipherFile);
-
+  for (int i = 0; i < dest_size; i++)
+  {
+    hashedtext[i] = decryptedtext[i];
+  }
+  for (int i = 0; i < 16; i++)
+  {
+    hashedtext[dest_size + i] = md4Hash[i];
+  }
   /* Encrypt the plaintext with hash */
   unsigned char keyAes[24];
   unsigned char ivAes[16];
