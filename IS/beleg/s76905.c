@@ -219,7 +219,7 @@ int main(void)
   unsigned char key[32];
   /* A 128 bit IV */
   unsigned char iv[16];
-  getKeys("s76905-source-key-corrupt.bin", key, iv, 32)
+  getKeys("s76905-source-key-corrupt.bin", key, iv, 32);
 
   printf("\nreading cipher text out of a file\n");
   // Reading size of file
