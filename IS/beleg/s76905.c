@@ -295,7 +295,7 @@ int main(void)
   {
     for (int j = 0; j < 5; j++)
     {
-      printf("%02x", plaintext[j]);
+      printf("%02x", testtext[j]);
     }
     printf("test: pdf not found error\n");
     exit(7);
