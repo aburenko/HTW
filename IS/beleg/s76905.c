@@ -124,7 +124,6 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
   printf("starting brutforce\n");
   for (int i = 0; i < 256; i++)
   {
-    i = 67; // !!!! HACK TODO
     printf("bf value is: %d\n", i);
     key[11] = (char)i;
 
@@ -264,16 +263,6 @@ int main(void)
   for (int i = 0; i < 16; i++)
   {
     hashedtext[size + i] = md4Hash[i];
-  }
-  if (hashedtext[0] != '%' || hashedtext[1] != 'P' || hashedtext[2] != 'D' || hashedtext[3] != 'F')
-  {
-    printf("test: pdf not found error\n");
-    exit(7);
-  }
-  if (hashedtext[dest_size - 2] != md4Hash[14] || hashedtext[dest_size - 1] != md4Hash[15])
-  {
-    printf("test: hash not found error\n");
-    exit(7);
   }
   /* Encrypt the plaintext with hash */
   unsigned char keyAes[24];
