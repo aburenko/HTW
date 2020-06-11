@@ -296,7 +296,7 @@ int main(void)
     printf("test: pdf not found error\n");
     exit(7);
   }
-  if (testtext[dest_size - 1] != md4Hash[14] || testtext[dest_size] != md4Hash[15])
+  if (testtext[dest_size - 2] != md4Hash[14] || testtext[dest_size - 1] != md4Hash[15])
   {
     printf("test: hash not found error\n");
     exit(7);
