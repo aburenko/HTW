@@ -262,7 +262,6 @@ int main(void)
   // fwrite(decryptedtext, sizeof(unsigned char), decryptedtext_len, cipherFile);
   // fclose(cipherFile);
 
-  getKeys("s76905-source-key-corrupt.bin", key, iv, 32);
   unsigned char *md4Hash = md4_hash(decryptedtext);
   /* concatenate decrypted text with hash */
   int dest_size = size + 16;
