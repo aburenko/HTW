@@ -37,7 +37,7 @@ static char *pt(unsigned char *md)
 
 unsigned char *md4_hash(unsigned char plaintext[])
 {
-  printf("creating md4 hash");
+  printf("\ncreating md4 hash\n");
   FILE *fin;
   long filesize;
 
@@ -178,7 +178,7 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 }
 
 void getKeys(char *file, unsigned char *key,
-            unsigned char *iv, int sizeKey)
+             unsigned char *iv, int sizeKey)
 {
   FILE *keyFile;
   size_t result = 0;
@@ -271,11 +271,18 @@ int main(void)
   strcat(hashedtext, md4Hash);
   /* Encrypt the plaintext with hash */
   unsigned char keyAes[24];
-  getKeys("s76905-dest-key.bin", key, iv, 24);
+  unsigned char ivAes[24];
+  getKeys("s76905-dest-key.bin", key, ivAes, 24);
   int encrypted_len = 0;
-  ciphertext_len = encrypt(hashedtext, dest_size, keyAes, iv,
-                           encryptedhashedtext);
+  encrypted_len = encrypt(hashedtext, dest_size, keyAes, ivAes,
+                          encryptedhashedtext);
 
+  printf("len was: %d. Starts with: ", encrypted_len);
+  for (int j = 0; j < 5; j++)
+  {
+    printf("%02x", encryptedhashedtext[j]);
+  }
+  printf("\n");
 
   /* save encrypted pdf with hash */
   printf("\nsaving enrypted text + hash\n");
