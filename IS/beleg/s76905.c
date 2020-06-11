@@ -78,7 +78,7 @@ void clean_up()
 }
 
 int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
-            unsigned char iv[], unsigned char plaintext[], EVP_CIPHER * type)
+            unsigned char iv[], unsigned char plaintext[], const EVP_CIPHER * type)
 {
   printf("init vars\n");
   EVP_CIPHER_CTX *ctx;
@@ -285,7 +285,7 @@ int main(void)
   /* Decrypt the ciphertext */
   printf("start test\n");
   unsigned char testtext[dest_size];
-  testtext_len = decrypt(encryptedhashedtext, encrypted_len, keyAes, ivAes,
+  int testtext_len = decrypt(encryptedhashedtext, encrypted_len, keyAes, ivAes,
                          testtext, EVP_aes_192_ofb());
   if (testtext_len != dest_size)
   {
