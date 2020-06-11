@@ -261,7 +261,7 @@ int main(void)
 
   /* save decrypted pdf file */
   printf("\nsaving decrypted text - hash\n");
-  cipherFile = fopen("output.pdf", "w+");
+  cipherFile = fopen("outputtest", "w+");
   fwrite(hashedtext, sizeof(unsigned char), dest_size, cipherFile);
   fclose(cipherFile);
 
