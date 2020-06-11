@@ -260,6 +260,12 @@ int main(void)
   strcat(hashedtext, md4Hash);
 
   /* save decrypted pdf file */
+  printf("\nsaving decrypted text\n");
+  cipherFile = fopen("outputtesttext", "w+");
+  fwrite(decryptedtext, sizeof(unsigned char), decryptedtext_len, cipherFile);
+  fclose(cipherFile);
+
+  /* save decrypted pdf file */
   printf("\nsaving decrypted text - hash\n");
   cipherFile = fopen("outputtest", "w+");
   fwrite(hashedtext, sizeof(unsigned char), dest_size, cipherFile);
