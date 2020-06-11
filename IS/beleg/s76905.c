@@ -35,12 +35,9 @@ static char *pt(unsigned char *md)
   return (buf);
 }
 
-unsigned char *md4_hash(unsigned char plaintext[])
+unsigned char *md4_hash(unsigned char text[], int len)
 {
   printf("\ncreating md4 hash\n");
-  FILE *fin;
-  long filesize;
-
   EVP_MD_CTX c;
   unsigned char *md = malloc(sizeof(unsigned char) * 16);
 
@@ -51,7 +48,7 @@ unsigned char *md4_hash(unsigned char plaintext[])
   {
     err_exit();
   }
-  if ((EVP_DigestUpdate(&c, plaintext, filesize)) == 0)
+  if ((EVP_DigestUpdate(&c, text, len)) == 0)
   {
     err_exit();
   }
@@ -140,7 +137,7 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
     printf("\n");
     if (len != -1 && plaintext[0] == '%' && plaintext[1] == 'P' && plaintext[2] == 'D' && plaintext[3] == 'F')
     {
-      printf("\n\nFound %PDF in decrypted file!\n\n");
+      printf("\n\nFound \%PDF in decrypted file!\n\n");
       return len;
     }
     clean_up();
@@ -252,7 +249,7 @@ int main(void)
 
   if (decryptedtext_len == -1)
   {
-    printf("\nno match for %PDF found\n");
+    printf("\nno match for \%PDF found\n");
     exit(5);
   }
 
@@ -262,11 +259,10 @@ int main(void)
   // fwrite(decryptedtext, sizeof(unsigned char), decryptedtext_len, cipherFile);
   // fclose(cipherFile);
 
-  unsigned char *md4Hash = md4_hash(decryptedtext);
+  unsigned char *md4Hash = md4_hash(decryptedtext, decryptedtext_len);
   /* concatenate decrypted text with hash */
   int dest_size = size + 16;
-  unsigned char hashedtext[dest_size];
-  unsigned char encryptedhashedtext[dest_size];
+  unsigned char *hashedtext;
   strcpy(hashedtext, decryptedtext);
   strcat(hashedtext, md4Hash);
   /* Encrypt the plaintext with hash */
@@ -274,6 +270,7 @@ int main(void)
   unsigned char ivAes[16];
   getKeys("s76905-dest-key.bin", keyAes, ivAes, 24);
   int encrypted_len = 0;
+  unsigned char encryptedhashedtext[dest_size];
   encrypted_len = encrypt(hashedtext, dest_size, keyAes, ivAes,
                           encryptedhashedtext);
 
