@@ -124,6 +124,7 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
   printf("starting brutforce\n");
   for (int i = 0; i < 256; i++)
   {
+    i = 67; // !!!! HACK TODO
     printf("bf value is: %d\n", i);
     key[11] = (char)i;
 
@@ -262,7 +263,7 @@ int main(void)
   }
   for (int i = 0; i < 16; i++)
   {
-    hashedtext[dest_size + i] = md4Hash[i];
+    hashedtext[size + i] = md4Hash[i];
   }
   /* Encrypt the plaintext with hash */
   unsigned char keyAes[24];
