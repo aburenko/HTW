@@ -257,13 +257,23 @@ int main(void)
   /* concatenate decrypted text with hash */
   int dest_size = size + 16;
   unsigned char hashedtext[dest_size];
-  for (int i = 0; i < dest_size; i++)
+  for (int i = 0; i < size; i++)
   {
     hashedtext[i] = decryptedtext[i];
   }
   for (int i = 0; i < 16; i++)
   {
     hashedtext[size + i] = md4Hash[i];
+  }
+  if (hashedtext[0] != '%' || hashedtext[1] != 'P' || hashedtext[2] != 'D' || hashedtext[3] != 'F')
+  {
+    printf("test: pdf not found error\n");
+    exit(7);
+  }
+  if (hashedtext[dest_size - 2] != md4Hash[14] || hashedtext[dest_size - 1] != md4Hash[15])
+  {
+    printf("test: hash not found error\n");
+    exit(7);
   }
   /* Encrypt the plaintext with hash */
   unsigned char keyAes[24];
@@ -282,7 +292,6 @@ int main(void)
   printf("\n");
 
   // test
-  /* Decrypt the ciphertext */
   printf("start test\n");
   unsigned char testtext[dest_size];
   int testtext_len = decrypt(encryptedhashedtext, encrypted_len, keyAes, ivAes,
