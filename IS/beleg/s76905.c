@@ -78,7 +78,7 @@ void clean_up()
 }
 
 int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
-            unsigned char iv[], unsigned char plaintext[], int type)
+            unsigned char iv[], unsigned char plaintext[], EVP_CIPHER * type)
 {
   printf("init vars\n");
   EVP_CIPHER_CTX *ctx;
@@ -292,7 +292,7 @@ int main(void)
     printf("test: size error\n");
     exit(7);
   }
-  if (testtext[0] == '%' || testtext[1] == 'P' | testtext[2] == 'D' || testtext[3] == 'F')
+  if (testtext[0] == '%' || testtext[1] == 'P' || testtext[2] == 'D' || testtext[3] == 'F')
   {
     printf("test: pdf not found error\n");
     exit(7);
