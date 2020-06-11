@@ -137,7 +137,7 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
     printf("\n");
     if (len != -1 && plaintext[0] == '%' && plaintext[1] == 'P' && plaintext[2] == 'D' && plaintext[3] == 'F')
     {
-      printf("\n\nFound \%PDF in decrypted file!\n\n");
+      printf("\n\nFound %%PDF in decrypted file!\n\n");
       return len;
     }
     clean_up();
@@ -249,7 +249,7 @@ int main(void)
 
   if (decryptedtext_len == -1)
   {
-    printf("\nno match for \%PDF found\n");
+    printf("\nno match for %%PDF found\n");
     exit(5);
   }
 
@@ -262,7 +262,7 @@ int main(void)
   unsigned char *md4Hash = md4_hash(decryptedtext, decryptedtext_len);
   /* concatenate decrypted text with hash */
   int dest_size = size + 16;
-  unsigned char *hashedtext;
+  unsigned char hashedtext[dest_size];
   strcpy(hashedtext, decryptedtext);
   strcat(hashedtext, md4Hash);
   /* Encrypt the plaintext with hash */
