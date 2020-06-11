@@ -209,6 +209,7 @@ void getKeys(char *file, unsigned char *key,
   {
     printf("%02x", iv[i]);
   }
+  printf("\n");
 }
 
 int main(void)
