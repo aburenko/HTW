@@ -298,9 +298,9 @@ int main(void)
   }
   if (testtext[dest_size - 2] != md4Hash[14] || testtext[dest_size - 1] != md4Hash[15])
   {
-    for (int j = 2; j > 0; j--)
+    for (int j = 2; j >= 0; j--)
     {
-      printf("%02x", plaintext[dest_size - 1 - j]);
+      printf("%02x - %02x\n", testtext[dest_size - 1 - j], md4Hash[15 - j]);
     }
     printf("test: hash not found error\n");
     exit(7);
