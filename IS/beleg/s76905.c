@@ -42,7 +42,7 @@ unsigned char *md4_hash(unsigned char plaintext[])
   long filesize;
 
   EVP_MD_CTX c;
-  unsigned char md = malloc(sizeof(unsigned char) * 16);
+  unsigned char *md = malloc(sizeof(unsigned char) * 16);
 
   ERR_load_crypto_strings();
   EVP_MD_CTX_init(&c);
