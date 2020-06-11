@@ -151,7 +151,6 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
   EVP_CIPHER_CTX *ctx;
 
   int len;
-
   int ciphertext_len;
 
   /* Create and initialise the context */
@@ -297,7 +296,7 @@ int main(void)
     printf("test: pdf not found error\n");
     exit(7);
   }
-  if (strcmp(testtext + size, md4_hash))
+  if (testtext[dest_size-1] == md4Hash[14] || testtext[dest_size] == md4Hash[15] )
   {
     printf("test: pdf not found error\n");
     exit(7);
