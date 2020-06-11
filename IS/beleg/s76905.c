@@ -291,16 +291,12 @@ int main(void)
     printf("test: size error\n");
     exit(7);
   }
-  if (testtext[0] == '%' || testtext[1] == 'P' || testtext[2] == 'D' || testtext[3] == 'F')
+  if (testtext[0] != '%' || testtext[1] != 'P' || testtext[2] != 'D' || testtext[3] != 'F')
   {
-    for (int j = 0; j < 5; j++)
-    {
-      printf("%02x", testtext[j]);
-    }
     printf("test: pdf not found error\n");
     exit(7);
   }
-  if (testtext[dest_size - 1] == md4Hash[14] || testtext[dest_size] == md4Hash[15])
+  if (testtext[dest_size - 1] != md4Hash[14] || testtext[dest_size] != md4Hash[15])
   {
     printf("test: hash not found error\n");
     exit(7);
