@@ -271,8 +271,8 @@ int main(void)
   strcat(hashedtext, md4Hash);
   /* Encrypt the plaintext with hash */
   unsigned char keyAes[24];
-  unsigned char ivAes[24];
-  getKeys("s76905-dest-key.bin", key, ivAes, 24);
+  unsigned char ivAes[16];
+  getKeys("s76905-dest-key.bin", keyAes, ivAes, 24);
   int encrypted_len = 0;
   encrypted_len = encrypt(hashedtext, dest_size, keyAes, ivAes,
                           encryptedhashedtext);
