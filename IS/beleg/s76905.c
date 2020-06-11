@@ -78,7 +78,7 @@ void clean_up()
 }
 
 int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
-            unsigned char iv[], unsigned char plaintext[])
+            unsigned char iv[], unsigned char plaintext[], int type)
 {
   printf("init vars\n");
   EVP_CIPHER_CTX *ctx;
@@ -92,7 +92,7 @@ int decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned char key[],
     handleErrors();
 
   // printf("decrypt init\n");
-  if (1 != EVP_DecryptInit_ex(ctx, EVP_camellia_256_cfb1(), NULL, key, iv))
+  if (1 != EVP_DecryptInit_ex(ctx, type, NULL, key, iv))
     handleErrors();
 
   printf("decrypt update\n");
@@ -128,7 +128,7 @@ int brutforce_decrypt(unsigned char ciphertext[], int ciphertext_len, unsigned c
     key[11] = (char)i;
 
     int len = decrypt(ciphertext, ciphertext_len, key, iv,
-                      plaintext);
+                      plaintext, EVP_camellia_256_cfb1());
     printf("len was: %d. Starts with: ", len);
     for (int j = 0; j < 5; j++)
     {
@@ -280,6 +280,29 @@ int main(void)
     printf("%02x", encryptedhashedtext[j]);
   }
   printf("\n");
+
+  // test
+  /* Decrypt the ciphertext */
+  printf("start test\n");
+  unsigned char testtext[dest_size];
+  testtext_len = decrypt(encryptedhashedtext, encrypted_len, keyAes, ivAes,
+                         testtext, EVP_aes_192_ofb());
+  if (testtext_len != dest_size)
+  {
+    printf("test: size error\n");
+    exit(7);
+  }
+  if (testtext[0] == '%' || testtext[1] == 'P' | testtext[2] == 'D' || testtext[3] == 'F')
+  {
+    printf("test: pdf not found error\n");
+    exit(7);
+  }
+  if (strcmp(testtext + size, md4_hash))
+  {
+    printf("test: pdf not found error\n");
+    exit(7);
+  }
+  printf("end test\n");
 
   /* save encrypted pdf with hash */
   printf("\nsaving enrypted text + hash\n");
