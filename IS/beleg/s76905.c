@@ -217,7 +217,7 @@ int main(void) {
     int decrypted_len = 0;
 
     /* Decrypt the cipher */
-    decrypted = brutforce_decrypt(cipher, cipher_len, key, iv,
+    decrypted_len = brutforce_decrypt(cipher, cipher_len, key, iv,
                                           decrypted);
 
     if (decrypted_len == -1) {
