@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/edu/HTW/Compiler_Interpreter/Calculator_compiler/calculator_compiler_g4.c
+stdio.h
+-
+ctype.h
+-
+stdlib.h
+-
+
