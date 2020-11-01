@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/edu/HTW/Compiler_Interpreter/pl0Compiler/lex.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+ctype.h
+-
+lex.h
+C:/edu/HTW/Compiler_Interpreter/pl0Compiler/lex.h
+
+C:/edu/HTW/Compiler_Interpreter/pl0Compiler/lex.h
+

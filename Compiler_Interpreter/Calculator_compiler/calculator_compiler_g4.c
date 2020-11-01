@@ -126,6 +126,5 @@ int main(int argc, char *argv[]) {
     printf("%s\n", pBuf);
     lex(pBuf);
     printf("%-10.4f\n", expr());
-    free(pBuf);
     return 0;
 }
