@@ -1,0 +1,28 @@
+telnet 141.56.134.111 8554
+==========================
+
+OPTIONS * RTSP/1.0
+CSeq: 1
+
+DESCRIBE rtsp://idefix:8554/test.mkv RTSP/1.0
+CSeq: 2
+
+SETUP rtsp://idefix:8554/test.mkv/track1 RTSP/1.0
+CSeq: 3
+Transport: rtp/udp; compression; port=8554; mode=PLAY
+
+::Session aus setup nehmen::
+
+PLAY rtsp://idefix:8554/test.mkv/track1 RTSP/1.0
+CSeq: 4
+Session: 2A0AB94A
+Range: npt=10-15
+
+PAUSE rtsp://idefix:8554/test.mkv/track1 RTSP/1.0
+CSeq: 5
+Session: 2A0AB94A
+Range: npt=10-15
+ 
+TEARDOWN rtsp://idefix:8554/test.mkv/track1 RTSP/1.0
+Session: 2A0AB94A
+Cseq: 6

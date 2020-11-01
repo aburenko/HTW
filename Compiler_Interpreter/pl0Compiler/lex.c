@@ -14,6 +14,8 @@ static int Z = 0;            /* Aktueller Zustand des Automaten 	*/
 static char vBuf[128 + 1], *pBuf;    /* Ausgabepuffer */
 static int Ende;            /* Flag 				*/
 static int line, col;            /* Flag 				*/
+int startLine = 0;
+int startCol = 0;
 
 /*---- Initialisierung der lexiaklischen Analyse ----*/
 void initLex(char *fname) {
@@ -32,8 +34,8 @@ void initLex(char *fname) {
  * 2 Buchstaben
  * 3 :
  * 4 =
- * 5<
- * 6>
+ * 5 <
+ * 6 >
  * 7 Sonstige Steuerzeichen
  * */
 static char vZKl[128] =
@@ -65,35 +67,72 @@ static void fslb(void); // schreiben, lesen, beenden
  */
 static NS vSMatrix[][8] =
         /* 0*/
-        {{{0, fslb}, {2, fsl}, {1, fsl}, {3, fsl}, {0, fslb}, {4, fsl}, {5, fsl}, {0, fl}},
+        {{{0, fslb}, {2, fsl}, {9,  fsl}, {3, fsl}, {0, fslb}, {4, fsl}, {5, fsl}, {0, fl}},
                 /* 1 */
-         {{0, fb},   {1, fsl}, {1, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
                 /* 2 */
-         {{0, fb},   {2, fsl}, {2, fgl}, {0, fl},  {0, fl},   {0, fb},  {0, fb},  {0, fb}},
+         {{0, fb},   {2, fsl}, {2,  fgl}, {0, fl},  {0, fl},   {0, fb},  {0, fb},  {0, fb}},
                 /* 3 */
-         {{0, fb},   {0, fb},  {0, fb},  {0, fb},  {6, fsl},  {0, fl},  {0, fl},  {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {6, fsl},  {0, fl},  {0, fl},  {0, fl}},
                 /* 4 */
-         {{0, fb},   {0, fb},  {0, fb},  {0, fb},  {7, fsl},  {0, fl},  {0, fl},  {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {7, fsl},  {0, fl},  {0, fl},  {0, fl}},
                 /* 5 */
-         {{0, fb},   {0, fb},  {0, fb},  {0, fb},  {8, fsl},  {0, fl},  {0, fl},  {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {8, fsl},  {0, fl},  {0, fl},  {0, fl}},
                 /* 6 */
-         {{0, fb},   {0, fb},  {0, fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}},
                 /* 7 */
-         {{0, fb},   {0, fb},  {0, fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}},
                 /* 8 */
-         {{0, fb},   {0, fb},  {0, fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}}};
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}},
 
+                /* 9 */
+         {{0, fb},   {1, fsl}, {10, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+                /* 10 */
+         {{0, fb},   {1, fsl}, {11, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+                /* 11 */
+         {{0, fb},   {1, fsl}, {12, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+                /* 12 */
+         {{0, fb},   {1, fsl}, {13, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+                /* 13 */
+         {{0, fb},   {1, fsl}, {14, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+                /* 14 */
+         {{0, fb},   {1, fsl}, {15, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+                /* 15 */
+         {{0, fb},   {1, fsl}, {16, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+                /* 16 */
+         {{0, fb},   {1, fsl}, {17, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+                /* 17 */
+         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}}};
+
+
+typedef struct KeywordPair {
+    char *name;
+    tZS tZSident;
+} kwp;
+
+static kwp keyword[] = {{"BEGIN",     zBGN},
+                        {"CALL",      zCLL},
+                        {"CONST",     zCST},
+                        {"DO",        zDO},
+                        {"END",       zEND},
+                        {"IF",        zIF},
+                        {"PROCEDURE", zPRC},
+                        {"THEN",      zTHN},
+                        {"VAR",       zVAR},
+                        {"WHILE",     zWHL}};
 
 /* Ausgabefunktionen des Automaten */
 static void fl(void) {
     X = fgetc(pIF);
     if (X == '\n') line++, col = 0;
     else col++;
+    startLine = line;
 }
 
 static void fb(void) {
-    Morph.PosCol = col;
-    Morph.PosLine = line;
+    int flag = 1;
+    //   Morph.PosCol = col;
+    //   Morph.PosLine = line;
     switch (Z) {
         /* Symbol */
         case 3: // :
@@ -123,6 +162,28 @@ static void fb(void) {
             Morph.Val.Symb = (long) zGE;
             Morph.MC = mcSymb;
             break;
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+        case 17:
+            for (int j = 0; j < sizeof(keyword) / sizeof(kwp); ++j) {
+                if (strcmp(keyword[j].name, strupr(vBuf)) == 0) {
+                    Morph.Val.Symb = keyword[j].tZSident;
+                    Morph.MC = mcSymb;
+                    flag = 0;
+                    break;
+                }
+            }
+            if (flag == 1) {
+                Morph.Val.pStr = vBuf;
+                Morph.MC = mcIdent;
+            }
+            break;
     }
     Ende = 1; // entfällt bei Variante mit Zustand zEnd
 }
@@ -151,6 +212,7 @@ tMorph Lex(void) {
     Morph = MorphInit;
     pBuf = vBuf;
     Ende = 0;
+    startLine = line;
     do {
         int KlassVonX = vZKl[X & 0x7f];
         /* Berechnung des Folgezustands */
@@ -161,5 +223,7 @@ tMorph Lex(void) {
         /* Automat schaltet */
         Z = ns.state;
     } while (Ende == 0);
+    Morph.PosLine = startLine;
+    Morph.PosCol = startCol;
     return Morph;
 }

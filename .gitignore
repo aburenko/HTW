@@ -15,3 +15,8 @@ Internet-Technologien1/*/*.class
 KI/Bayesian network/.idea/workspace.xml
 IS/.vscode/*
 IS/beleg/a.out
+
+#CompilerInterpreter
+Compiler_Interpreter/*.idea
+Compiler_Interpreter/*cmake-build-debug
+Compiler_Interpreter/*CMakeLists
