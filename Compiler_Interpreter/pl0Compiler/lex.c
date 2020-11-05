@@ -14,8 +14,7 @@ static int Z = 0;            /* Aktueller Zustand des Automaten 	*/
 static char vBuf[128 + 1], *pBuf;    /* Ausgabepuffer */
 static int Ende;            /* Flag 				*/
 static int line, col;            /* Flag 				*/
-int startLine = 0;
-int startCol = 0;
+int startLine, startCol = 0;
 
 /*---- Initialisierung der lexiaklischen Analyse ----*/
 void initLex(char *fname) {
@@ -37,6 +36,7 @@ void initLex(char *fname) {
  * 5 <
  * 6 >
  * 7 Sonstige Steuerzeichen
+ * 8 Nicht Schlüsselwortbuchstaben J|K|M|Q|X|Y|Z
  * */
 static char vZKl[128] =
 /*      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F     */
@@ -45,10 +45,10 @@ static char vZKl[128] =
 /*10*/  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,/*10*/
 /*20*/  7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,/*20*/
 /*30*/  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 0, 5, 4, 6, 0,/*30*/
-/*40*/  0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,/*40*/
-/*50*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0,/*50*/
-/*60*/  0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,/*60*/
-/*70*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0}/*70*/;
+/*40*/  0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 8, 2, 8, 2, 2,/*40*/
+/*50*/  8, 2, 2, 2, 2, 2, 2, 2, 8, 8, 8, 0, 0, 0, 0, 0,/*50*/
+/*60*/  0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 8, 2, 8, 2, 2,/*60*/
+/*70*/  8, 2, 2, 2, 2, 2, 2, 2, 8, 8, 8, 0, 0, 0, 0, 0}/*70*/;
 
 
 // funtionübersicht
@@ -65,44 +65,44 @@ static void fslb(void); // schreiben, lesen, beenden
  * Das niederwertige Halbbyte (4bit) enthält den Folgezustand.
  * Das höherwertige Halbbyte (4bit) enthält einen Funktionsindex, multipliziert mit 16, oder um 4 bit nach links verschoben.
  */
-static NS vSMatrix[][8] =
+static NS vSMatrix[][9] =
         /* 0*/
-        {{{0, fslb}, {2, fsl}, {9,  fsl}, {3, fsl}, {0, fslb}, {4, fsl}, {5, fsl}, {0, fl}},
+        {{{0, fslb}, {2, fsl}, {9,  fsl}, {3, fsl}, {0, fslb}, {4, fsl}, {5, fsl}, {0, fl}, {1, fsl}},
                 /* 1 */
-         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
                 /* 2 */
-         {{0, fb},   {2, fsl}, {2,  fgl}, {0, fl},  {0, fl},   {0, fb},  {0, fb},  {0, fb}},
+         {{0, fb},   {2, fsl}, {2,  fgl}, {0, fl},  {0, fl},   {0, fb},  {0, fb},  {0, fb}, {0, fl}},
                 /* 3 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {6, fsl},  {0, fl},  {0, fl},  {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {6, fsl},  {0, fl},  {0, fl},  {0, fl}, {0, fl}},
                 /* 4 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {7, fsl},  {0, fl},  {0, fl},  {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {7, fsl},  {0, fl},  {0, fl},  {0, fl}, {0, fl}},
                 /* 5 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {8, fsl},  {0, fl},  {0, fl},  {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {8, fsl},  {0, fl},  {0, fl},  {0, fl}, {0, fl}},
                 /* 6 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}, {0, fl}},
                 /* 7 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}, {0, fl}},
                 /* 8 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}, {0, fl}},
 
                 /* 9 */
-         {{0, fb},   {1, fsl}, {10, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+         {{0, fb},   {1, fsl}, {10, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
                 /* 10 */
-         {{0, fb},   {1, fsl}, {11, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+         {{0, fb},   {1, fsl}, {11, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
                 /* 11 */
-         {{0, fb},   {1, fsl}, {12, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+         {{0, fb},   {1, fsl}, {12, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
                 /* 12 */
-         {{0, fb},   {1, fsl}, {13, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+         {{0, fb},   {1, fsl}, {13, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
                 /* 13 */
-         {{0, fb},   {1, fsl}, {14, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+         {{0, fb},   {1, fsl}, {14, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
                 /* 14 */
-         {{0, fb},   {1, fsl}, {15, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+         {{0, fb},   {1, fsl}, {15, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
                 /* 15 */
-         {{0, fb},   {1, fsl}, {16, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+         {{0, fb},   {1, fsl}, {16, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
                 /* 16 */
-         {{0, fb},   {1, fsl}, {17, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}},
+         {{0, fb},   {1, fsl}, {17, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
                 /* 17 */
-         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}}};
+         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}}};
 
 
 typedef struct KeywordPair {
@@ -116,6 +116,7 @@ static kwp keyword[] = {{"BEGIN",     zBGN},
                         {"DO",        zDO},
                         {"END",       zEND},
                         {"IF",        zIF},
+                        {"ODD",       zODD},
                         {"PROCEDURE", zPRC},
                         {"THEN",      zTHN},
                         {"VAR",       zVAR},
@@ -126,11 +127,35 @@ static void fl(void) {
     X = fgetc(pIF);
     if (X == '\n') line++, col = 0;
     else col++;
-    startLine = line;
+}
+
+void to_upper(char *string) {
+    while (*string) {
+        *string = toupper((unsigned char) *string);
+        string++;
+    }
+}
+
+int binary_search(int size, char *target){
+    int bottom= 0;
+    int mid;
+    int top = size - 1;
+
+    while(bottom <= top){
+        mid = (bottom + top)/2;
+        if (strcmp(keyword[mid].name, target) == 0){
+            return mid;
+        } else if (strcmp(keyword[mid].name, target) > 0){
+            top    = mid - 1;
+        } else if (strcmp(keyword[mid].name, target) < 0){
+            bottom = mid + 1;
+        }
+    }
+
+    return -1;
 }
 
 static void fb(void) {
-    int flag = 1;
     //   Morph.PosCol = col;
     //   Morph.PosLine = line;
     switch (Z) {
@@ -171,17 +196,14 @@ static void fb(void) {
         case 15:
         case 16:
         case 17:
-            for (int j = 0; j < sizeof(keyword) / sizeof(kwp); ++j) {
-                if (strcmp(keyword[j].name, strupr(vBuf)) == 0) {
-                    Morph.Val.Symb = keyword[j].tZSident;
-                    Morph.MC = mcSymb;
-                    flag = 0;
-                    break;
-                }
-            }
-            if (flag == 1) {
-                Morph.Val.pStr = vBuf;
+            to_upper(vBuf);
+            int index = binary_search(sizeof(keyword) / sizeof(kwp), vBuf);
+            if (index != -1) {
+                Morph.MC = mcSymb;
+                Morph.Val.Symb = keyword[index].tZSident;
+            } else {
                 Morph.MC = mcIdent;
+                Morph.Val.pStr = vBuf;
             }
             break;
     }
@@ -208,18 +230,18 @@ static void fslb(void) {
 
 /*---- Lexikalische Analyse ----*/
 tMorph Lex(void) {
-    int Zn;
     Morph = MorphInit;
     pBuf = vBuf;
     Ende = 0;
     startLine = line;
+    startCol = col;
     do {
         int KlassVonX = vZKl[X & 0x7f];
         /* Berechnung des Folgezustands */
         NS ns = vSMatrix[Z][KlassVonX];
         /* Ausfuehrung der Aktion */
         ns.func();
-        //printf("Z:%d K:%d F:%d-> ", Z, KlassVonX, ns.func);
+        //printf("Z:%d K:%d -> ", Z, KlassVonX);
         /* Automat schaltet */
         Z = ns.state;
     } while (Ende == 0);
