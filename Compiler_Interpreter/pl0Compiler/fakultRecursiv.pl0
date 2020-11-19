@@ -12,6 +12,8 @@ procedure p1;
   !fac
  end;
 
+
+
 begin
   ?a;
   fac := 1;

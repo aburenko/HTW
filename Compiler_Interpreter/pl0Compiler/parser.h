@@ -36,10 +36,12 @@ typedef struct BOGEN
 // Alternativbogen gibt.
 }tBog;
 
-tBog gTerm[];
-tBog gExpr[];
-tBog gCondition[];
-tBog gStatement[];
-tBog gBlock[];
-tBog gProgramm[];
-tBog gFact[];
+extern const tBog gTerm[];
+extern const tBog gExpr[];
+extern const tBog gCondition[];
+extern const tBog gStatement[];
+extern const tBog gBlock[];
+extern const tBog gProgramm[];
+extern const tBog gFact[];
+
+int parse(tBog* pGraph);

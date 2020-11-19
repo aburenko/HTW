@@ -24,6 +24,7 @@ void initLex(char *fname) {
         exit(-1);
     }
     if (pIF) X = fgetc(pIF);
+    printf("initLex mit %c \n", X);
     Morph.MC = mcEmpty;
 }
 
@@ -46,9 +47,9 @@ static char vZKl[128] =
 /*20*/  7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,/*20*/
 /*30*/  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 0, 5, 4, 6, 0,/*30*/
 /*40*/  0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 8, 2, 8, 2, 2,/*40*/
-/*50*/  8, 2, 2, 2, 2, 2, 2, 2, 8, 8, 8, 0, 0, 0, 0, 0,/*50*/
+/*50*/  2, 8, 2, 2, 2, 2, 2, 2, 8, 8, 8, 0, 0, 0, 0, 0,/*50*/
 /*60*/  0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 8, 2, 8, 2, 2,/*60*/
-/*70*/  8, 2, 2, 2, 2, 2, 2, 2, 8, 8, 8, 0, 0, 0, 0, 0}/*70*/;
+/*70*/  2, 8, 2, 2, 2, 2, 2, 2, 8, 8, 8, 0, 0, 0, 0, 0}/*70*/;
 
 
 // funtionübersicht
@@ -75,15 +76,15 @@ static NS vSMatrix[][9] =
                 /* 3 */
          {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {6, fsl},  {0, fl},  {0, fl},  {0, fl}, {0, fl}},
                 /* 4 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {7, fsl},  {0, fl},  {0, fl},  {0, fl}, {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {7, fsl},  {0, fb},  {0, fb},  {0, fb}, {0, fl}},
                 /* 5 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {8, fsl},  {0, fl},  {0, fl},  {0, fl}, {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {8, fsl},  {0, fl},  {0, fb},  {0, fb}, {0, fb}},
                 /* 6 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}, {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}},
                 /* 7 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}, {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}},
                 /* 8 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fl},  {0, fl},  {0, fl}, {0, fl}},
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}},
 
                 /* 9 */
          {{0, fb},   {1, fsl}, {10, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
@@ -102,7 +103,7 @@ static NS vSMatrix[][9] =
                 /* 16 */
          {{0, fb},   {1, fsl}, {17, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
                 /* 17 */
-         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}}};
+         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},};
 
 
 typedef struct KeywordPair {
@@ -197,6 +198,7 @@ static void fb(void) {
         case 16:
         case 17:
             to_upper(vBuf);
+//            printf("lex: buf was %s\n", vBuf);
             int index = binary_search(sizeof(keyword) / sizeof(kwp), vBuf);
             if (index != -1) {
                 Morph.MC = mcSymb;
