@@ -8,7 +8,8 @@
 #include "lex.h"
 
 static FILE *pIF;            /* Quellfile 				*/
-static tMorph Morph, MorphInit;        /* Morphem   				*/
+static tMorph Morph;
+static tMorph MorphInit;        /* Morphem   				*/
 static signed char X;            /* Aktuelles Eingabezeichen 		*/
 static int Z = 0;            /* Aktueller Zustand des Automaten 	*/
 static char vBuf[128 + 1], *pBuf;    /* Ausgabepuffer */

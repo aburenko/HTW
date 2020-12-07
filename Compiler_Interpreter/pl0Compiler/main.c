@@ -10,8 +10,6 @@
 #include <ctype.h>
 #include "parser.h"
 
-static tMorph Morph = {0};
-
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         printf("file was %s\n", argv[1]);
@@ -19,7 +17,7 @@ int main(int argc, char *argv[]) {
     }
     printf("file was %s\n", argv[1]);
     initLex(argv[1]);
-    int return_value = parse(NULL);
+    int return_value = parse((tBog *)NULL);
     printf("return value was %d\n", return_value);
     puts("");
 //    do {

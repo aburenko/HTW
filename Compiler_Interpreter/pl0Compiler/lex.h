@@ -32,4 +32,3 @@ typedef struct NextState {
 void initLex();
 
 tMorph Lex(void);
-
