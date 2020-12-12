@@ -15,11 +15,11 @@
 tBog gTerm[] = {
 /* 0*/ {BgGr, {(ul) gFact}, NULL, 1, 3},
 /* 1*/
-       {BgSy, {(ul) '*'}, NULL, 0, 2},
+       {BgSy, {(ul) '*'},   NULL, 0, 2},
 /* 2*/
-       {BgSy, {(ul) '/'}, NULL, 0, 0},
+       {BgSy, {(ul) '/'},   NULL, 0, 0},
 /* 3*/
-       {BgEn, {(ul) 0}, NULL, 0, 0}
+       {BgEn, {(ul) 0},     NULL, 0, 0}
 };
 
 tBog gExpr[] = {
@@ -153,11 +153,11 @@ tBog gBlock[] = {
 /* 11*/
        {BgSy, {(ul) ';'},        NULL, 12, 0},
 /* 12*/
-       {BgSy, {(ul) zPRC},    Bl4,     14, 13}, // Bl4
+       {BgSy, {(ul) zPRC},    NULL,     14, 13}, // Bl4
 /* 13*/
        {BgNl, {(ul) NULL},    Bl5,     18, 0}, // Bl5
 /* 14*/
-       {BgMo, {(ul) mcIdent},    NULL, 15, 0},
+       {BgMo, {(ul) mcIdent},    Bl4, 15, 0},
 /* 15*/
        {BgSy, {(ul) ';'},        NULL, 16, 0},
 /* 16*/
@@ -219,6 +219,7 @@ void showCurrMorph() {
             break;
     }
 }
+
 tMorph Morph = {0};
 
 int parse(tBog *pGraph) {
@@ -272,12 +273,16 @@ int parse(tBog *pGraph) {
                 return 1;
             } /* Ende erreichet - Erfolg */
         }
+        pLS();
+        printf("parse after switch\n");
         if (succ && pBog->fx != NULL) {
             pLS();
-            printf("call function with Morph.Val.pStr %s\n", Morph.Val.pStr);
+            printf("call function\n");
             succ = pBog->fx();
             printf("function finished\n");
         }
+        pLS();
+        printf("parse after func call\n");
         if (!succ) {/* Alternativbogen probieren */
             if (pBog->iAlt != 0) {
                 pLS();

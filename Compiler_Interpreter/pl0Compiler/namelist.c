@@ -24,8 +24,6 @@ t_list *listCreate() {
 }
 
 void *getFirst(t_list *list) {
-    printf("namelist.c: getFirst()\n");
-    if (list == NULL) return NULL;
     printf("namelist.c: getFirst() 1\n");
     list->pcurr = list->pfirst;
     printf("namelist.c: getFirst() 2\n");
@@ -87,7 +85,7 @@ void initNameList(void) {
 // functions implementation
 tBez *createBez(char *pBez) {
     printf("namelist.c: createBez() with bez %s\n", pBez);
-    tBez *newBez = (tBez *) malloc(sizeof(t_cnt));
+    tBez *newBez = (tBez *) malloc(sizeof(tBez));
     printf("namelist.c: createBez() 1\n");
     if (newBez == NULL) {
         return NULL;
@@ -115,23 +113,24 @@ tBez *createBez(char *pBez) {
 }
 
 tConst *createConst(long Val) {
-    tConst *newConst = (tConst *) malloc(sizeof(newConst));
+    tConst *newConst = (tConst *) malloc(sizeof(tConst));
     if (newConst == NULL) {
         return FAIL;
     }
     newConst->Val = Val;
     newConst->Idx = idxCnstCounter;
+    newConst->structType = const_struct;
     idxCnstCounter++;
     insertBehindValue(pConstList, newConst);
     return newConst;
 }
 
 tConst *searchConst(long Val) {
-    tConst *tmpConst;
-    for (tmpConst = getFirst(pConstList);
-         tmpConst != NULL && tmpConst->Val != Val;
-         pConstList = getNext(pConstList));
-    return tmpConst;
+    t_cnt *tmpConnector;
+    for (tmpConnector = (tConst *)getFirst(pConstList);
+         tmpConnector != NULL && ((tConst *)tmpConnector->value)->Val != Val;
+         tmpConnector = (tConst *)getNext(pConstList));
+    return (tConst *)tmpConnector->value;
 }
 
 tVar *createVar(void) {
@@ -141,6 +140,7 @@ tVar *createVar(void) {
     if (pVar == NULL) return NULL;
     printf("namelist.c: createVar() 2\n");
     pVar->Dspl = pCurrProcedure->SpzzVar;
+    pVar->structType =  var_struct;
     printf("namelist.c: createVar() 3\n");
     pCurrProcedure->SpzzVar += sizeof(int32_t);
     printf("namelist.c: createVar() 4\n");
@@ -155,18 +155,24 @@ tVar *createVar(void) {
 }
 
 tProc *createProc(tProc *pParent) {
+    printf("namelist.c: createProc() 1\n");
     tProc *pP = (tProc *) malloc(sizeof(tProc));
     if (pP == NULL) {
         return NULL;
     }
+    printf("namelist.c: createProc() 2\n");
     pP->structType = proc_struct;
     pP->IdxProc = idxProcCounter;
+    printf("namelist.c: createProc() 3\n");
     idxProcCounter++;
     pP->pParent = pParent;
+    printf("namelist.c: createProc() 4\n");
     pP->childList = listCreate();
     pP->pLLabl = listCreate();
+    printf("namelist.c: createProc() 5\n");
     pP->SpzzVar = 0;
     pCurrProcedure = pP;
+    printf("namelist.c: createProc() end\n");
     return pP;
 }
 
@@ -176,9 +182,12 @@ tBez *searchBez(tProc *pProc, char *pBez) {
         printf("namelist.c: searchBez() was null\n");
         return NULL;
     }
-    tBez *tmpBez = getFirst(pProc->childList);
+
+    tBez *tmpBez =  NULL;
+    t_cnt *tmpConnector = getFirst(pProc->childList);
     printf("namelist.c: searchBez() 1\n");
-    while (tmpBez != NULL) {
+    while (tmpConnector != NULL) {
+        tBez *tmpBez = (tBez *) tmpConnector->value;
         printf("namelist.c: searchBez() 1.1 %s\n", pBez);
         printf("namelist.c: searchBez() 1.2 %s\n", tmpBez->pName);
         if (strcmp(tmpBez->pName, pBez) == 0) {
@@ -186,7 +195,7 @@ tBez *searchBez(tProc *pProc, char *pBez) {
             break;
         }
         printf("namelist.c: searchBez() iter\n");
-        tmpBez = getNext(pProc->childList);
+        tmpConnector = getNext(pProc->childList);
     }
     printf("namelist.c: searchBez() 2\n");
     return tmpBez;

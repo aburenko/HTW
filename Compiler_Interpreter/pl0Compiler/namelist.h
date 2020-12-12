@@ -33,11 +33,13 @@ typedef struct {
 
 // Variablenbeschreibung
 typedef struct tVAR {
+    tStructType structType;
     int Dspl; // Relativadresse
 } tVar;
 
 // Konstantenbeschreibung
 typedef struct tCONST {
+    tStructType structType;
     long Val;
     int Idx;
 } tConst;

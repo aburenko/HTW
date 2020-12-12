@@ -1,4 +1,11 @@
-// Arnold Beck
+/*
+ *
+ * Name: Anton Burenko
+ * s-Nummer: s76905
+ * Studiengruppe: 17/041/01
+ * Dozent: Prof. Dr.-Ing. Arnold Beck
+ *
+ * */
 
 /****************************************************/
 #include <stdio.h>

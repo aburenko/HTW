@@ -19,4 +19,4 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/t6.pl0
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tm.pl0
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(pl0Compiler lex.c parser.c namelist.c main.c)
+add_executable(pl0Compiler lex.c parser.c namelist.c main.c codegen.c)
