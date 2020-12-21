@@ -47,7 +47,7 @@ tBog gExpr[] = {
 tBog gFact[] = {
 /* 0*/ {BgMo, {(ul) mcIdent}, NULL, 5, 1},
 /* 1*/
-       {BgMo, {(ul) mcNum},   NULL, 5, 2},
+       {BgMo, {(ul) mcNum},   fa1, 5, 2},
 /* 2*/
        {BgSy, {(ul) '('},     NULL, 3, 0},
 /* 3*/
@@ -107,7 +107,7 @@ tBog gStatement[] = {
 /* 11*/
        {BgMo, {(ul) mcIdent},    NULL, 21, 0},
 /* 12*/
-       {BgGr, {(ul) gExpr},      NULL, 21, 0},
+       {BgGr, {(ul) gExpr},      st10, 21, 0},
 /* 13*/
        {BgGr, {(ul) gExpr},      NULL, 21, 0},
 /* 14*/
@@ -153,15 +153,15 @@ tBog gBlock[] = {
 /* 11*/
        {BgSy, {(ul) ';'},        NULL, 12, 0},
 /* 12*/
-       {BgSy, {(ul) zPRC},    NULL,     14, 13}, // Bl4
+       {BgSy, {(ul) zPRC},    NULL,     14, 13},
 /* 13*/
-       {BgNl, {(ul) NULL},    Bl5,     18, 0}, // Bl5
+       {BgNl, {(ul) NULL},    Bl6,     18, 0}, // Bl5
 /* 14*/
-       {BgMo, {(ul) mcIdent},    Bl4, 15, 0},
+       {BgMo, {(ul) mcIdent},    Bl4, 15, 0}, // Bl4
 /* 15*/
        {BgSy, {(ul) ';'},        NULL, 16, 0},
 /* 16*/
-       {BgGr, {(ul) gBlock},     NULL, 17, 0},
+       {BgGr, {(ul) gBlock},     Bl5, 17, 0},
 /* 17*/
        {BgSy, {(ul) ';'},        NULL, 12, 0},
 /* 18*/
@@ -173,7 +173,7 @@ tBog gBlock[] = {
 tBog gProgramm[] = {
 /* 0*/ {BgGr, {(ul) gBlock}, NULL, 1, 0},
 /* 1*/
-       {BgSy, {(ul) '.'},    NULL, 2, 0},
+       {BgSy, {(ul) '.'},    pr1, 2, 0}, // pr1
 /* 2*/
        {BgEn, {(ul) 0},      NULL, 0, 0}
 };
@@ -223,10 +223,10 @@ void showCurrMorph() {
 tMorph Morph = {0};
 
 int parse(tBog *pGraph) {
-    initNameList();
     if (pGraph == NULL) {
-        printf("init graphs\n");
+        printf("init graphs and name list\n");
         pGraph = gProgramm;
+        initNameList();
     }
     tBog *pBog = pGraph;
     int succ = 0;
@@ -261,7 +261,7 @@ int parse(tBog *pGraph) {
             }
             case BgGr: {
                 pLS();
-                printf("was BgGr, call new bogen where next is next is %d, alt is %d\n", pBog->iNext, pBog->iAlt);
+                printf("was BgGr, call new bogen where next is %d, alt is %d\n", pBog->iNext, pBog->iAlt);
                 recDepth++;
                 succ = parse(pBog->BgX.G);
                 recDepth--;

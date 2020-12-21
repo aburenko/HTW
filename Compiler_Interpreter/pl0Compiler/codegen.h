@@ -6,7 +6,8 @@
  * Dozent: Prof. Dr.-Ing. Arnold Beck
  *
  * */
-#include <stdio.h>
+#ifndef CODEGEN_HEADER
+#define CODEGEN_HEADER
 
 typedef enum CODE_ENUM {
     puValVrLocl = 0x00,
@@ -16,7 +17,10 @@ typedef enum CODE_ENUM {
     puAdrVrMain = 0x04,
     puAdrVrGlob = 0x05,
     puConst = 0x06,
+    storeVal = 0x07,
+    putVal = 0x08,
     call = 0x16,
+    retProc = 0x17,
     jmp = 0x18,
     jnot = 0x19,
     entryProc = 0x1A
@@ -28,6 +32,17 @@ void wr2ToCode(short x);
 // Schreibt an der  Übergebenen Stelle
 void wr2ToCodeAtP(short x, char *pD);
 
+void wr2ToCodeAtBegin(short x);
+
 int code(tCode Code, ...);
 
-char *pCode = NULL;
+void writeToFile(void);
+
+static char *pCode = NULL;
+static char *pCodeBegin = NULL;
+
+static int LenCode = 128;
+
+#define MAX_LEN_OF_CODE 81
+
+#endif

@@ -7,6 +7,10 @@
  *
  * */
 /* Morphemcodes */
+
+#ifndef LEX_HEADER
+#define LEX_HEADER
+
 typedef enum T_MC {
     mcEmpty, mcSymb, mcNum, mcIdent
 } tMC;
@@ -39,3 +43,5 @@ typedef struct NextState {
 void initLex();
 
 tMorph Lex(void);
+
+#endif

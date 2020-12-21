@@ -24,6 +24,7 @@ t_list *listCreate() {
 }
 
 void *getFirst(t_list *list) {
+    if(list == NULL) return NULL;
     printf("namelist.c: getFirst() 1\n");
     list->pcurr = list->pfirst;
     printf("namelist.c: getFirst() 2\n");
@@ -78,6 +79,7 @@ void printList(t_list *list) {
 }
 
 void initNameList(void) {
+    printf("init name list was called\n");
     pConstList = listCreate();
     mainProc = pCurrProcedure = createProc(NULL);
 }
@@ -127,10 +129,13 @@ tConst *createConst(long Val) {
 
 tConst *searchConst(long Val) {
     t_cnt *tmpConnector;
-    for (tmpConnector = (tConst *)getFirst(pConstList);
-         tmpConnector != NULL && ((tConst *)tmpConnector->value)->Val != Val;
-         tmpConnector = (tConst *)getNext(pConstList));
-    return (tConst *)tmpConnector->value;
+    for (tmpConnector = (tConst *) getFirst(pConstList);
+         tmpConnector != NULL && ((tConst *) tmpConnector->value)->Val != Val;
+         tmpConnector = (tConst *) getNext(pConstList));
+    if (tmpConnector == NULL) {
+        return NULL;
+    }
+    return (tConst *) tmpConnector->value;
 }
 
 tVar *createVar(void) {
@@ -140,7 +145,7 @@ tVar *createVar(void) {
     if (pVar == NULL) return NULL;
     printf("namelist.c: createVar() 2\n");
     pVar->Dspl = pCurrProcedure->SpzzVar;
-    pVar->structType =  var_struct;
+    pVar->structType = var_struct;
     printf("namelist.c: createVar() 3\n");
     pCurrProcedure->SpzzVar += sizeof(int32_t);
     printf("namelist.c: createVar() 4\n");
@@ -183,7 +188,7 @@ tBez *searchBez(tProc *pProc, char *pBez) {
         return NULL;
     }
 
-    tBez *tmpBez =  NULL;
+    tBez *tmpBez = NULL;
     t_cnt *tmpConnector = getFirst(pProc->childList);
     printf("namelist.c: searchBez() 1\n");
     while (tmpConnector != NULL) {
@@ -280,14 +285,66 @@ int Bl4(void) {
 
 // Ende der Prozedurvereinbarung
 int Bl5(void) {
-    printf("namelist.c:  der Prozedurvereinbarung\n");
-    tBez *tmpBez;
-    for (tmpBez = getFirst(pCurrProcedure->childList);
-         tmpBez != NULL;
-         tmpBez = getNext(pCurrProcedure->childList)) {
-        free(tmpBez->pObj);
-        free(tmpBez);
+    printf("namelist.c: Bl5\n");
+    t_cnt *tmpConnector;
+    for (tmpConnector = getFirst(pCurrProcedure->childList);
+         tmpConnector != NULL;
+         tmpConnector = getNext(pCurrProcedure->childList)) {
+        free(tmpConnector->value);
     }
-    pCurrProcedure = pCurrProcedure->pParent;
+    printf("namelist.c: Bl5 after for\n");
+    tProc *pTmpParentProcedure = pCurrProcedure->pParent;
+    free(pCurrProcedure);
+    pCurrProcedure = pTmpParentProcedure;
+    printf("namelist.c: Bl5 Codegen\n");
+    code(retProc);
+    printf("namelist.c: Bl5 End\n");
+    return OK;
+}
+
+// Beginn des Anweisungsteils
+int Bl6(void) {
+    printf("%d", pCurrProcedure == NULL);
+    printf("namelist.c: Bl6 pCurrProcedure->IdxProc: %d, pCurrProcedure->SpzzVar: %d\n", pCurrProcedure->IdxProc,
+           pCurrProcedure->SpzzVar);
+    code(entryProc, 0, pCurrProcedure->IdxProc, pCurrProcedure->SpzzVar);
+    printf("namelist.c: Bl6 end\n");
+    return OK;
+}
+
+// Endebehandlung
+int pr1(void) {
+    printf("namelist.c: pr1\n");
+    Bl5();
+    t_cnt *tmpConnector = getFirst(pConstList);
+    while (tmpConnector != NULL) {
+        tConst *pConst = tmpConnector->value;
+        wr2ToCode(pConst->Val);
+        tmpConnector = getNext(pConstList);
+    }
+    printf("namelist.c: pr1 0.5\n");
+    // write number of procedures at first place
+//    wr2ToCodeAtBegin(idxProcCounter);
+    printf("namelist.c: pr1 1\n");
+    writeToFile();
+    return OK;
+}
+
+int fa1(void) {
+    printf("namelist.c: fa1\n");
+    tConst *pConst = searchConst(Morph.Val.Num);
+    printf("namelist.c: after search const\n");
+    if (pConst == NULL) {
+        printf("namelist.c: fa1 0.5 create const\n");
+        createConst(Morph.Val.Num);
+    }
+    printf("namelist.c: fa1 1\n");
+    code(puConst, Morph.Val.Num);
+    printf("namelist.c: fa1 2\n");
+    return OK;
+}
+
+int st10(void) {
+    code(putVal);
     return OK;
 }

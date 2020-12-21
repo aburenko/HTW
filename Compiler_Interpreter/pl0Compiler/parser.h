@@ -6,6 +6,9 @@
  * Dozent: Prof. Dr.-Ing. Arnold Beck
  *
  * */
+#ifndef PARSER_HEADER
+#define PARSER_HEADER
+
 #include "namelist.h"
 
 typedef unsigned long ul;
@@ -44,3 +47,5 @@ extern tBog gProgramm[];
 extern tBog gFact[];
 
 int parse(tBog *pGraph);
+
+#endif

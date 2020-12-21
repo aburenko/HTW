@@ -6,9 +6,13 @@
  * Dozent: Prof. Dr.-Ing. Arnold Beck
  *
  * */
+#ifndef NAMELIST_HEADER
+#define NAMELIST_HEADER
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "codegen.h"
 #include "lex.h"
 
 #define OK 1
@@ -78,8 +82,8 @@ void printList(t_list *list);
 static tProc *mainProc = NULL;
 static tProc *pCurrProcedure = NULL;
 static t_list *pConstList = NULL;
-static int idxCnstCounter = 0;
-static int idxProcCounter = 0;
+static short idxCnstCounter = 0;
+static short idxProcCounter = 0;
 
 // functions from lecture
 void initNameList(void);
@@ -88,16 +92,17 @@ tBez *createBez(char *pBez);
 
 tConst *createConst(long Val);
 
-tConst *searchConst(long Val);
-
 tVar *createVar(void);
 
 tProc *createProc(tProc *pParent);
+
+tConst *searchConst(long Val);
 
 tBez *searchBez(tProc *pProc, char *pBez);
 
 tBez *searchBezGlobal(char *pBez);
 
+// Reihenfolge-ToDo: Factor (fa1), Block (bl6, bl5), Statement (st10), Pogramm (pr1)
 int Bl1(void);
 
 int Bl2(void);
@@ -107,3 +112,39 @@ int Bl3(void);
 int Bl4(void);
 
 int Bl5(void);
+
+int Bl6(void);
+
+
+int pr1(void); // Endebehandlung
+
+int st1(void); // Linke Seite der Zuweisung
+int st2(void); // Rechte Seite der Zuweisung
+int st8(void); // Prozeduraufruf
+int st9(void); // Eingabe
+int st10(void); // Ausgabeq
+
+// conditionals
+int st3(void); // if, nach Condition
+int st4(void); // if, nach Statement
+
+// loops
+int st5(void); // while
+int st6(void); // while, nach Condition
+int st7(void); // while, nach Statement
+
+int ex1(void); // negative sign
+int ex2(void); // addition
+int ex3(void); // subtraction
+
+int te1(void); // mul
+int te2(void); // div
+
+int fa1(void); // factor numeral
+int fa2(void); // factor ident
+
+int co1(void); // Codegenerierung odd
+int co2_to_co7(void);// Vergleichsoperator
+int co8(void); // Codegenerierung des gespeicherten Vergleichsbefehles
+
+#endif
