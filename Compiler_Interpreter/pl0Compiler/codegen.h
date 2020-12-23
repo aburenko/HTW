@@ -34,12 +34,17 @@ void wr2ToCodeAtP(short x, char *pD);
 
 void wr2ToCodeAtBegin(short x);
 
+void wr2ToCodeConst(long x);
+
+void codeEndProcedure();
+
 int code(tCode Code, ...);
 
 void writeToFile(void);
 
 static char *pCode = NULL;
 static char *pCodeBegin = NULL;
+static char *pCurrProcedureBegin = NULL;
 
 static int LenCode = 128;
 

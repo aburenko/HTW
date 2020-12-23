@@ -26,6 +26,19 @@ void wr2ToCodeAtBegin(short x) {
     wr2ToCodeAtP(x, pCodeBegin);
 }
 
+void wr2ToCodeConst(long x) {
+//    printf("wr x %#010x\n", x);
+//    printf("wr first %#010x\n", x & 0x0000ffff);
+//    printf("wr second %#010x\n", (x & 0xffff0000) >> 16);
+    wr2ToCode(x & 0x0000ffff);
+    wr2ToCode((x & 0xffff0000) >> 16);
+}
+
+void codeEndProcedure(void) {
+    short procedureLength = pCode - pCurrProcedureBegin;
+    wr2ToCodeAtP(procedureLength, pCurrProcedureBegin);
+}
+
 void writeToFile(void) {
     FILE *file = fopen("compiler_output", "w");
 
@@ -66,6 +79,7 @@ int code(tCode Code, ...) {
     switch (Code) {
 /* Befehle mit 3 Parametern */
         case entryProc:
+            pCurrProcedureBegin = pCode - 1;
             sarg = va_arg(ap, int);
             wr2ToCode(sarg);
 /* Befehle mit 2 Parametern */

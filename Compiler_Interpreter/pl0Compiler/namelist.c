@@ -24,7 +24,7 @@ t_list *listCreate() {
 }
 
 void *getFirst(t_list *list) {
-    if(list == NULL) return NULL;
+    if (list == NULL) return NULL;
     printf("namelist.c: getFirst() 1\n");
     list->pcurr = list->pfirst;
     printf("namelist.c: getFirst() 2\n");
@@ -298,6 +298,7 @@ int Bl5(void) {
     pCurrProcedure = pTmpParentProcedure;
     printf("namelist.c: Bl5 Codegen\n");
     code(retProc);
+    codeEndProcedure();
     printf("namelist.c: Bl5 End\n");
     return OK;
 }
@@ -319,12 +320,12 @@ int pr1(void) {
     t_cnt *tmpConnector = getFirst(pConstList);
     while (tmpConnector != NULL) {
         tConst *pConst = tmpConnector->value;
-        wr2ToCode(pConst->Val);
+        wr2ToCodeConst(pConst->Val);
         tmpConnector = getNext(pConstList);
     }
     printf("namelist.c: pr1 0.5\n");
     // write number of procedures at first place
-//    wr2ToCodeAtBegin(idxProcCounter);
+    wr2ToCodeAtBegin(idxProcCounter);
     printf("namelist.c: pr1 1\n");
     writeToFile();
     return OK;
@@ -336,10 +337,10 @@ int fa1(void) {
     printf("namelist.c: after search const\n");
     if (pConst == NULL) {
         printf("namelist.c: fa1 0.5 create const\n");
-        createConst(Morph.Val.Num);
+        pConst = createConst(Morph.Val.Num);
     }
     printf("namelist.c: fa1 1\n");
-    code(puConst, Morph.Val.Num);
+    code(puConst, pConst->Idx);
     printf("namelist.c: fa1 2\n");
     return OK;
 }
