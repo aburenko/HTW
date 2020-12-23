@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/edu/HTW/Compiler_Interpreter/pl0Compiler/codegen.c
+stdlib.h
+-
+stdarg.h
+-
+stdio.h
+-
+codegen.h
+C:/edu/HTW/Compiler_Interpreter/pl0Compiler/codegen.h
+
+C:/edu/HTW/Compiler_Interpreter/pl0Compiler/codegen.h
+

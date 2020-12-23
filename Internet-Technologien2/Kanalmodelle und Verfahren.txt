@@ -1,0 +1,38 @@
+Wie unterschieden sich die Kanalmodelle BSC und BEC?
+- BSC-> Symmetrisch d.h. 0 bit werden genau so behandelt wie 1 bits
+Wird meist wür eine erste Näherung verwendet und ist gut für den physical layer geeignet
+Im BSC gibt es an sich zwei Möglich Ausgangszustände: 0,1 und im BEC kommt noch der Zustand E dazu
+
+Welcher Kanal hat bei 50% Fehlern eine höhere Kanalkapazität?
+- BEC, weil BSC in dem Fall C=0
+
+Welcher Kanal ist besser für die Modellierung der Übertragung auf Anwendungsebene geeignet und warum?
+-
+
+Warum ist des u.U. sinnvoll, den Fehlerschutz zusätzlich zur Bitübertragungsebene auch auf
+Anwendungsebene anzuwenden?
+-
+
+Warum sollte eine Fehlerkennung auf den Schichten 1/2 für RTP-Daten u.U. deaktiviert werden.
+-
+
+Welche Vorteile hat das FEC-Verfahren mittels Parity Check im Gegensatz zur Verdopplung des Datenstroms?
+-
+
+Bestimmen Sie die Restfehlerwahrscheinlichkeit bei einer Paketverlustwahrscheinlichkeit von 1%
+ und einem Schutz von jeweils zwei Medienpaketen mit einem Paritätspaket!
+-
+
+Wozu dient Interleaving im Kontext einer Datenübertragung?
+- möglichkeit Packete auf kleinere Teile zu verteilen, um besser Fehlerkorrektur zu machen
+
+Wann ist Interleaving nicht sinnvoll?
+- Bei Echtzeitanwendungen
+
+Wozu dient Unequal Error Protection?
+- Daten von größerer Bedeutung werden besser geschützt, als unwichtigere 
+(z.B. Wiederholen der Daten im folgenden Paket)
+
+Was ist das Ziel der Fehlerverdeckung?
+-z.B. sollte man den Header bei JPEG besser schützen als den Datenteil, da bei einem kaputten Header 
+die ganze Datei unbrauchbar ist aber Fehler im Body weniger tragisch sind

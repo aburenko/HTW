@@ -1,0 +1,38 @@
+1
+==
+1. 3*140ms
+2. udp(kein rückkanal), keine acknowledgments
+
+2
+==
+100 Paketen/s
+1000 Bit pro Paket
+Paketverlustwahrscheinlichkeit = 0.01
+1. 1 000 000 Bit * (1 - 0.01)  = 990 000 Bit pro Sekunde
+2. fec k=4 p=1 -> overhead = 1/5
+3. 1 - ((1-P)^(k+1)+binkoef(k+1,1)*P*(1-P)^k) => 0,001
+4. 50 sek
+
+3
+==
+1. 4
+2. 2
+3. 4
+4.
+5. Blockfehlerwahrscheinlich = 0,09
+	Fehlerkorrektur = 0.73
+	Bitfehlerwahrscheinlichkeit = 3.7 * 10^-3
+
+4
+==
+1. 3
+2. 2, 1, 2
+3. BMD: A C D C -
+   MLD: A C D C B
+
+5
+==
+1. 	t_E = 20
+	t_K = 10
+	t_A = 20
+2. n - k + 1 

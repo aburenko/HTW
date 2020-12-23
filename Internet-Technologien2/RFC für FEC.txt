@@ -1,0 +1,21 @@
+Warum ist es sinnvoll, eine FEC-Nutzung auf Anwendungsebene zu standardisieren?
+- Kompatibilität zu sichern
+
+Welche Vorteile bietet RFC 5109 im Gegensatz zu einer simplen statischen Nutzung von FEC?
+- unterschiedliche Wichtung zw. versch. Mediendaten
+
+Auf welchem FEC-Verfahren basiert RFC 5109?
+- XOR
+
+Für welche Anwendungen ist die Uneven Level Protection (ULP) sinnvoll?
+- für Aufio/Video-multimediadaten
+
+Welche Gruppengrößen sind mit RFC 5109 möglich?
+(Gruppengröße ist die Anzahl der Pakete, die mit einem FEC Packet geschützt sind)
+- erzeugen von geringerem Overhead durch größere Gruppengröße
+
+Wie kann der Beginn des nächsten Level-Headers ermittelt werden?
+- Protection Length sagt wie viele daten in einem Paket sind
+
+Was bedeutet SN-Base?
+- sequence nummer des ersten Packets
