@@ -36,7 +36,7 @@ void wr2ToCodeConst(long x) {
 
 void codeEndProcedure(void) {
     short procedureLength = pCode - pCurrProcedureBegin;
-    wr2ToCodeAtP(procedureLength, pCurrProcedureBegin);
+    wr2ToCodeAtP(procedureLength, pCurrProcedureBegin + 1);
 }
 
 void writeToFile(void) {

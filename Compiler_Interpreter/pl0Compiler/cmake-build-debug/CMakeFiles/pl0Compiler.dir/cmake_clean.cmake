@@ -1,12 +1,10 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/pl0Compiler.dir/codegen.c.obj"
-  "CMakeFiles/pl0Compiler.dir/lex.c.obj"
-  "CMakeFiles/pl0Compiler.dir/main.c.obj"
-  "CMakeFiles/pl0Compiler.dir/namelist.c.obj"
-  "CMakeFiles/pl0Compiler.dir/parser.c.obj"
-  "libpl0Compiler.dll.a"
-  "pl0Compiler.exe"
-  "pl0Compiler.exe.manifest"
+  "CMakeFiles/pl0Compiler.dir/codegen.c.o"
+  "CMakeFiles/pl0Compiler.dir/lex.c.o"
+  "CMakeFiles/pl0Compiler.dir/main.c.o"
+  "CMakeFiles/pl0Compiler.dir/namelist.c.o"
+  "CMakeFiles/pl0Compiler.dir/parser.c.o"
+  "pl0Compiler"
   "pl0Compiler.pdb"
 )
 

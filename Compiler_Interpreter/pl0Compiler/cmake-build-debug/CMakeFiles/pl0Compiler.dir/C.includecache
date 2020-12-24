@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-C:/edu/HTW/Compiler_Interpreter/pl0Compiler/codegen.c
+/home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/codegen.c
 stdlib.h
 -
 stdarg.h
@@ -14,7 +14,7 @@ stdarg.h
 stdio.h
 -
 codegen.h
-C:/edu/HTW/Compiler_Interpreter/pl0Compiler/codegen.h
+/home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/codegen.h
 
-C:/edu/HTW/Compiler_Interpreter/pl0Compiler/codegen.h
+/home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/codegen.h
 

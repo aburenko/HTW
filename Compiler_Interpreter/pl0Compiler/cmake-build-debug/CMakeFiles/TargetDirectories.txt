@@ -1,3 +1,3 @@
-C:/edu/HTW/Compiler_Interpreter/pl0Compiler/cmake-build-debug/CMakeFiles/pl0Compiler.dir
-C:/edu/HTW/Compiler_Interpreter/pl0Compiler/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/edu/HTW/Compiler_Interpreter/pl0Compiler/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/cmake-build-debug/CMakeFiles/pl0Compiler.dir
