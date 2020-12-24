@@ -15,9 +15,9 @@
 tBog gTerm[] = {
 /* 0*/ {BgGr, {(ul) gFact}, NULL, 1, 3},
 /* 1*/
-       {BgSy, {(ul) '*'},   NULL, 0, 2},
+       {BgSy, {(ul) '*'},   te1, 0, 2},
 /* 2*/
-       {BgSy, {(ul) '/'},   NULL, 0, 0},
+       {BgSy, {(ul) '/'},   te2, 0, 0},
 /* 3*/
        {BgEn, {(ul) 0},     NULL, 0, 0}
 };
@@ -25,7 +25,7 @@ tBog gTerm[] = {
 tBog gExpr[] = {
 /* 0*/ {BgSy, {(ul) '+'},   NULL, 3, 1},
 /* 1*/
-       {BgSy, {(ul) '-'},   NULL, 3, 2},
+       {BgSy, {(ul) '-'},   ex1, 3, 2},
 /* 2*/
        {BgGr, {(ul) gTerm}, NULL, 4, 0},
 /* 3*/
@@ -37,15 +37,15 @@ tBog gExpr[] = {
 /* 6*/
        {BgSy, {(ul) '-'},   NULL, 8, 0},
 /* 7*/
-       {BgGr, {(ul) gTerm}, NULL, 4, 0},
+       {BgGr, {(ul) gTerm}, ex2, 4, 0},
 /* 8*/
-       {BgGr, {(ul) gTerm}, NULL, 4, 0},
+       {BgGr, {(ul) gTerm}, ex3, 4, 0},
 /* 9*/
        {BgEn, {(ul) 0},     NULL, 0, 0}
 };
 
 tBog gFact[] = {
-/* 0*/ {BgMo, {(ul) mcIdent}, NULL, 5, 1},
+/* 0*/ {BgMo, {(ul) mcIdent}, fa2, 5, 1},
 /* 1*/
        {BgMo, {(ul) mcNum},   fa1, 5, 2},
 /* 2*/
@@ -137,9 +137,9 @@ tBog gBlock[] = {
 /* 3*/
        {BgSy, {(ul) '='},        NULL, 4,  0},
 /* 4*/
-       {BgMo, {(ul) mcNum},   Bl2,     0,  0}, // Bl2
+       {BgMo, {(ul) mcNum},   Bl2,     5,  6}, // Bl2
 /* 5*/
-       {BgSy, {(ul) ','},        NULL, 2,  0},
+       {BgSy, {(ul) ','},        NULL, 2,  6},
 /* 6*/
        {BgSy, {(ul) ';'},        NULL, 7,  0},
 /* 7*/

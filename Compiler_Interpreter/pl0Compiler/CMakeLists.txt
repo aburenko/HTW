@@ -18,5 +18,7 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/t6.pl0
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tm.pl0
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tminWithPlus.pl0
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(pl0Compiler codegen.c lex.c parser.c namelist.c main.c)

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdint.h>
+#include <langinfo.h>
 #include "namelist.h"
 
 tMorph Morph;
@@ -45,12 +46,30 @@ void *getLast(t_list *list) {
     if (list == NULL) return NULL;
     printf("namelist.c: getLast() 2\n");
     t_cnt *tmpConnector;
-    printf("namelist.c: getLast() 3 %s\n", list);
+    printf("namelist.c: getLast() 3\n");
     for (tmpConnector = getFirst(list);
          tmpConnector->pnext != NULL;
          tmpConnector = getNext(list));
     printf("namelist.c: getLast() 4\n");
     return tmpConnector;
+}
+
+void printBezeichnerList(t_list *list) {
+    printf("bez listing: start\n");
+    if (list == NULL) {
+        printf("bez list was empty\n");
+        return;
+    }
+    t_cnt *tmpConnector = getFirst(list);
+    if (tmpConnector == NULL) {
+        printf("first elem was null\n");
+        return;
+    }
+    while (tmpConnector != NULL){
+        tBez * pBez = (tBez *) tmpConnector->value;
+        printf("bez listing: %s\n", pBez->pName);
+        tmpConnector = getNext(list);
+    }
 }
 
 void insertBehindValue(t_list *list, void *valueNew) {
@@ -115,6 +134,7 @@ tBez *createBez(char *pBez) {
 }
 
 tConst *createConst(long Val) {
+    printf("namelist.c: createConst with val %d\n", Val);
     tConst *newConst = (tConst *) malloc(sizeof(tConst));
     if (newConst == NULL) {
         return FAIL;
@@ -183,13 +203,20 @@ tProc *createProc(tProc *pParent) {
 
 tBez *searchBez(tProc *pProc, char *pBez) {
     printf("namelist.c: searchBez()\n");
-    if (pProc->childList == NULL) {
-        printf("namelist.c: searchBez() was null\n");
+    if (pProc == NULL) {
+        printf("namelist.c: searchBez() pProc was null\n");
         return NULL;
     }
-
+    if (pProc->childList == NULL) {
+        printf("namelist.c: searchBez() pProc->childList was null\n");
+        return NULL;
+    }
+    printBezeichnerList(pProc->childList);
     tBez *tmpBez = NULL;
     t_cnt *tmpConnector = getFirst(pProc->childList);
+    if (tmpConnector == NULL) {
+        return NULL;
+    }
     printf("namelist.c: searchBez() 1\n");
     while (tmpConnector != NULL) {
         tBez *tmpBez = (tBez *) tmpConnector->value;
@@ -207,9 +234,18 @@ tBez *searchBez(tProc *pProc, char *pBez) {
 }
 
 tBez *searchBezGlobal(char *pBez) {
+    printf("namelist.c: search global %s\n", pBez);
+    printBezeichnerList(pCurrProcedure->childList);
+    if (pCurrProcedure == NULL) {
+        return NULL;
+    }
     tProc *pPr = pCurrProcedure;
-    tBez *pB;
-    while (pPr != NULL && (pB = searchBez(pPr, pBez)) == NULL) {
+    tBez *pB = NULL;
+    while (pPr != NULL) {
+        pB = searchBez(pPr, pBez);
+        if (pB != NULL) {
+            break;
+        }
         pPr = pPr->pParent;
     }
     return pB;
@@ -231,7 +267,7 @@ int Bl1(void) {
 
 // Konstantenwert
 int Bl2(void) {
-    printf("namelist.c: Konstantenwert\n");
+    printf("namelist.c: Bl2 Konstantenwert\n");
     tBez *pBez;
     tConst *pConst;
     pBez = getLast(pCurrProcedure->childList);
@@ -345,7 +381,47 @@ int fa1(void) {
     return OK;
 }
 
+int fa2(void) {
+    printf("namelist.c: fa2\n");
+    tBez * pBez = searchBezGlobal(Morph.Val.pStr);
+    if (pBez == NULL) {
+        printf("can not find bezeichner %s", Morph.Val.pStr);
+        exit(-6);
+    }
+    if (!(pBez->structType == var_struct) || !(pBez->structType == const_struct))
+    {
+        printf("non valid type of struct %d", pBez->structType);
+        exit(-7);
+    }
+    code(puConst, ((tConst*)getLast(pConstList))->Idx);
+    return OK;
+}
+
 int st10(void) {
     code(putVal);
+    return OK;
+}
+
+int ex1(void) { // negative sign
+    code(vzMinus);
+    return OK;
+}
+
+int ex2(void) { // addition
+    code(OpAdd);
+    return OK;
+}
+
+int ex3(void) {  // subtraction
+    code(OpSub);
+    return OK;
+}
+
+int te1(void) { // mul
+    code(OpMult);
+    return OK;
+}
+int te2(void) { // div
+    code(OpDiv);
     return OK;
 }

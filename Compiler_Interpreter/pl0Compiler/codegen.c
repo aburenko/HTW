@@ -40,7 +40,8 @@ void codeEndProcedure(void) {
 }
 
 void writeToFile(void) {
-    FILE *file = fopen("compiler_output", "w");
+    char * destinationPath = "./../compiled/compiled.cl0";
+    FILE *file = fopen(destinationPath, "w");
 
     for (int i = 0; i < pCode - pCodeBegin; i++) {
         fputc((char)pCodeBegin[i], file);
