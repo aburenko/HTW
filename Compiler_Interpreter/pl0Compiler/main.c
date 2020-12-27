@@ -15,6 +15,15 @@
 #include <ctype.h>
 #include "parser.h"
 
+void listTest() {
+    pCurrProcedure = createProc(NULL);
+    t_list *list = listCreate();
+    pCurrProcedure->childList = list;
+    tBez * bez = createBez("C");
+    insertBehindValue(list, bez);
+    searchBez(pCurrProcedure, "C");
+}
+
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         printf("file was %s\n", argv[1]);

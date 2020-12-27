@@ -13,12 +13,18 @@
 #include <ctype.h>
 
 tBog gTerm[] = {
-/* 0*/ {BgGr, {(ul) gFact}, NULL, 1, 3},
+/* 0*/ {BgGr, {(ul) gFact}, NULL, 1, 0},
 /* 1*/
-       {BgSy, {(ul) '*'},   te1, 0, 2},
+       {BgNl, {NULL},   NULL, 2, 0},
 /* 2*/
-       {BgSy, {(ul) '/'},   te2, 0, 0},
+       {BgSy, {(ul) '*'},   NULL, 4, 3},
 /* 3*/
+       {BgSy, {(ul) '/'},   NULL, 5, 6},
+/* 4*/
+       {BgGr, {(ul) gFact},   te1, 1, 0},
+/* 5*/
+       {BgGr, {(ul) gFact},   te2, 1, 0},
+/* 6*/
        {BgEn, {(ul) 0},     NULL, 0, 0}
 };
 
