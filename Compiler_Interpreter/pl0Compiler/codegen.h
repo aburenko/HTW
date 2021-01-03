@@ -66,6 +66,7 @@ void codeEndProcedure();
 int code(tCode Code, ...);
 
 void writeToFile(void);
+char * getPCode();
 
 static char *pCode = NULL;
 static char *pCodeBegin = NULL;

@@ -26,6 +26,10 @@ void wr2ToCodeAtBegin(short x) {
     wr2ToCodeAtP(x, pCodeBegin);
 }
 
+char * getPCode() {
+    return  pCode;
+}
+
 void wr2ToCodeConst(long x) {
 //    printf("wr x %#010x\n", x);
 //    printf("wr first %#010x\n", x & 0x0000ffff);

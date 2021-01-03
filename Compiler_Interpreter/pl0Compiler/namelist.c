@@ -49,12 +49,12 @@ t_cnt *getLast(t_list *list) {
     t_cnt *tmpConnector = getFirst(list);
     if (tmpConnector == NULL) {
         printf("namelist.c: getLast() tmpConnector was NULL 2.5\n");
-        return  NULL;
+        return NULL;
     }
     printf("namelist.c: getLast() 3\n");
     for (;
-         tmpConnector->pnext != NULL;
-         tmpConnector = getNext(list));
+            tmpConnector->pnext != NULL;
+            tmpConnector = getNext(list));
     printf("namelist.c: getLast() 4\n");
     return tmpConnector;
 }
@@ -70,8 +70,8 @@ void printBezeichnerList(t_list *list) {
         printf("first elem was null\n");
         return;
     }
-    while (tmpConnector != NULL){
-        tBez * pBez = (tBez *) tmpConnector->value;
+    while (tmpConnector != NULL) {
+        tBez *pBez = (tBez *) tmpConnector->value;
         printf("bez listing: %s\n", pBez->pName);
         tmpConnector = getNext(list);
     }
@@ -96,6 +96,7 @@ void insertBehindValue(t_list *list, void *valueNew) {
 void initNameList(void) {
     printf("init name list was called\n");
     pConstList = listCreate();
+    pLabelList = listCreate();
     mainProc = pCurrProcedure = createProc(NULL);
 }
 
@@ -134,7 +135,7 @@ void testPCurrProcedure(void) {
     printBezeichnerList(pCurrProcedure->childList);
     getLast(pCurrProcedure->childList);
     getFirst(pCurrProcedure->childList);
-    tBez * pBeztmp = searchBez(pCurrProcedure, "C");
+    tBez *pBezTmp = searchBez(pCurrProcedure, "C");
     printBezeichnerList(pCurrProcedure->childList);
     printf("namelist.c: testPCurrProcedure TEST END\n");
 }
@@ -157,7 +158,7 @@ tConst *searchConst(long Val) {
     t_cnt *tmpConnector;
     for (tmpConnector = getFirst(pConstList);
          tmpConnector != NULL && ((tConst *) tmpConnector->value)->Val != Val;
-         tmpConnector =  getNext(pConstList));
+         tmpConnector = getNext(pConstList));
     if (tmpConnector == NULL) {
         return NULL;
     }
@@ -231,13 +232,14 @@ tBez *searchBez(tProc *pProc, char *pBez) {
         printf("namelist.c: searchBez() 1.2 %s\n", tmpBez->pName);
         if (strcmp(tmpBez->pName, pBez) == 0) {
             printf("namelist.c: searchBez() found a match, break\n");
+            return tmpBez;
             break;
         }
         printf("namelist.c: searchBez() iter\n");
         tmpConnector = getNext(pProc->childList);
     }
-    printf("namelist.c: searchBez() 2\n");
-    return tmpBez;
+    printf("namelist.c: searchBez() nothihg found\n");
+    return NULL;
 }
 
 tBez *searchBezGlobal(char *pBez) {
@@ -279,7 +281,7 @@ int Bl1(void) {
 int Bl2(void) {
     printf("namelist.c: Bl2 Konstantenwert\n");
     t_cnt *pConnector = getLast(pCurrProcedure->childList);
-    tBez * pBez = (tBez *) pConnector->value;
+    tBez *pBez = (tBez *) pConnector->value;
     tConst *pConst = searchConst(Morph.Val.Num);
     if (pConst != NULL) {
         pBez->pObj = pConst;
@@ -307,10 +309,6 @@ int Bl3(void) {
     tVar *pVar = createVar();
     printf("namelist.c: Variablenbezeichner 4\n");
     pBez->pObj = pVar;
-    printf("namelist.c: Variablenbezeichner 5\n");
-    pVar->Dspl = pCurrProcedure->SpzzVar;
-    printf("namelist.c: Variablenbezeichner 6\n");
-    pCurrProcedure->SpzzVar = pCurrProcedure->SpzzVar + 4;
     printf("namelist.c: Variablenbezeichner 7\n");
     return OK;
 }
@@ -338,12 +336,12 @@ int Bl5(void) {
     for (tmpConnector = getFirst(pCurrProcedure->childList);
          tmpConnector != NULL;
          tmpConnector = getNext(pCurrProcedure->childList)) {
-        free(tmpConnector->value);
+//        free(tmpConnector->value);
     }
     printf("namelist.c: Bl5 after for\n");
-    tProc *pTmpParentProcedure = pCurrProcedure->pParent;
-    free(pCurrProcedure);
-    pCurrProcedure = pTmpParentProcedure;
+//    tProc *pTmpParentProcedure = pCurrProcedure->pParent;
+//    free(pCurrProcedure);
+//    pCurrProcedure = pTmpParentProcedure;
     printf("namelist.c: Bl5 Codegen\n");
     code(retProc);
     codeEndProcedure();
@@ -353,7 +351,7 @@ int Bl5(void) {
 
 // Beginn des Anweisungsteils
 int Bl6(void) {
-//    printf("%d\n", pCurrProcedure == NULL);
+    printf("bl6 %d\n", pCurrProcedure == NULL);
     printf("namelist.c: Bl6 pCurrProcedure->IdxProc: %d, pCurrProcedure->SpzzVar: %d\n", pCurrProcedure->IdxProc,
            pCurrProcedure->SpzzVar);
     code(entryProc, 0, pCurrProcedure->IdxProc, pCurrProcedure->SpzzVar);
@@ -395,59 +393,245 @@ int fa1(void) {
 
 int fa2(void) {
     printf("namelist.c: fa2\n");
-    tBez * pBez = searchBezGlobal(Morph.Val.pStr);
+    tBez *pBez = searchBezGlobal(Morph.Val.pStr);
     if (pBez == NULL) {
         printf("can not find bezeichner %s", Morph.Val.pStr);
         exit(-6);
     }
-    if (pBez->structType == proc_struct)
-    {
+    if (pBez->structType == proc_struct) {
         printf("non valid type of struct %d", pBez->structType);
         exit(-7);
     }
 
-    tConst *pConst = (tConst*) pBez->pObj;
+    tConst *pConst = (tConst *) pBez->pObj;
     if (pConst->structType == const_struct) {
         code(puConst, pConst->Idx);
     } else if (pConst->structType == var_struct) {
-        tVar * pVar = (tVar*) pBez->pObj;
-        // TODO var gen
-        code(puValVrMain, pVar->Dspl);
-        code(puValVrLocl, pVar->Dspl);
-        code(puValVrGlob, pVar->Dspl, pCurrProcedure->IdxProc);
-    } else
-    {
+        tVar *pVar = (tVar *) pBez->pObj;
+        if (procedureWhereFound == 0) {
+            code(puValVrMain, pVar->Dspl);
+        } else if (procedureWhereFound == pCurrProcedure->IdxProc) {
+            code(puValVrLocl, pVar->Dspl);
+        } else {
+            code(puValVrGlob, pVar->Dspl, pCurrProcedure->IdxProc);
+        }
+    } else {
         printf("non valid type of struct %d", pBez->structType);
         exit(-8);
     }
     return OK;
 }
 
+int st1(void) {
+    printf("namelist.c: st1\n");
+    tBez *pBez = searchBezGlobal(Morph.Val.pStr);
+    if (pBez == NULL) {
+        printf("can not find bezeichner %s", Morph.Val.pStr);
+        exit(-6);
+    }
+    if (pBez->structType == proc_struct) {
+        printf("non valid type of struct %d", pBez->structType);
+        exit(-7);
+    }
+    tVar *pVar = (tVar *) pBez->pObj;
+    if (pVar->structType != var_struct) {
+        printf("non valid type of struct %d", pVar->structType);
+        exit(-7);
+    }
+    if (procedureWhereFound == 0) {
+        code(puAdrVrMain, pVar->Dspl);
+    } else if (procedureWhereFound == pCurrProcedure->IdxProc) {
+        code(puAdrVrLocl, pVar->Dspl);
+    } else {
+        code(puAdrVrMain, pVar->Dspl, pCurrProcedure->IdxProc);
+    }
+    return OK;
+}
+
+
+int st2(void) {
+    printf("namelist.c: st2\n");
+    code(storeVal);
+    return OK;
+}
+
+tLabl *createLabel(tStructType structType, char *iJump) {
+    tLabl *labl = (tLabl *) malloc(sizeof(tLabl));
+    labl->structType = structType;
+    labl->iJmp = iJump;
+    return labl;
+}
+
+int st3(void) {
+    printf("st3\n");
+    tLabl *labl = createLabel(jnot_struct, getPCode());
+    insertBehindValue(pLabelList, labl);
+    code(jnot, 0);
+    return OK;
+}
+
+int st4(void) {
+    printf("st4\n");
+    tLabl *label = (tLabl *) getLast(pLabelList)->value;
+    short relativeAddress = getPCode() - label->iJmp;
+    if (label->structType == jnot_struct) {
+        relativeAddress -= 3;
+    }
+    // save the relative adress
+    wr2ToCodeAtP(relativeAddress, label->iJmp + 1);
+    return OK;
+}
+
+int st5(void) {
+    printf("5 not implemented yet");
+    exit(-10);
+    return OK;
+}
+
+int st6(void) {
+    printf("6 not implemented yet");
+    exit(-10);
+    return OK;
+}
+
+int st7(void) {
+    printf("7 not implemented yet");
+    exit(-10);
+    return OK;
+}
+
+int st8(void) {
+    printf("namelist.c: st8\n");
+    tBez *pBez = searchBezGlobal(Morph.Val.pStr);
+    if (pBez == NULL) {
+        printf("can not find bezeichner %s", Morph.Val.pStr);
+        exit(-6);
+    }
+    printf("namelist.c: st8 middle\n");
+    tProc *pProc = (tProc *) pBez->pObj;
+    if (pProc->structType != proc_struct) {
+        printf("non valid type of struct %d", pBez->structType);
+        exit(-7);
+    }
+    code(call, pProc->IdxProc);
+    printf("namelist.c: st8 end\n");
+    return OK;
+}
+
+int st9(void) {
+    printf("namelist.c: st9\n");
+    tBez *pBez = searchBezGlobal(Morph.Val.pStr);
+    if (pBez == NULL) {
+        printf("can not find bezeichner %s", Morph.Val.pStr);
+        exit(-6);
+    }
+    if (pBez->structType == proc_struct) {
+        printf("not proc: non valid type of struct %d", pBez->structType);
+        exit(-7);
+    }
+    tVar *pVar = (tVar *) pBez->pObj;
+    if (pVar->structType != var_struct) {
+        printf("not var: non valid type of struct %d", pVar->structType);
+        exit(-7);
+    }
+    if (procedureWhereFound == 0) {
+        code(puAdrVrMain, pVar->Dspl);
+    } else if (procedureWhereFound == pCurrProcedure->IdxProc) {
+        code(puAdrVrLocl, pVar->Dspl);
+    } else {
+        code(puAdrVrMain, pVar->Dspl, pCurrProcedure->IdxProc);
+    }
+    code(getVal);
+    return OK;
+}
+
 int st10(void) {
+    printf("namelist.c: st10\n");
     code(putVal);
     return OK;
 }
 
 int ex1(void) { // negative sign
+    printf("namelist.c: ex1\n");
     code(vzMinus);
     return OK;
 }
 
 int ex2(void) { // addition
+    printf("namelist.c: ex2\n");
     code(OpAdd);
     return OK;
 }
 
 int ex3(void) {  // subtraction
+    printf("namelist.c: ex3\n");
     code(OpSub);
     return OK;
 }
 
 int te1(void) { // mul
+    printf("namelist: te1\n");
     code(OpMult);
     return OK;
 }
+
 int te2(void) { // div
+    printf("namelist: te2\n");
     code(OpDiv);
+    return OK;
+}
+
+int co1(void) {
+    printf("namelist: co1\n");
+    code(odd);
+    return OK;
+}
+
+tMorph compareOperator;
+
+int co2_to_co7(void) {
+    printf("namelist: co2_to_co7\n");
+    compareOperator = Morph;
+    return OK;
+}
+
+int co8(void) {
+    printf("namelist: co8\n");
+    switch (compareOperator.MC) {
+        case mcSymb :
+            if (compareOperator.Val.Symb == zLE) {
+                printf("co8 Symbol <=\n");
+                code(cmpLE);
+            }
+            else if (compareOperator.Val.Symb == zGE) {
+                printf("co8 Symbol >=\n");
+                code(cmpGE);
+            }
+            else if (isprint(compareOperator.Val.Symb)) {
+                printf("co8 Symbol %c\n", (char) compareOperator.Val.Symb);
+                if (compareOperator.Val.Symb == '=') {
+                    code(cmpEQ);
+                } else if(compareOperator.Val.Symb == '#') {
+                    code(cmpNE);
+                } else if(compareOperator.Val.Symb == '<') {
+                    code(cmpLT);
+                } else if(compareOperator.Val.Symb == '>') {
+                    code(cmpGT);
+                }
+            }
+            else {
+                printf("ERROR Symbol \n");
+            }
+            break;
+        case mcNum :
+            printf("ERROR Zahl %ld\n", compareOperator.Val.Num);
+            break;
+        case mcIdent:
+            printf("ERROR Ident %s\n", (char *) compareOperator.Val.pStr);
+            break;
+        case mcEmpty:
+            printf("ERROR mcEmpty\n");
+            break;
+    }
     return OK;
 }

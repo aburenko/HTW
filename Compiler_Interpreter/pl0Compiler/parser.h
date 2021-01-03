@@ -34,6 +34,7 @@ typedef struct BOGEN {
     int (*fx)(void); // Funktionspointer (Funktion, wenn Bogen akzeptiert)
     int iNext; // Folgebogen, wenn Bogen akzeptiert
     int iAlt; // Alternativbogen, wenn Bogen nicht akzeptiert
+    char* name; // Alternativbogen, wenn Bogen nicht akzeptiert
 // oder 0 oder -1, wenn es keinen
 // Alternativbogen gibt.
 } tBog;

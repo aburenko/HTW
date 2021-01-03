@@ -24,7 +24,7 @@ extern tMorph Morph;
 //typedef char* tKz;
 
 typedef enum eStructType {
-    var_struct, const_struct, proc_struct, bez_struct
+    var_struct, const_struct, proc_struct, bez_struct, jnot_struct, jmp_struct
 } tStructType;
 
 // Namenslisteneintrag
@@ -56,6 +56,12 @@ typedef struct connector {
     void *value;
 } t_cnt;
 
+typedef struct tLABL
+{
+    tStructType structType;
+    char* iJmp;
+} tLabl;
+
 typedef struct list {
     t_cnt *pfirst;
     t_cnt *pcurr;
@@ -82,6 +88,7 @@ void printList(t_list *list);
 static tProc *mainProc = NULL;
 static tProc *pCurrProcedure = NULL;
 static t_list *pConstList = NULL;
+static t_list *pLabelList = NULL;
 static short idxCnstCounter = 0;
 static short idxProcCounter = 0;
 static short procedureWhereFound = 0;

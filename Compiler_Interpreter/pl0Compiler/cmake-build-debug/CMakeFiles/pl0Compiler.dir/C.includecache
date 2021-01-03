@@ -10,6 +10,18 @@
 
 /home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/lex.h
 
+/home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/namelist.c
+stdio.h
+-
+ctype.h
+-
+stdint.h
+-
+langinfo.h
+-
+namelist.h
+/home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/namelist.h
+
 /home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/namelist.h
 stdio.h
 -
@@ -21,20 +33,4 @@ codegen.h
 /home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/codegen.h
 lex.h
 /home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/lex.h
-
-/home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/parser.c
-parser.h
-/home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/parser.h
-stdio.h
--
-stdlib.h
--
-string.h
--
-ctype.h
--
-
-/home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/parser.h
-namelist.h
-/home/aburenko/edu/HTW/Compiler_Interpreter/pl0Compiler/namelist.h
 
