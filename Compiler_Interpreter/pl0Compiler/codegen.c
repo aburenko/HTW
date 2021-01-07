@@ -39,7 +39,9 @@ void wr2ToCodeConst(long x) {
 }
 
 void codeEndProcedure(void) {
+    printf("codeEndProcedure called\n");
     short procedureLength = pCode - pCurrProcedureBegin;
+    printf("codeEndProcedure length was %d\n", procedureLength);
     wr2ToCodeAtP(procedureLength, pCurrProcedureBegin + 1);
 }
 
@@ -58,7 +60,7 @@ int code(tCode Code, ...) {
     if (pCode == NULL) {
         pCodeBegin = pCode = malloc(LenCode);
         if (pCode == NULL) {
-            printf("pCode was null, exit");
+            printf("pCode was null, exit\n");
             exit(-4);
         }
         for (int i = 0; i < 2; ++i) {
@@ -70,13 +72,16 @@ int code(tCode Code, ...) {
     if (pCode - pCodeBegin + MAX_LEN_OF_CODE >= LenCode)
         // Ueberwachung des Zwischencodegenerierungspuffers
     {
+        int lenFromProcBegin = pCode - pCurrProcedureBegin;
         char *xCode = realloc(pCodeBegin, (LenCode += 1024));
         if (xCode == NULL) {
-            printf("xCode was null, exit");
+            printf("xCode was null, exit\n");
             exit(-5);
         };
         pCode = xCode + (pCode - pCodeBegin);
+        pCurrProcedureBegin = pCode - lenFromProcBegin;
         pCodeBegin = xCode;
+        printf("buffer extended\n");
     }
     *pCode++ = (char) Code;
     va_start(ap, Code);
@@ -84,6 +89,7 @@ int code(tCode Code, ...) {
     switch (Code) {
 /* Befehle mit 3 Parametern */
         case entryProc:
+            printf("new proc begin was set\n");
             pCurrProcedureBegin = pCode - 1;
             sarg = va_arg(ap, int);
             wr2ToCode(sarg);

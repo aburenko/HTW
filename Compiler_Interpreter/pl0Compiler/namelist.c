@@ -228,8 +228,7 @@ tBez *searchBez(tProc *pProc, char *pBez) {
     printf("namelist.c: searchBez() 1\n");
     while (tmpConnector != NULL) {
         tmpBez = (tBez *) tmpConnector->value;
-        printf("namelist.c: searchBez() 1.1 %s\n", pBez);
-        printf("namelist.c: searchBez() 1.2 %s\n", tmpBez->pName);
+        printf("namelist.c: searchBez() 1.1 %s = %s ?\n", pBez,  tmpBez->pName);
         if (strcmp(tmpBez->pName, pBez) == 0) {
             printf("namelist.c: searchBez() found a match, break\n");
             return tmpBez;
@@ -256,7 +255,6 @@ tBez *searchBezGlobal(char *pBez) {
         }
         pPr = pPr->pParent;
     }
-    procedureWhereFound = pCurrProcedure->IdxProc;
     return pB;
 }
 
@@ -315,37 +313,46 @@ int Bl3(void) {
 
 // Prozedurbezeichner
 int Bl4(void) {
-    printf("namelist.c: Prozedurbezeichner\n");
+    printf("namelist.c: Bl4 Prozedurbezeichner\n");
     tBez *pBez;
     pBez = searchBez(pCurrProcedure, (char *) Morph.Val.pStr);
     if (pBez != NULL) return FAIL;
     pBez = createBez((char *) Morph.Val.pStr);
-    if (pBez != NULL) {
-        return OK;
+    if (pBez == NULL) {
+        printf("namelist.c: Bl4 failed creating Bezeichner\n");
+        exit(-1);
     }
     tProc *pProc = createProc(pCurrProcedure);
     pBez->pObj = pProc;
     pCurrProcedure = pProc;
+    printf("namelist.c: Bl4 Prozedurbezeichner with number %d created\n", pCurrProcedure->IdxProc);
     return OK;
 }
 
 // Ende der Prozedurvereinbarung
 int Bl5(void) {
-    printf("namelist.c: Bl5\n");
-    t_cnt *tmpConnector;
+    printf("namelist.c: Bl5 for procedure number %d\n", pCurrProcedure->IdxProc);
+    t_cnt *tmpConnector = NULL;
+    t_cnt *tmpPrevConnector = NULL;
     for (tmpConnector = getFirst(pCurrProcedure->childList);
          tmpConnector != NULL;
          tmpConnector = getNext(pCurrProcedure->childList)) {
-//        free(tmpConnector->value);
+        free(tmpConnector->value);
+        free(tmpPrevConnector);
+        tmpPrevConnector = tmpConnector;
+    }
+    if (tmpPrevConnector != NULL)
+    {
+        free(tmpPrevConnector);
     }
     printf("namelist.c: Bl5 after for\n");
-//    tProc *pTmpParentProcedure = pCurrProcedure->pParent;
-//    free(pCurrProcedure);
-//    pCurrProcedure = pTmpParentProcedure;
     printf("namelist.c: Bl5 Codegen\n");
     code(retProc);
     codeEndProcedure();
     printf("namelist.c: Bl5 End\n");
+    if (pCurrProcedure->pParent != NULL) {
+        pCurrProcedure = pCurrProcedure->pParent;
+    }
     return OK;
 }
 
@@ -408,6 +415,7 @@ int fa2(void) {
         code(puConst, pConst->Idx);
     } else if (pConst->structType == var_struct) {
         tVar *pVar = (tVar *) pBez->pObj;
+        int procedureWhereFound= pBez->IdxProc;
         if (procedureWhereFound == 0) {
             code(puValVrMain, pVar->Dspl);
         } else if (procedureWhereFound == pCurrProcedure->IdxProc) {
@@ -438,6 +446,7 @@ int st1(void) {
         printf("non valid type of struct %d", pVar->structType);
         exit(-7);
     }
+    int procedureWhereFound = pBez->IdxProc;
     if (procedureWhereFound == 0) {
         code(puAdrVrMain, pVar->Dspl);
     } else if (procedureWhereFound == pCurrProcedure->IdxProc) {
@@ -509,6 +518,10 @@ int st8(void) {
     }
     printf("namelist.c: st8 middle\n");
     tProc *pProc = (tProc *) pBez->pObj;
+    if (pProc == NULL) {
+        printf("procedure bezeichner was found, but object was null!!");
+        exit(-6);
+    }
     if (pProc->structType != proc_struct) {
         printf("non valid type of struct %d", pBez->structType);
         exit(-7);
@@ -534,6 +547,7 @@ int st9(void) {
         printf("not var: non valid type of struct %d", pVar->structType);
         exit(-7);
     }
+    int procedureWhereFound = pBez->IdxProc;
     if (procedureWhereFound == 0) {
         code(puAdrVrMain, pVar->Dspl);
     } else if (procedureWhereFound == pCurrProcedure->IdxProc) {

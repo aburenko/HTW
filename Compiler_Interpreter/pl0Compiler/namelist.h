@@ -91,7 +91,6 @@ static t_list *pConstList = NULL;
 static t_list *pLabelList = NULL;
 static short idxCnstCounter = 0;
 static short idxProcCounter = 0;
-static short procedureWhereFound = 0;
 
 // functions from lecture
 void initNameList(void);
