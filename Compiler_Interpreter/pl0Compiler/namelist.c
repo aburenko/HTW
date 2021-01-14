@@ -59,6 +59,30 @@ t_cnt *getLast(t_list *list) {
     return tmpConnector;
 }
 
+t_cnt *getPreLast(t_list *list) {
+    printf("namelist.c: getPreLast()\n");
+    printf("namelist.c: getPreLast() 1\n");
+    if (list == NULL) return NULL;
+    printf("namelist.c: getPreLast() 2\n");
+    t_cnt *tmpConnector = getFirst(list);
+    if (tmpConnector == NULL) {
+        printf("namelist.c: getPreLast() tmpConnector was NULL 2.5\n");
+        return NULL;
+    }
+    printf("namelist.c: getPreLast() 3\n");
+    t_cnt *tmpConnectorPrevious = tmpConnector;
+    while (tmpConnector->pnext != NULL) {
+        tmpConnectorPrevious = tmpConnector;
+        tmpConnector = getNext(list);
+    }
+    if (tmpConnectorPrevious == tmpConnector) {
+        printf("namelist.c: was equal!!() 4\n");
+        exit(-10);
+    }
+    printf("namelist.c: getPreLast() 4\n");
+    return tmpConnectorPrevious;
+}
+
 void printBezeichnerList(t_list *list) {
     printf("bez listing: start\n");
     if (list == NULL) {
@@ -492,20 +516,27 @@ int st4(void) {
 }
 
 int st5(void) {
-    printf("5 not implemented yet");
-    exit(-10);
+    printf("st5 beschreibt anfang einer condition\n");
+    tLabl *labl = createLabel(st5_struct, getPCode());
+    insertBehindValue(pLabelList, labl);
     return OK;
 }
 
 int st6(void) {
-    printf("6 not implemented yet");
-    exit(-10);
+    printf("st6\n");
+    tLabl *labl = createLabel(jnot_struct, getPCode());
+    insertBehindValue(pLabelList, labl);
+    code(jnot, 0);
     return OK;
 }
 
 int st7(void) {
-    printf("7 not implemented yet");
-    exit(-10);
+    printf("st7\n");
+    tLabl *label = (tLabl *) getLast(pLabelList)->value;
+    short relativeAddress = getPCode() - label->iJmp;
+    wr2ToCodeAtP(relativeAddress, label->iJmp + 1);
+    label = (tLabl *) getPreLast(pLabelList)->value;
+    code(jmp, label->iJmp - getPCode() - 3);
     return OK;
 }
 

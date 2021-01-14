@@ -24,7 +24,7 @@ extern tMorph Morph;
 //typedef char* tKz;
 
 typedef enum eStructType {
-    var_struct, const_struct, proc_struct, bez_struct, jnot_struct, jmp_struct
+    var_struct, const_struct, proc_struct, bez_struct, jnot_struct, jmp_struct, st5_struct
 } tStructType;
 
 // Namenslisteneintrag
@@ -109,7 +109,6 @@ tBez *searchBez(tProc *pProc, char *pBez);
 
 tBez *searchBezGlobal(char *pBez);
 
-// Reihenfolge-ToDo: Factor (fa1), Block (bl6, bl5), Statement (st10), Pogramm (pr1)
 int Bl1(void);
 
 int Bl2(void);

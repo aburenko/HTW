@@ -6,8 +6,11 @@
  * Dozent: Prof. Dr.-Ing. Arnold Beck
  *
  *
- * Erweiterungen laut dem S-Nummer 43733
- * 43733%3+1 = 3 => 3. Erkennung und Überlesen von Kommentaren im Pascalstil (*..... kommentar ....*)
+ * Erweiterungen laut dem S-Nummer 43733:
+ *
+ * 43733%3+1 = 3 => 3. Erkennung und Überlesen von Kommentaren
+ * im Pascalstil (*..... kommentar ....*)
+ *
  * 43733%2+1 = 2 => 2. Arrays von Zahlen
  *
  * */

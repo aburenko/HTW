@@ -1,0 +1,13 @@
+const c=10;
+var i;
+(* a comment *)
+begin
+ i:=0;
+ while i<c do
+ begin
+ (* an another comment
+ really long one *)
+ !i;
+ i:=i+1
+ end
+end.
