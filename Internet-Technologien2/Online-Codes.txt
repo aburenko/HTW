@@ -1,0 +1,8 @@
+1. Netzwerkcodierung
+	- ein Verfahren zur Optimierung von Datenfluss
+
+2. Vorteil von ratenlosen Codes
+	- kann beliebig viel Redundanz erzeugt werden
+
+3. Mögliche Anwendungen für ratenlose Codes:
+	- 	
