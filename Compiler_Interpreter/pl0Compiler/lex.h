@@ -31,11 +31,6 @@ typedef struct {
         int Symb;
     } Val;
     int MLen;   /* Morphemlaenge*/
-    int arrayIndexType; /* 0-init 1-number 2-variable */
-    union ARRAY_INDEX { // used only for arrays
-        long index;
-        char *ident;
-    } arrayIndex;
 } tMorph;
 
 typedef void (*FX)(void);

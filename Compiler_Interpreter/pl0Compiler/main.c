@@ -35,7 +35,11 @@ int main(int argc, char *argv[]) {
     printf("file was %s\n", argv[1]);
     initLex(argv[1]);
     int return_value = parse((tBog *)NULL);
-    printf("return value was %d\n", return_value);
+    if (return_value == 1) {
+        printf("compiled successfully\n");
+    } else {
+        printf("compiling error occured, return value was %d\n", return_value);
+    }
     puts("");
     return 0;
 }

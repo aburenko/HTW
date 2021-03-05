@@ -1,0 +1,25 @@
+const c=6;
+var i, array[6];
+(* a comment *)
+begin
+
+ !99;
+
+ i:=0;
+ while i<c do
+ begin
+ i:=i+1;
+ array[i] := i;
+ !array[i];
+ end;
+
+ !99;
+
+ i:=3;
+ array[i] := i;
+ array[i+1] := 10;
+ array[i+1]:=i+1 + array[1+array[i-1+1]*2/2];
+ !array[i+1];
+
+ !99;
+end.

@@ -53,7 +53,7 @@ t_cnt *getLast(t_list *list) {
 
 
 int getListSize(t_list *list) {
-    t_cnt * pcurrtemp = list->pcurr;
+    t_cnt *pcurrtemp = list->pcurr;
     if (list == NULL) exit(-3);
     t_cnt *tmpConnector = getFirst(list);
     if (tmpConnector == NULL) {
@@ -85,8 +85,7 @@ t_cnt *getNumberNFromEnd(t_list *list, int n) {
     int counter = 0;
     for (;
             tmpConnector->pnext != NULL;
-            tmpConnector = getNext(list))
-    {
+            tmpConnector = getNext(list)) {
         if (counter == neededElementIndex) break;
         counter++;
     }
@@ -109,7 +108,7 @@ t_cnt *getPreLast(t_list *list) {
 }
 
 void removeLast(t_list *list) {
-    t_cnt * preLast = getPreLast(list);
+    t_cnt *preLast = getPreLast(list);
     if (preLast->pnext != NULL) {
         free(preLast->pnext->value);
     }
@@ -216,6 +215,7 @@ tVar *createVar(void) {
     if (pVar == NULL) return NULL;
     pVar->Dspl = pCurrProcedure->SpzzVar;
     pVar->structType = var_struct;
+    pVar->type = 0; // set as var first
     pCurrProcedure->SpzzVar += sizeof(int32_t);
 
     t_cnt *pConn = getLast(pCurrProcedure->childList);
@@ -224,6 +224,26 @@ tVar *createVar(void) {
     pBez->pObj = pVar;
     return pVar;
 }
+
+//tArr *createArrayVar(void) {
+//    tArr *pArrVar = (tArr *) malloc(sizeof(tArr));
+//    if (pArrVar == NULL) return NULL;
+//    pArrVar->Dspl = pCurrProcedure->SpzzVar;
+//    pArrVar->structType = arr_struct;
+//    // get size of array
+//    if (Morph.arrayIndexType == 1) {
+//        pArrVar->size = Morph.arrayIndex.index;
+//    } else {
+//        printf("namelist.c: createArrayVar(), array index can not be variable when initializing\n");
+//        exit(-17);
+//    }
+//    pCurrProcedure->SpzzVar += pArrVar->size * sizeof(int32_t);
+//    t_cnt *pConn = getLast(pCurrProcedure->childList);
+//    tBez *pBez = pConn->value;
+//    if (pBez == NULL) return NULL;
+//    pBez->pObj = pArrVar;
+//    return pArrVar;
+//}
 
 tConst *findOrCreateConst(long value) {
     tConst *pConst = searchConst(value);
@@ -262,56 +282,37 @@ void generateVariableValue(tBez *pBez) {
     }
 }
 
-void generateIndex() {
-    // push index
-    if (Morph.arrayIndexType == 1) {
-        printf("generateIndex 1 %ld\n", Morph.arrayIndex.index);
-        tConst *pConst = findOrCreateConst(Morph.arrayIndex.index);
-        printf("generateIndex const index was %d\n ", pConst->Idx);
-        code(puConst, pConst->Idx);
-        printf("generateIndex const end\n");
-    } else if (Morph.arrayIndexType == 2) {
-        printf("generateIndex 2 %s\n", Morph.arrayIndex.ident);
-        tBez *pIndexBez = searchBezGlobal(Morph.arrayIndex.ident);
-        tConst *pIndexConst = (tConst *) pIndexBez->pObj;
-        if (pIndexConst->structType == const_struct) {
-            code(puConst, pIndexConst->Idx);
-        } else if (pIndexConst->structType == var_struct) {
-            generateVariableValue(pIndexBez);
-        }
-    } else {
-        printf("non valid type of array index %d", Morph.arrayIndexType);
-        exit(-7);
-    }
-}
+//void generateIndex() {
+//    // push index
+//    if (Morph.arrayIndexType == 1) {
+//        printf("generateIndex 1 %ld\n", Morph.arrayIndex.index);
+//        tConst *pConst = findOrCreateConst(Morph.arrayIndex.index);
+//        printf("generateIndex const index was %d\n ", pConst->Idx);
+//        code(puConst, pConst->Idx);
+//        printf("generateIndex const end\n");
+//    } else if (Morph.arrayIndexType == 2) {
+//        printf("generateIndex 2 %s\n", Morph.arrayIndex.ident);
+//        tBez *pIndexBez = searchBezGlobal(Morph.arrayIndex.ident);
+//        tConst *pIndexConst = (tConst *) pIndexBez->pObj;
+//        if (pIndexConst->structType == const_struct) {
+//            code(puConst, pIndexConst->Idx);
+//        } else if (pIndexConst->structType == var_struct) {
+//            generateVariableValue(pIndexBez);
+//        }
+//    } else {
+//        printf("non valid type of array index %d", Morph.arrayIndexType);
+//        exit(-7);
+//    }
+//}
 
-void generateArrayBlock() {
-    generateIndex();
-    tConst *pConst = findOrCreateConst(4);
-    code(puConst, pConst->Idx);
-    code(OpMult);
-    code(OpAddAddr);
-}
+//void generateArrayBlock() {
+//    generateIndex();
+//    tConst *pConst = findOrCreateConst(4);
+//    code(puConst, pConst->Idx);
+//    code(OpMult);
+//    code(OpAddAddr);
+//}
 
-tArr *createArrayVar(void) {
-    tArr *pArrVar = (tArr *) malloc(sizeof(tArr));
-    if (pArrVar == NULL) return NULL;
-    pArrVar->Dspl = pCurrProcedure->SpzzVar;
-    pArrVar->structType = arr_struct;
-    // get size of array
-    if (Morph.arrayIndexType == 1) {
-        pArrVar->size = Morph.arrayIndex.index;
-    } else {
-        printf("namelist.c: createArrayVar(), array index can not be variable when initializing\n");
-        exit(-17);
-    }
-    pCurrProcedure->SpzzVar += pArrVar->size * sizeof(int32_t);
-    t_cnt *pConn = getLast(pCurrProcedure->childList);
-    tBez *pBez = pConn->value;
-    if (pBez == NULL) return NULL;
-    pBez->pObj = pArrVar;
-    return pArrVar;
-}
 
 tProc *createProc(tProc *pParent) {
     tProc *pP = (tProc *) malloc(sizeof(tProc));
@@ -403,7 +404,6 @@ int Bl2(void) {
     return OK;
 }
 
-// Variablenbezeichner, auch für arrays
 int Bl3(void) {
     printf("namelist.c: Variablenbezeichner with Morph.Val.pStr %s\n", Morph.Val.pStr);
     tBez *pBez;
@@ -411,14 +411,37 @@ int Bl3(void) {
     if (pBez != NULL) return FAIL;
     pBez = createBez(Morph.Val.pStr);
     if (pBez == NULL) return FAIL;
-    if (Morph.arrayIndexType == 0) { // normal var
-        tVar *pVar = createVar();
-        if (pVar == NULL) return FAIL;
-    } else {
-        tArr *pArr = createArrayVar();
-        if (pArr == NULL) return FAIL;
-    }
+    tVar *pVar = createVar();
+    if (pVar == NULL) return FAIL;
     printf("namelist.c: Variablenbezeichner 7\n");
+    return OK;
+}
+
+
+int Bl3_E(void) {
+    tConst *pConst = findOrCreateConst(4);
+    code(puConst, pConst->Idx);
+    code(OpMult);
+    code(OpAddAddr);
+    return OK;
+}
+
+int Bl3_SWAP(void) {
+    code(swap);
+    return OK;
+}
+
+int Bl3_SIZE(void) {
+    // get last var
+    t_cnt *pConnector = getLast(pCurrProcedure->childList);
+    tBez *pBez = (tBez *) pConnector->value;
+    // set to type array
+    tVar *pVar = (tVar *) pBez->pObj;
+    pVar->type = 1;
+    // add size to SpzzVar of current procedure
+    int size = Morph.Val.Num;
+    // no +1 because first was already generated during var creation
+    pCurrProcedure->SpzzVar += (size) * sizeof(int32_t);
     return OK;
 }
 
@@ -509,14 +532,19 @@ int fa2(void) {
     tConst *pConst = (tConst *) pBez->pObj;
     if (pConst->structType == const_struct) {
         code(puConst, pConst->Idx);
-    } else if (pConst->structType == var_struct) { // variable
-        generateVariableValue(pBez);
-    } else if (pConst->structType == arr_struct) { // array
-        // push address
-        generateVariableAddress(pBez);
-        // generate the rest of array block
-        generateArrayBlock();
-        code(swap);
+    } else if (pConst->structType == var_struct) {
+        if (((tVar *) pBez->pObj)->type == 0) // variable
+            generateVariableValue(pBez);
+        else if (((tVar *) pBez->pObj)->type == 1) { // array
+            // push address
+            generateVariableAddress(pBez);
+            // generate the rest of array block
+            // generateArrayBlock();
+            // ode(swap);
+        } else {
+            printf("namelist.c: false type fa2 %p\n", getPCode());
+            exit(-7);
+        }
     } else {
         exit(-8);
     }
@@ -538,9 +566,9 @@ int st1(void) {
     tVar *pVar = (tVar *) pBez->pObj;
     if (pVar->structType == var_struct) {
         generateVariableAddress(pBez);
-    } else if (pVar->structType == arr_struct) {
-        generateVariableAddress(pBez);
-        generateArrayBlock();
+//    } else if (pVar->structType == arr_struct) {
+//        generateVariableAddress(pBez);
+//        generateArrayBlock();
     } else {
         printf("non valid type of struct %d", pVar->structType);
         exit(-7);
@@ -590,13 +618,19 @@ int st9(void) {
     tVar *pVar = (tVar *) pBez->pObj;
     if (pVar->structType == var_struct) {
         generateVariableAddress(pBez);
-    } else if (pVar->structType == arr_struct) {
-        generateVariableAddress(pBez);
-        generateArrayBlock();
+//    } else if (pVar->structType == arr_struct) {
+//        generateVariableAddress(pBez);
+//        generateArrayBlock();
     } else {
         printf("not var: non valid type of struct %d", pVar->structType);
         exit(-7);
     }
+//    code(getVal);
+    return OK;
+}
+
+int s_get(void) {
+    printf("namelist.c: s_get %p\n", getPCode());
     code(getVal);
     return OK;
 }
@@ -657,7 +691,7 @@ int st7(void) {
         printf("not jnot_struct");
         exit(-1);
     }
-    int extension  = getBufferExtension();
+    int extension = getBufferExtension();
     short relativeAddress = getPCode() - label->iJmp - extension;
     printf("relative adresse %d %d p:%p label:%p\n", relativeAddress, extension, getPCode(), label->iJmp);
     wr2ToCodeAtP(relativeAddress, label->iJmp + extension + 1);

@@ -74,9 +74,9 @@ static void fslb(void); // schreiben, lesen, beenden
  */
 static NS vSMatrix[][14] =
         /* 0 Sonderzeichen bzw start*/
-        {{{0, fslb}, {2, fsl}, {9,  fsl}, {3, fsl}, {0, fslb}, {4, fsl}, {5, fsl}, {0, fl}, {1, fsl}, {18, fl}, {0, fslb}, {0, fslb}, {0, fb}, {0, fb}},
+        {{{0, fslb}, {2, fsl}, {9,  fsl}, {3, fsl}, {0, fslb}, {4, fsl}, {5, fsl}, {0, fl}, {1, fsl}, {18, fl}, {0, fslb}, {0, fslb}, {0, fslb}, {0, fslb}},
                 /* 1 Identifier */
-         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl},  {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
                 /* 2 Zahl */
          {{0, fb},   {2, fsl}, {2,  fgl}, {0, fl},  {0, fl},   {0, fb},  {0, fb},  {0, fb}, {0, fl},  {0, fb}, {0, fb}, {0, fb}, {0, fb},{0, fb}},
                 /* 3 : */
@@ -92,37 +92,29 @@ static NS vSMatrix[][14] =
                 /* 8 GroesserGleich */
          {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
                 /* 9 keywords*/
-         {{0, fb},   {1, fsl}, {10, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+         {{0, fb},   {1, fsl}, {10, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
                 /* 10 keywords*/
-         {{0, fb},   {1, fsl}, {11, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+         {{0, fb},   {1, fsl}, {11, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
                 /* 11 keywords*/
-         {{0, fb},   {1, fsl}, {12, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+         {{0, fb},   {1, fsl}, {12, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
                 /* 12 keywords*/
-         {{0, fb},   {1, fsl}, {13, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+         {{0, fb},   {1, fsl}, {13, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
                 /* 13 keywords*/
-         {{0, fb},   {1, fsl}, {14, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+         {{0, fb},   {1, fsl}, {14, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
                 /* 14 keywords*/
-         {{0, fb},   {1, fsl}, {15, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+         {{0, fb},   {1, fsl}, {15, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
                 /* 15 keywords*/
-         {{0, fb},   {1, fsl}, {16, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+         {{0, fb},   {1, fsl}, {16, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
                 /* 16 keywords*/
-         {{0, fb},   {1, fsl}, {17, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+         {{0, fb},   {1, fsl}, {17, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
                 /* 17 keywords*/
-         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
                 /* 18 Comment Zustand Stern */
          {{0, fb},   {0, fb},  {0,  fb},  {0, fb}, {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {19, fl}, {0, fb}, {0, fb}},
                 /* 19 Comment Zustand zweites Stern: liest alle Ziechen zwischen Sternen*/
          {{19, fl},   {19, fl},  {19, fl},  {19, fl},  {19, fl},   {19, fl},  {19, fl},  {19, fl}, {19, fl}, {19, fl}, {19, fl}, {20, fl}, {19, fl}, {19, fl}},
                 /* 20 Comment Endzustand )  */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fl}, {0, fb}, {0, fb}, {0, fb}},
-                /* 21 Array Zustand [ */
-         {{0, fb},   {22, fslAZ}, {23,  fslAI}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
-                /* 22 Array Zustand Zahl */
-         {{0, fb},   {22, fslAZ}, {0,  fb}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {24, fl}},
-                /* 23 Array Zustand Identifier */
-         {{0, fb},   {23, fslAI}, {23,  fslAI}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {23, fsl},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {24, fl}},
-                /* 24 Array Zustand ] */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},};
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fl}, {0, fb}, {0, fb}, {0, fb}}};
 
 
 /*---- Initialisierung der lexiaklischen Analyse ----*/
@@ -196,7 +188,6 @@ static void fb(void) {
         case 1: /* Identifier */
             Morph.Val.pStr = vBuf;
             Morph.MC = mcIdent;
-            Morph.arrayIndexType = 0; // not an array -> has no type
             break;
         case 2: /* Zahl */
             Morph.Val.Num = atol(vBuf);
@@ -217,19 +208,6 @@ static void fb(void) {
         case 18: // (
             Morph.Val.Symb = '(';
             Morph.MC = mcSymb;
-            break;
-        case 24: /* array */
-            Morph.Val.pStr = vBuf;
-            Morph.MC = mcIdent;
-            Morph.arrayIndexType = arrayIndexType;
-            if (arrayIndexType == 1) {
-                Morph.arrayIndex.index = atol(vBufArrayIndex);
-            } else if (arrayIndexType == 2) {
-                to_upper(vBufArrayIndex);
-                Morph.arrayIndex.ident = vBufArrayIndex;
-            } else {
-                printf("unknown error in case 22 occurred");exit(-15);
-            }
             break;
         case 9:
         case 10:

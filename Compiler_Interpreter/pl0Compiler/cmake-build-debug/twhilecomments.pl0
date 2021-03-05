@@ -1,5 +1,5 @@
-const c=10;
-var i;
+const c=15;
+var i, array[16];
 (* a comment *)
 begin
  i:=0;
@@ -7,7 +7,8 @@ begin
  begin
  (* an another comment
  really long one *)
- !i;
+ array[i] = i+1;
  i:=i+1
+ !array[i];
  end
 end.

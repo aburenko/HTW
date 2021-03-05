@@ -51,7 +51,7 @@ tBog gExpr[] = {
 };
 
 tBog gFact[] = {
-/* 0*/ {BgMo, {(ul) mcIdent}, fa2, 5, 1, "fact 0"},
+/* 0*/ {BgMo, {(ul) mcIdent}, fa2, 6, 1, "fact 0"},
 /* 1*/
        {BgMo, {(ul) mcNum},   fa1, 5, 2, "fact 1"},
 /* 2*/
@@ -61,7 +61,13 @@ tBog gFact[] = {
 /* 4*/
        {BgSy, {(ul) ')'},     NULL, 5, 0, "fact 4"},
 /* 5*/
-       {BgEn, {(ul) 0},       NULL, 0, 0, "fact 5"}
+       {BgEn, {(ul) 0},       NULL, 0, 0, "fact 5"},
+/* 6*/
+       {BgSy, {(ul) '['},          NULL, 7,  5,  "fact 6"},
+/* 7*/
+       {BgGr, {(ul) gExpr},          Bl3_E, 8,  0,  "fact 7"},
+/* 8*/
+       {BgSy, {(ul) ']'},          Bl3_SWAP, 5,  0,  "fact 8"}
 };
 
 tBog gCondition[] = {
@@ -89,7 +95,7 @@ tBog gCondition[] = {
 };
 
 tBog gStatement[] = {
-/* 0*/ {BgMo, {(ul) mcIdent},    st1, 7,  1, "statement 0"},
+/* 0*/ {BgMo, {(ul) mcIdent},    st1, 22,  1, "statement 0"},
 /* 1*/
        {BgSy, {(ul) zIF},        NULL, 8,  2, "statement 01"},
 /* 2*/
@@ -111,7 +117,7 @@ tBog gStatement[] = {
 /* 10*/
        {BgMo, {(ul) mcIdent},    st8, 21, 0, "statement 10"},
 /* 11*/
-       {BgMo, {(ul) mcIdent},    st9, 21, 0, "statement 011"},
+       {BgMo, {(ul) mcIdent},    st9, 25, 0, "statement 011"},
 /* 12*/
        {BgGr, {(ul) gExpr},      st10, 21, 0, "statement 012"},
 /* 13*/
@@ -131,7 +137,21 @@ tBog gStatement[] = {
 /* 20*/
        {BgSy, {(ul) zEND},       NULL, 21, 0, "statement 20"},
 /* 21*/
-       {BgEn, {(ul) 0},          NULL, 0,  0, "statement 21"}
+       {BgEn, {(ul) 0},          NULL, 0,  0, "statement 21"},
+/* 22*/
+       {BgSy, {(ul) '['},          NULL, 23,  7,  "statement 22"},
+/* 23*/
+       {BgGr, {(ul) gExpr},          Bl3_E, 24,  0,  "statement 23"},
+/* 24*/
+       {BgSy, {(ul) ']'},          NULL, 7,  0,  "statement 24"},
+/* 25*/
+       {BgSy, {(ul) '['},          NULL, 26,  28,  "statement 25"},
+/* 26*/
+       {BgGr, {(ul) gExpr},          Bl3_E, 27,  0,  "statement 26"},
+/* 27*/
+       {BgSy, {(ul) ']'},          NULL, 28,  0,  "statement 27"},
+/* 28*/
+       {BgNl, {(ul) NULL},          s_get, 21,  0,  "statement 28"}
 };
 
 tBog gBlock[] = {
@@ -153,7 +173,7 @@ tBog gBlock[] = {
 /* 8*/
        {BgNl, {(ul) NULL},       NULL, 12, 0, "block 08"},
 /* 9*/
-       {BgMo, {(ul) mcIdent}, Bl3,     10, 0, "block 09"}, // Bl3
+       {BgMo, {(ul) mcIdent}, Bl3,     20, 0, "block 09"}, // Bl3
 /* 10*/
        {BgSy, {(ul) ','},        NULL, 9,  11, "block 10"},
 /* 11*/
@@ -173,7 +193,13 @@ tBog gBlock[] = {
 /* 18*/
        {BgGr, {(ul) gStatement}, NULL, 19, 0,  "block 018"},
 /* 19*/
-       {BgEn, {(ul) 0},          NULL, 0,  0,  "block 019"}
+       {BgEn, {(ul) 0},          NULL, 0,  0,  "block 019"},
+/* 20*/
+       {BgSy, {(ul) '['},          NULL, 21,  10,  "block 020"},
+/* 21*/
+        {BgMo, {(ul) mcNum},          Bl3_SIZE, 22,  0,  "block 021"},
+/* 22*/
+        {BgSy, {(ul) ']'},          NULL, 10,  0,  "block 022"}
 };
 
 tBog gProgramm[] = {
@@ -204,7 +230,7 @@ void showCurrMorph() {
             else if (Morph.Val.Symb == zTHN) printf("Symbol _THEN\n");
             else if (Morph.Val.Symb == zVAR) printf("Symbol _VAR\n");
             else if (Morph.Val.Symb == zWHL) printf("Symbol _WHILE\n");
-            if (isprint(Morph.Val.Symb))printf("Symbol %c\n", (char) Morph.Val.Symb);
+            if (isprint(Morph.Val.Symb))printf("Symbol '%c'\n", (char) Morph.Val.Symb);
             break;
         case mcNum :
             printf("Zahl %ld\n", Morph.Val.Num);
@@ -241,6 +267,7 @@ int parse(tBog *pGraph) {
             }
             case BgSy: {
                 showCurrMorph();
+                // printf("(Morph.Val.Symb == pBog->BgX.S) -> %c == %c\n", Morph.Val.Symb,pBog->BgX.S);
                 succ = (Morph.Val.Symb == pBog->BgX.S);
                 break;
             }

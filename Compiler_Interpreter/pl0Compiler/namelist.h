@@ -21,7 +21,7 @@
 extern tMorph Morph;
 
 typedef enum eStructType {
-    var_struct, const_struct, proc_struct, bez_struct, jnot_struct, jmp_struct, st5_struct, arr_struct
+    var_struct, const_struct, proc_struct, bez_struct, jnot_struct, jmp_struct, st5_struct
 } tStructType;
 
 // Namenslisteneintrag
@@ -57,14 +57,8 @@ typedef struct list {
 typedef struct tVAR {
     tStructType structType;
     int Dspl; // Relativadresse
+    int type; // 0 - var, 1 - arr
 } tVar;
-
-// Arraybeschreibung
-typedef struct tARR {
-    tStructType structType;
-    int Dspl; // Relativadresse
-    int size;
-} tArr;
 
 // Konstantenbeschreibung
 typedef struct tCONST {
@@ -107,8 +101,6 @@ tConst *createConst(long Val);
 
 tVar *createVar(void);
 
-tArr *createArrayVar(void);
-
 tProc *createProc(tProc *pParent);
 
 tConst *searchConst(long Val);
@@ -122,6 +114,9 @@ int Bl1(void);
 int Bl2(void);
 
 int Bl3(void);
+int Bl3_E(void);
+int Bl3_SWAP(void);
+int Bl3_SIZE(void);
 
 int Bl4(void);
 
@@ -146,6 +141,8 @@ int st4(void); // if, nach Statement
 int st5(void); // while
 int st6(void); // while, nach Condition
 int st7(void); // while, nach Statement
+
+int s_get(void);
 
 int ex1(void); // negative sign
 int ex2(void); // addition
