@@ -32,5 +32,11 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/twhile.pl0
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/twhilecomments.pl0
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tarraytest.pl0
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tArraysAndCommentTest.pl0
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tarraytestloop.pl0
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(pl0Compiler codegen.c lex.c parser.c namelist.c main.c)

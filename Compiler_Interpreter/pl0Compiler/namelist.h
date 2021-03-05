@@ -20,11 +20,8 @@
 
 extern tMorph Morph;
 
-// basic elements ===========================
-//typedef char* tKz;
-
 typedef enum eStructType {
-    var_struct, const_struct, proc_struct, bez_struct, jnot_struct, jmp_struct, st5_struct
+    var_struct, const_struct, proc_struct, bez_struct, jnot_struct, jmp_struct, st5_struct, arr_struct
 } tStructType;
 
 // Namenslisteneintrag
@@ -35,22 +32,7 @@ typedef struct {
     char *pName;
 } tBez;
 
-// Variablenbeschreibung
-typedef struct tVAR {
-    tStructType structType;
-    int Dspl; // Relativadresse
-} tVar;
-
-// Konstantenbeschreibung
-typedef struct tCONST {
-    tStructType structType;
-    long Val;
-    int Idx;
-} tConst;
-
-
-// basic list ===============================
-//structs
+// basic list elements ======================
 typedef struct connector {
     struct connector *pnext;
     void *value;
@@ -66,6 +48,30 @@ typedef struct list {
     t_cnt *pfirst;
     t_cnt *pcurr;
 } t_list;
+
+// basic elements ===========================
+//typedef char* tKz;
+
+
+// Variablenbeschreibung
+typedef struct tVAR {
+    tStructType structType;
+    int Dspl; // Relativadresse
+} tVar;
+
+// Arraybeschreibung
+typedef struct tARR {
+    tStructType structType;
+    int Dspl; // Relativadresse
+    int size;
+} tArr;
+
+// Konstantenbeschreibung
+typedef struct tCONST {
+    tStructType structType;
+    long Val;
+    int Idx;
+} tConst;
 
 // Prozedurbeschreibung
 typedef struct tPROC {
@@ -100,6 +106,8 @@ tBez *createBez(char *pBez);
 tConst *createConst(long Val);
 
 tVar *createVar(void);
+
+tArr *createArrayVar(void);
 
 tProc *createProc(tProc *pParent);
 

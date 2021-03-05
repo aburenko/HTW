@@ -14,27 +14,17 @@
 #include <ctype.h>
 #include "lex.h"
 
+static int arrayIndexType = 0; /* 0-init 1-number 2-variable */
 static FILE *pIF;            /* Quellfile 				*/
 static tMorph Morph;
 static tMorph MorphInit;        /* Morphem   				*/
 static signed char X;            /* Aktuelles Eingabezeichen 		*/
 static int Z = 0;            /* Aktueller Zustand des Automaten 	*/
 static char vBuf[128 + 1], *pBuf;    /* Ausgabepuffer */
+static char vBufArrayIndex[128 + 1], *pBufArrayIndex;    /* Extra Ausgabepuffer für Array Index*/
 static int Ende;            /* Flag 				*/
 static int line, col;            /* Flag 				*/
 int startLine, startCol = 0;
-
-/*---- Initialisierung der lexiaklischen Analyse ----*/
-void initLex(char *fname) {
-    pIF = fopen(fname, "r+");
-    if (pIF == NULL) {
-        printf("error reading file\n");
-        exit(-1);
-    }
-    if (pIF) X = fgetc(pIF);
-    printf("initLex mit %c \n", X);
-    Morph.MC = mcEmpty;
-}
 
 /* Zeichenklassenvektor
  * 0 Sonderzeichen
@@ -46,18 +36,21 @@ void initLex(char *fname) {
  * 6 >
  * 7 Sonstige Steuerzeichen
  * 8 Nicht Schlüsselwortbuchstaben J|K|M|Q|X|Y|Z
- * 9 ")" or "("
- * 10 "*"
+ * 9  "("
+ * 10 ")"
+ * 11 "*"
+ * 12 "["
+ * 13 "]"
  * */
 static char vZKl[128] =
 /*      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F     */
 /*---------------------------------------------------------*/
 /* 0 */{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,/* 0*/
 /*10*/  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,/*10*/
-/*20*/  7, 0, 0, 0, 0, 0, 0, 0, 9, 9, 10, 0, 0, 0, 0, 0,/*20*/
+/*20*/  7, 0, 0, 0, 0, 0, 0, 0, 9, 10, 11, 0, 0, 0, 0, 0,/*20*/
 /*30*/  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 0, 5, 4, 6, 0,/*30*/
 /*40*/  0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 8, 2, 8, 2, 2,/*40*/
-/*50*/  2, 8, 2, 2, 2, 2, 2, 2, 8, 8, 8, 0, 0, 0, 0, 0,/*50*/
+/*50*/  2, 8, 2, 2, 2, 2, 2, 2, 8, 8, 8, 12, 0, 13, 0, 0,/*50*/
 /*60*/  0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 8, 2, 8, 2, 2,/*60*/
 /*70*/  2, 8, 2, 2, 2, 2, 2, 2, 8, 8, 8, 0, 0, 0, 0, 0}/*70*/;
 
@@ -67,6 +60,9 @@ static void fl(void); // lesen
 static void fb(void); // beenden
 static void fgl(void); // schreiben als Großbuchstaben, lesen
 static void fsl(void); // schreiben, lesen
+static void fslA(void); // schreiben für Array index, lesen
+static void fslAZ(void); // schreiben für Array index, lesen zahlen
+static void fslAI(void); // schreiben für Array index, lesen indents
 static void fslb(void); // schreiben, lesen, beenden
 
 
@@ -76,45 +72,72 @@ static void fslb(void); // schreiben, lesen, beenden
  * Das niederwertige Halbbyte (4bit) enthält den Folgezustand.
  * Das höherwertige Halbbyte (4bit) enthält einen Funktionsindex, multipliziert mit 16, oder um 4 bit nach links verschoben.
  */
-static NS vSMatrix[][9] =
-        /* 0*/
-        {{{0, fslb}, {2, fsl}, {9,  fsl}, {3, fsl}, {0, fslb}, {4, fsl}, {5, fsl}, {0, fl}, {1, fsl}},
-                /* 1 */
-         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
-                /* 2 */
-         {{0, fb},   {2, fsl}, {2,  fgl}, {0, fl},  {0, fl},   {0, fb},  {0, fb},  {0, fb}, {0, fl}},
-                /* 3 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {6, fsl},  {0, fl},  {0, fl},  {0, fl}, {0, fl}},
-                /* 4 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {7, fsl},  {0, fb},  {0, fb},  {0, fb}, {0, fl}},
-                /* 5 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {8, fsl},  {0, fl},  {0, fb},  {0, fb}, {0, fb}},
-                /* 6 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}},
-                /* 7 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}},
-                /* 8 */
-         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}},
+static NS vSMatrix[][14] =
+        /* 0 Sonderzeichen bzw start*/
+        {{{0, fslb}, {2, fsl}, {9,  fsl}, {3, fsl}, {0, fslb}, {4, fsl}, {5, fsl}, {0, fl}, {1, fsl}, {18, fl}, {0, fslb}, {0, fslb}, {0, fb}, {0, fb}},
+                /* 1 Identifier */
+         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl},  {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+                /* 2 Zahl */
+         {{0, fb},   {2, fsl}, {2,  fgl}, {0, fl},  {0, fl},   {0, fb},  {0, fb},  {0, fb}, {0, fl},  {0, fb}, {0, fb}, {0, fb}, {0, fb},{0, fb}},
+                /* 3 : */
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {6, fsl},  {0, fl},  {0, fl},  {0, fl}, {0, fl}, {0, fl},  {0, fl}, {0, fb}, {0, fb}, {0, fb}},
+                /* 4 < */
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {7, fsl},  {0, fb},  {0, fb},  {0, fb}, {0, fl}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
+                /* 5 > */
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {8, fsl},  {0, fl},  {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
+                /* 6 Ergibtzeichen */
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
+                /* 7 KleinerGleich */
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
+                /* 8 GroesserGleich */
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
+                /* 9 keywords*/
+         {{0, fb},   {1, fsl}, {10, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+                /* 10 keywords*/
+         {{0, fb},   {1, fsl}, {11, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+                /* 11 keywords*/
+         {{0, fb},   {1, fsl}, {12, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+                /* 12 keywords*/
+         {{0, fb},   {1, fsl}, {13, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+                /* 13 keywords*/
+         {{0, fb},   {1, fsl}, {14, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+                /* 14 keywords*/
+         {{0, fb},   {1, fsl}, {15, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+                /* 15 keywords*/
+         {{0, fb},   {1, fsl}, {16, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+                /* 16 keywords*/
+         {{0, fb},   {1, fsl}, {17, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+                /* 17 keywords*/
+         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}, {0, fb}, {0, fb}, {0, fb}, {21, fl}, {0, fb}},
+                /* 18 Comment Zustand Stern */
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb}, {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {19, fl}, {0, fb}, {0, fb}},
+                /* 19 Comment Zustand zweites Stern: liest alle Ziechen zwischen Sternen*/
+         {{19, fl},   {19, fl},  {19, fl},  {19, fl},  {19, fl},   {19, fl},  {19, fl},  {19, fl}, {19, fl}, {19, fl}, {19, fl}, {20, fl}, {19, fl}, {19, fl}},
+                /* 20 Comment Endzustand )  */
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fl}, {0, fb}, {0, fb}, {0, fb}},
+                /* 21 Array Zustand [ */
+         {{0, fb},   {22, fslAZ}, {23,  fslAI}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},
+                /* 22 Array Zustand Zahl */
+         {{0, fb},   {22, fslAZ}, {0,  fb}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {24, fl}},
+                /* 23 Array Zustand Identifier */
+         {{0, fb},   {23, fslAI}, {23,  fslAI}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {23, fsl},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {24, fl}},
+                /* 24 Array Zustand ] */
+         {{0, fb},   {0, fb},  {0,  fb},  {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}, {0, fb}},};
 
-                /* 9 */
-         {{0, fb},   {1, fsl}, {10, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
-                /* 10 */
-         {{0, fb},   {1, fsl}, {11, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
-                /* 11 */
-         {{0, fb},   {1, fsl}, {12, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
-                /* 12 */
-         {{0, fb},   {1, fsl}, {13, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
-                /* 13 */
-         {{0, fb},   {1, fsl}, {14, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
-                /* 14 */
-         {{0, fb},   {1, fsl}, {15, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
-                /* 15 */
-         {{0, fb},   {1, fsl}, {16, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
-                /* 16 */
-         {{0, fb},   {1, fsl}, {17, fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},
-                /* 17 */
-         {{0, fb},   {1, fsl}, {1,  fsl}, {0, fb},  {0, fb},   {0, fb},  {0, fb},  {0, fb}, {1, fsl}},};
 
+/*---- Initialisierung der lexiaklischen Analyse ----*/
+void initLex(char *fname) {
+    pIF = fopen(fname, "r+");
+    if (pIF == NULL) {
+        printf("error reading file\n");
+        exit(-1);
+    }
+    if (pIF) {
+        X = fgetc(pIF);
+    }
+    printf("initLex mit %c \n", X);
+    Morph.MC = mcEmpty;
+}
 
 typedef struct KeywordPair {
     char *name;
@@ -132,13 +155,6 @@ static kwp keyword[] = {{"BEGIN",     zBGN},
                         {"THEN",      zTHN},
                         {"VAR",       zVAR},
                         {"WHILE",     zWHL}};
-
-/* Ausgabefunktionen des Automaten */
-static void fl(void) {
-    X = fgetc(pIF);
-    if (X == '\n') line++, col = 0;
-    else col++;
-}
 
 void to_upper(char *string) {
     while (*string) {
@@ -167,8 +183,7 @@ int binary_search(int size, char *target){
 }
 
 static void fb(void) {
-    //   Morph.PosCol = col;
-    //   Morph.PosLine = line;
+    printf("fb ");
     switch (Z) {
         /* Symbol */
         case 3: // :
@@ -181,6 +196,7 @@ static void fb(void) {
         case 1: /* Identifier */
             Morph.Val.pStr = vBuf;
             Morph.MC = mcIdent;
+            Morph.arrayIndexType = 0; // not an array -> has no type
             break;
         case 2: /* Zahl */
             Morph.Val.Num = atol(vBuf);
@@ -198,6 +214,23 @@ static void fb(void) {
             Morph.Val.Symb = (long) zGE;
             Morph.MC = mcSymb;
             break;
+        case 18: // (
+            Morph.Val.Symb = '(';
+            Morph.MC = mcSymb;
+            break;
+        case 24: /* array */
+            Morph.Val.pStr = vBuf;
+            Morph.MC = mcIdent;
+            Morph.arrayIndexType = arrayIndexType;
+            if (arrayIndexType == 1) {
+                Morph.arrayIndex.index = atol(vBufArrayIndex);
+            } else if (arrayIndexType == 2) {
+                to_upper(vBufArrayIndex);
+                Morph.arrayIndex.ident = vBufArrayIndex;
+            } else {
+                printf("unknown error in case 22 occurred");exit(-15);
+            }
+            break;
         case 9:
         case 10:
         case 11:
@@ -206,7 +239,7 @@ static void fb(void) {
         case 14:
         case 15:
         case 16:
-        case 17:
+        case 17: /*keywords*/
             to_upper(vBuf);
 //            printf("lex: buf was %s\n", vBuf);
             int index = binary_search(sizeof(keyword) / sizeof(kwp), vBuf);
@@ -219,44 +252,78 @@ static void fb(void) {
             }
             break;
     }
-    Ende = 1; // entfällt bei Variante mit Zustand zEnd
+    Ende = 1;
 }
 
+static void fl(void) {
+    printf("fl ");
+    X = fgetc(pIF);
+    if (X == '\n') line++, col = 0;
+    else col++;
+}
 
 static void fgl(void) {
-    *pBuf = (char) toupper(X);// oder *Buf=(char)X&0xdf;
+    printf("fgl-");
+    *pBuf = (char) toupper(X);
     *(++pBuf) = 0;
     fl();
 }
 
 static void fsl(void) {
+    printf("fsl-");
     *pBuf = (char) X;
     *(++pBuf) = 0;
     fl();
 }
 
+// for numbers
+static void fslAZ(void) {
+    if (arrayIndexType != 2) { arrayIndexType = 1;}
+    else {printf("unknown error in fslAZ occured");exit(-15);}
+    printf("fslAZ-");
+    fslA();
+}
+
+// for identifiers
+static void fslAI(void) {
+    if (arrayIndexType != 1) { arrayIndexType = 2;}
+    else {printf("unknown error in fslAZ occured");exit(-15);}
+    printf("fslAI-");
+    fslA();
+}
+static void fslA(void) {
+    *pBufArrayIndex = (char) X;
+    *(++pBufArrayIndex) = 0;
+    fl();
+}
+
 static void fslb(void) {
+    printf("fslb-");
     fsl();
     fb();
 }
 
 /*---- Lexikalische Analyse ----*/
 tMorph Lex(void) {
+    // init
+    arrayIndexType  = 0;
     Morph = MorphInit;
     pBuf = vBuf;
+    pBufArrayIndex = vBufArrayIndex;
     Ende = 0;
     startLine = line;
     startCol = col;
     do {
         int KlassVonX = vZKl[X & 0x7f];
+        printf("[%c] Z:%d K:%d ->", X, Z, KlassVonX);
         /* Berechnung des Folgezustands */
         NS ns = vSMatrix[Z][KlassVonX];
         /* Ausfuehrung der Aktion */
         ns.func();
-        //printf("Z:%d K:%d -> ", Z, KlassVonX);
         /* Automat schaltet */
         Z = ns.state;
     } while (Ende == 0);
+    printf("END Z:%d  \n", Z);
     Morph.PosLine = startLine;
     Morph.PosCol = startCol;
     return Morph;

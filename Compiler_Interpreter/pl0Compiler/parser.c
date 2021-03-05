@@ -15,7 +15,7 @@
 tBog gTerm[] = {
 /* 0*/ {BgGr, {(ul) gFact}, NULL, 1, 0, "term0"},
 /* 1*/
-       {BgNl, {NULL},   NULL, 2, 0, "term1"},
+       {BgNl, {(ul) NULL},   NULL, 2, 0, "term1"},
 /* 2*/
        {BgSy, {(ul) '*'},   NULL, 4, 3, "term2"},
 /* 3*/
@@ -31,11 +31,11 @@ tBog gTerm[] = {
 tBog gExpr[] = {
 /* 0*/ {BgSy, {(ul) '+'},   NULL, 3, 1, "expression 0"},
 /* 1*/
-       {BgSy, {(ul) '-'},   ex1, 3, 2, "expression 1"},
+       {BgSy, {(ul) '-'},   NULL, 3, 2, "expression 1"},
 /* 2*/
        {BgGr, {(ul) gTerm}, NULL, 4, 0, "expression 2"},
 /* 3*/
-       {BgGr, {(ul) gTerm}, NULL, 4, 0, "expression 3"},
+       {BgGr, {(ul) gTerm}, ex1, 4, 0, "expression 3"},
 /* 4*/
        {BgNl, {(ul) NULL},  NULL, 5, 9, "expression 4"},
 /* 5*/
@@ -186,16 +186,8 @@ tBog gProgramm[] = {
 
 int parse(tBog *pGraph);
 
-int recDepth = 0;
-
-void pLS() {
-    for (int i = 0; i < recDepth * 2; ++i) {
-        printf("=");
-    }
-}
-
 void showCurrMorph() {
-    pLS();
+//    pLS();
     switch (Morph.MC) {
         case mcSymb :
             if (Morph.Val.Symb == zERG) printf("Symbol :=\n");
@@ -237,78 +229,54 @@ int parse(tBog *pGraph) {
     tBog *pBog = pGraph;
     int succ = 0;
     if (Morph.MC == mcEmpty) {
-        printf("call lex\n");
         Morph = Lex();
         showCurrMorph();
     }
     while (1) {
-        pLS();
-        printf("do switch\n");
         switch (pBog->BgD) {
             case BgNl: {
-                pLS();
-                printf("was BgNl\n");
+                showCurrMorph();
                 succ = 1;
                 break;
             }
             case BgSy: {
-                pLS();
-                printf("was BgSy\n");
                 showCurrMorph();
                 succ = (Morph.Val.Symb == pBog->BgX.S);
                 break;
             }
             case BgMo: {
-                pLS();
-                printf("was BgMo\n");
-                succ = (Morph.MC == (tMC) pBog->BgX.M);
                 showCurrMorph();
+                succ = (Morph.MC == (tMC) pBog->BgX.M);
                 break;
             }
             case BgGr: {
-                pLS();
                 printf("was BgGr, call new bogen %s where next is %d, alt is %d\n", pBog->name, pBog->iNext, pBog->iAlt);
-                recDepth++;
                 succ = parse(pBog->BgX.G);
-                recDepth--;
                 break;
             }
             case BgEn: {
-                pLS();
-                printf("was BgEn erreicht next is %d, alt is %d\n", pBog->iNext, pBog->iAlt);
+                printf("was BgEn achieved next is %d, alt is %d\n", pBog->iNext, pBog->iAlt);
                 return 1;
             } /* Ende erreichet - Erfolg */
         }
-        pLS();
-        printf("parse after switch\n");
         if (succ && pBog->fx != NULL) {
-            pLS();
-            printf("call function %s\n", pBog->name);
             succ = pBog->fx();
-            printf("function finished\n");
         }
-        pLS();
-        printf("parse after func call\n");
         if (!succ) {/* Alternativbogen probieren */
             if (pBog->iAlt != 0) {
-                pLS();
                 printf("alternativbogen %s probieren next is %d, alt is %d\n", pBog->name,pBog->iNext, pBog->iAlt);
                 pBog = pGraph + pBog->iAlt;
             } else {
-                pLS();
                 printf("bogen %s nicht geklappt\n", pBog->name);
                 return -1;
             }
         } else /* Morphem formal akzeptiert (eaten) */
         {
             if (pBog->BgD == BgSy || pBog->BgD == BgMo) {
-                pLS();
-                printf("call lexer\n");
                 Morph = Lex();
             }
-            printf("---------\n");
-            pLS();
             printf("%s eaten next is %d, alt is %d\n",pBog->name, pBog->iNext, pBog->iAlt);
+            printf("---------\n");
             pBog = pGraph + pBog->iNext;
         }
     }/* while */

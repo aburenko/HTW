@@ -1,0 +1,6 @@
+const i=1;
+var array[2];
+begin
+  array[1]:=2;
+  !4*array[i]
+end.

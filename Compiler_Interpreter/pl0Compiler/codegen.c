@@ -27,13 +27,16 @@ void wr2ToCodeAtBegin(short x) {
 }
 
 char * getPCode() {
-    return  pCode;
+    return pCode;
+}
+
+int getBufferExtension() {
+    int temp = bufferExtension;
+    bufferExtension  = 0;
+    return temp;
 }
 
 void wr2ToCodeConst(long x) {
-//    printf("wr x %#010x\n", x);
-//    printf("wr first %#010x\n", x & 0x0000ffff);
-//    printf("wr second %#010x\n", (x & 0xffff0000) >> 16);
     wr2ToCode(x & 0x0000ffff);
     wr2ToCode((x & 0xffff0000) >> 16);
 }
@@ -46,7 +49,7 @@ void codeEndProcedure(void) {
 }
 
 void writeToFile(void) {
-    char * destinationPath = "./../compiled/compiled.cl0";
+    char * destinationPath = "compiled.cl0";
     FILE *file = fopen(destinationPath, "w");
 
     for (int i = 0; i < pCode - pCodeBegin; i++) {
@@ -56,6 +59,7 @@ void writeToFile(void) {
 }
 
 int code(tCode Code, ...) {
+    short sarg;
     printf("code called %#02x\n", Code);
     if (pCode == NULL) {
         pCodeBegin = pCode = malloc(LenCode);
@@ -67,11 +71,10 @@ int code(tCode Code, ...) {
             wr2ToCode(0);
         }
     }
-    va_list ap;
-    short sarg;
     if (pCode - pCodeBegin + MAX_LEN_OF_CODE >= LenCode)
         // Ueberwachung des Zwischencodegenerierungspuffers
     {
+        char *oldPCode = pCode;
         int lenFromProcBegin = pCode - pCurrProcedureBegin;
         char *xCode = realloc(pCodeBegin, (LenCode += 1024));
         if (xCode == NULL) {
@@ -81,11 +84,13 @@ int code(tCode Code, ...) {
         pCode = xCode + (pCode - pCodeBegin);
         pCurrProcedureBegin = pCode - lenFromProcBegin;
         pCodeBegin = xCode;
+        bufferExtension = abs(pCode - oldPCode);
         printf("buffer extended\n");
     }
     *pCode++ = (char) Code;
-    va_start(ap, Code);
 
+    va_list ap;
+    va_start(ap, Code);
     switch (Code) {
 /* Befehle mit 3 Parametern */
         case entryProc:

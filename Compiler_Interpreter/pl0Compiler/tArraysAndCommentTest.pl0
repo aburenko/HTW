@@ -1,0 +1,17 @@
+const c=2;
+var b,m,array[3];
+(*my comment
+multiline*)
+procedure p;
+ var x;
+ begin
+ x:=1;
+ if b>x then
+ x:=b;
+ m:=x
+ end;
+begin
+ ?b;
+ call p;
+ !m
+end.

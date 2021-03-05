@@ -42,13 +42,13 @@ typedef enum CODE_ENUM
     jmp        ,/*18 (short RelAdr) [SPZZ innerhalb der Funktion]               */
     jnot       ,/*19 (short RelAdr) [SPZZ innerhalb der Funkt.,Beding.aus Keller]*/
     entryProc  ,/*1A (short lenCode,short ProcIdx,lenVar)                       */
-
-    /* Code fï¿½r Spracherweiterungen */
     putStrg    ,/*1B (char[])                                                   */
-    pop        ,/*1C  Entfernt einen Wert aus dem Stack - nicht implentiert     */
-    swap       ,/*1D  Austausch Adressse gegen Wert     - nicht implementiert   */
-
-    EndOfCode   /*1E               fuer interne Verwendung durch die VM         */
+    pop        ,/*1C */
+    swap       ,/*1D        puValVrGlob       Austausch Adressse gegen Wert                */
+    EndOfCode  ,/*1E */
+    put        ,/*1F Wert und Port vom Stack*/
+    get        ,/*20 Adr  und Port vom Stack*/
+    OpAddAddr   /*21 add 64bitAddress + 32 bit Offset                           */
 }tCode;
 
 // Schreibt am aktuellen Programmcounter
@@ -67,12 +67,14 @@ int code(tCode Code, ...);
 
 void writeToFile(void);
 char * getPCode();
+int getBufferExtension();
 
+static int bufferExtension = 0;
 static char *pCode = NULL;
 static char *pCodeBegin = NULL;
 static char *pCurrProcedureBegin = NULL;
 
-static int LenCode = 128;
+static int LenCode = 1024;
 
 #define MAX_LEN_OF_CODE 81
 
