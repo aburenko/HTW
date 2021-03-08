@@ -32,9 +32,7 @@ t_cnt *getFirst(t_list *list) {
 }
 
 t_cnt *getNext(t_list *list) {
-//    printf("namelist.c: getNext() 1\n");
     list->pcurr = list->pcurr->pnext;
-//    printf("namelist.c: getNext() 2\n");
     return list->pcurr;
 }
 
@@ -225,26 +223,6 @@ tVar *createVar(void) {
     return pVar;
 }
 
-//tArr *createArrayVar(void) {
-//    tArr *pArrVar = (tArr *) malloc(sizeof(tArr));
-//    if (pArrVar == NULL) return NULL;
-//    pArrVar->Dspl = pCurrProcedure->SpzzVar;
-//    pArrVar->structType = arr_struct;
-//    // get size of array
-//    if (Morph.arrayIndexType == 1) {
-//        pArrVar->size = Morph.arrayIndex.index;
-//    } else {
-//        printf("namelist.c: createArrayVar(), array index can not be variable when initializing\n");
-//        exit(-17);
-//    }
-//    pCurrProcedure->SpzzVar += pArrVar->size * sizeof(int32_t);
-//    t_cnt *pConn = getLast(pCurrProcedure->childList);
-//    tBez *pBez = pConn->value;
-//    if (pBez == NULL) return NULL;
-//    pBez->pObj = pArrVar;
-//    return pArrVar;
-//}
-
 tConst *findOrCreateConst(long value) {
     tConst *pConst = searchConst(value);
     if (pConst != NULL) {
@@ -266,7 +244,7 @@ void generateVariableAddress(tBez *pBez) {
     } else if (procedureWhereFound == pCurrProcedure->IdxProc) {
         code(puAdrVrLocl, pVar->Dspl);
     } else {
-        code(puAdrVrGlob, pVar->Dspl, pCurrProcedure->IdxProc);
+        code(puAdrVrGlob, pVar->Dspl, procedureWhereFound);
     }
 }
 
@@ -278,41 +256,9 @@ void generateVariableValue(tBez *pBez) {
     } else if (procedureWhereFound == pCurrProcedure->IdxProc) {
         code(puValVrLocl, pVar->Dspl);
     } else {
-        code(puValVrGlob, pVar->Dspl, pCurrProcedure->IdxProc);
+        code(puValVrGlob, pVar->Dspl, procedureWhereFound);
     }
 }
-
-//void generateIndex() {
-//    // push index
-//    if (Morph.arrayIndexType == 1) {
-//        printf("generateIndex 1 %ld\n", Morph.arrayIndex.index);
-//        tConst *pConst = findOrCreateConst(Morph.arrayIndex.index);
-//        printf("generateIndex const index was %d\n ", pConst->Idx);
-//        code(puConst, pConst->Idx);
-//        printf("generateIndex const end\n");
-//    } else if (Morph.arrayIndexType == 2) {
-//        printf("generateIndex 2 %s\n", Morph.arrayIndex.ident);
-//        tBez *pIndexBez = searchBezGlobal(Morph.arrayIndex.ident);
-//        tConst *pIndexConst = (tConst *) pIndexBez->pObj;
-//        if (pIndexConst->structType == const_struct) {
-//            code(puConst, pIndexConst->Idx);
-//        } else if (pIndexConst->structType == var_struct) {
-//            generateVariableValue(pIndexBez);
-//        }
-//    } else {
-//        printf("non valid type of array index %d", Morph.arrayIndexType);
-//        exit(-7);
-//    }
-//}
-
-//void generateArrayBlock() {
-//    generateIndex();
-//    tConst *pConst = findOrCreateConst(4);
-//    code(puConst, pConst->Idx);
-//    code(OpMult);
-//    code(OpAddAddr);
-//}
-
 
 tProc *createProc(tProc *pParent) {
     tProc *pP = (tProc *) malloc(sizeof(tProc));
@@ -566,9 +512,6 @@ int st1(void) {
     tVar *pVar = (tVar *) pBez->pObj;
     if (pVar->structType == var_struct) {
         generateVariableAddress(pBez);
-//    } else if (pVar->structType == arr_struct) {
-//        generateVariableAddress(pBez);
-//        generateArrayBlock();
     } else {
         printf("non valid type of struct %d", pVar->structType);
         exit(-7);
@@ -618,14 +561,10 @@ int st9(void) {
     tVar *pVar = (tVar *) pBez->pObj;
     if (pVar->structType == var_struct) {
         generateVariableAddress(pBez);
-//    } else if (pVar->structType == arr_struct) {
-//        generateVariableAddress(pBez);
-//        generateArrayBlock();
     } else {
         printf("not var: non valid type of struct %d", pVar->structType);
         exit(-7);
     }
-//    code(getVal);
     return OK;
 }
 
@@ -660,7 +599,6 @@ int st4(void) {
     if (label->structType == jnot_struct) {
         relativeAddress -= 3;
     }
-    // save the adress
     wr2ToCodeAtP(relativeAddress, label->iJmp + 1);
     return OK;
 }
